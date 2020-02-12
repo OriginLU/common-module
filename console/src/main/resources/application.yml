@@ -1,0 +1,17 @@
+server:
+  port: 8889
+
+
+#config security ignore urls
+custom:
+  security:
+    ingore:
+        urls: /swagger**/**
+
+
+#spring config
+spring:
+  profiles:
+    active: @profile.active@
+  application:
+    name: console
