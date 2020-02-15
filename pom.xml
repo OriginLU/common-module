@@ -28,10 +28,12 @@
         <spring.boot.dependencies.version>2.1.1.RELEASE</spring.boot.dependencies.version>
         <alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
         <common.lang3.version>3.4</common.lang3.version>
+        <common.collections.version>3.2.2</common.collections.version>
         <common.io.version>2.2</common.io.version>
         <slf4j.api.version>1.7.7</slf4j.api.version>
         <lombok.version>1.18.8</lombok.version>
         <junit.version>4.12</junit.version>
+        <springfox-swagger.version>2.9.2</springfox-swagger.version>
     </properties>
 
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
@@ -87,13 +89,7 @@
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-                <version>1.2</version>
+                <version>${common.collections.version}</version>
             </dependency>
 
             <!-- HTTP client libs -->
@@ -141,6 +137,18 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jwt.token.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${springfox-swagger.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox-swagger.version}</version>
             </dependency>
 
         </dependencies>
@@ -224,6 +232,7 @@
             <properties>
                 <profile.active>dev</profile.active>
                 <logging.path>logs</logging.path>
+                <logback.level>INFO</logback.level>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -236,6 +245,7 @@
             <properties>
                 <profile.active>test</profile.active>
                 <logging.path>/usr/local/server/logs</logging.path>
+                <logback.level>INFO</logback.level>
             </properties>
         </profile>
 
@@ -245,6 +255,7 @@
             <properties>
                 <profile.active>prod</profile.active>
                 <logging.path>logs/</logging.path>
+                <logback.level>INFO</logback.level>
             </properties>
         </profile>
     </profiles>
