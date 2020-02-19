@@ -13,6 +13,7 @@
         <module>console</module>
         <module>common</module>
         <module>model</module>
+        <module>generator</module>
     </modules>
 
     <properties>
@@ -27,6 +28,7 @@
         <http.client.version>4.5</http.client.version>
         <spring.boot.dependencies.version>2.1.1.RELEASE</spring.boot.dependencies.version>
         <alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
+        <mybatis.starter.version>2.0.1</mybatis.starter.version>
         <common.lang3.version>3.4</common.lang3.version>
         <common.collections.version>3.2.2</common.collections.version>
         <common.io.version>2.2</common.io.version>
@@ -60,6 +62,13 @@
                 <version>${spring.boot.dependencies.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.starter.version}</version>
+            </dependency>
+
 
             <dependency>
                 <groupId>junit</groupId>
