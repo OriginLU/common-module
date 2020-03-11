@@ -5,8 +5,8 @@
 #if(${enableCache})
     <!-- 开启二级缓存 -->
     <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
-
 #end
+#####################通用查询映射结果开始#########################
 #if(${baseResultMap})
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="${package.Entity}.${entity}">
@@ -24,8 +24,9 @@
 #end
 #end
     </resultMap>
-
 #end
+#####################通用查询映射结果结算#########################
+#####################列名#########################
 #if(${baseColumnList})
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
@@ -34,6 +35,78 @@
 #end
         ${table.fieldNames}
     </sql>
-
 #end
+#####################列名#########################
+#####################使用id查询#########################
+#foreach($field in ${table.fields})
+    #if(${field.keyFlag})##生成主键排在第一位
+    <select id="findById" parameterType="${field.propertyType}" resultMap="BaseResultMap">
+       SELECT * FROM ${table.name} WHERE ${field.name} = #{${field.name},jdbcType=${field.type}};
+    </select>
+    #end
+#end
+
+#foreach($field in ${table.fields})
+  #if(${field.keyFlag})##生成主键排在第一位
+      <!-- 通过id删除 -->
+    <delete id="deleteById" parameterType="${field.propertyType}">
+        delete from ${table.name} where ${field.name} = #{${field.propertyName},jdbcType=${field.type}};
+    </delete>
+  #end
+#end
+    <!-- 新增 -->
+    <insert id="insert" parameterType="${entity}" #foreach($field in ${table.fields}) #if(${field.keyFlag}) useGeneratedKeys="true" keyProperty="${field.propertyName}"#end#end>
+        insert into ${table.name}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        #foreach($field in ${table.fields})
+            <if test="${field.propertyName} != null">${field.name},</if>
+        #end
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+        #foreach($field in ${table.fields})
+            <if test="${field.propertyName} != null">${field.name},</if>
+        #end
+        </trim>
+    </insert>
+    <!-- 通过主键更新 -->
+    <update id="updateById" parameterType="${entity}">
+        update ${table.name}
+        <set>
+        #foreach($field in ${table.fields})
+            <if test="${field.propertyName} != null">${field.name} = #{${field.propertyName},jdbcType=${field.type}},</if>
+        #end
+        </set>
+        <where>
+        #foreach($field in ${table.fields})
+            #if(${field.keyFlag})##生成主键排在第一位
+             ${field.name} = #{${field.propertyName},jdbcType=${field.type}};
+            #end
+        #end
+        </where>
+    </update>
+
+    <sql id="query_condition">
+    #foreach($field in ${table.fields})
+        <if test="${field.propertyName} != null">and ${field.name} = #{${field.propertyName},jdbcType=${field.type}},</if>
+    #end
+    </sql>
+
+    <select id="list" resultMap="BaseResultMap" >
+        select * from ${table.name}
+        <where>
+            <include refid="query_condition"/>
+        </where>
+        <foreach item="sort" index="col" collection="orderBy"
+                 open="ORDER BY" separator="," close="">
+            ${col} ${sort}
+        </foreach>
+        limit #{startRow}, #{pageSize};
+    </select>
+
+    <select id="count" resultType="Long">
+        select count(*) from ${table.name}
+        <where>
+            <include refid="query_condition"/>
+        </where>
+    </select>
 </mapper>
