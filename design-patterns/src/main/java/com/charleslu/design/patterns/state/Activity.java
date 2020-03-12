@@ -13,9 +13,10 @@ public abstract class Activity<I,O> {
 
     private static final ThreadLocal<Integer> STATE = new ThreadLocal<>();
 
+    private final Map<Integer,StateAction<I,O>> stateActionMap = new HashMap<>();
+
     private List<StateAction<I,O>> actions;
 
-    private  Map<Integer,StateAction<I,O>> stateActionMap = new HashMap<>();
 
 
     public Activity(List<StateAction<I, O>> actions) {
