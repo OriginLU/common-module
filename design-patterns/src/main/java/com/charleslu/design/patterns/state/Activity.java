@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * 状态模式控制器
+ */
 @Slf4j
 public abstract class Activity<I,O> {
 

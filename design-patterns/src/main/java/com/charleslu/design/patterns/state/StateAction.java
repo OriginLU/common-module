@@ -1,7 +1,7 @@
 package com.charleslu.design.patterns.state;
 
 /**
- *
+ * 状态执行器
  */
 public interface StateAction<I,O>{
 
