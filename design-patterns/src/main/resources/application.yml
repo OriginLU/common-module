@@ -1,0 +1,9 @@
+server:
+  port: 8888
+
+#spring config
+spring:
+  profiles:
+    active: @profile.active@
+  application:
+    name: design-pattern
