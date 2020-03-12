@@ -15,4 +15,9 @@ public class TradeActivity extends Activity<String,String> {
     public TradeActivity(List<StateAction<String, String>> stateActions) {
         super(stateActions);
     }
+
+    @Override
+    public String getStateDesc() {
+        return StateEnum.fromType(getState()).getDesc();
+    }
 }

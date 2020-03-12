@@ -11,6 +11,7 @@ import java.util.Optional;
 @Slf4j
 public abstract class Activity<I,O> {
 
+    private static final ThreadLocal<Integer> STATE = new ThreadLocal<>();
 
     private List<StateAction<I,O>> actions;
 
@@ -35,9 +36,16 @@ public abstract class Activity<I,O> {
     }
 
     private StateAction<I,O> stateAction(int state){
-        return Optional.ofNullable(stateActionMap.get(state)).orElse((in, out, activity) -> {
-           log.info("未获取到状态处理器,当前状态为:" + state);
-        });
+        STATE.set(state);
+        return Optional.ofNullable(stateActionMap.get(state)).orElse((in, out, activity) ->
+           log.info("未获取到状态处理器,当前状态为:" + getStateDesc())
+        );
     }
+
+    public int getState(){
+        return STATE.get();
+    }
+
+    public abstract String getStateDesc();
 
 }

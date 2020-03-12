@@ -14,4 +14,9 @@ public class NoneActivity extends Activity<Object,Object> {
     public NoneActivity(List<StateAction<Object, Object>> stateActions) {
         super(stateActions);
     }
+
+    @Override
+    public String getStateDesc() {
+        return "none";
+    }
 }
