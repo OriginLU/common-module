@@ -1,10 +1,14 @@
 package com.charleslu.design.patterns.state;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 public abstract class Activity<I,O> {
 
 
@@ -19,8 +23,10 @@ public abstract class Activity<I,O> {
     }
 
     private void init(){
-        actions.forEach(act -> Optional.ofNullable(act.getClass().getDeclaredAnnotation(State.class))
+        if (!CollectionUtils.isEmpty(actions)){
+            actions.forEach(act -> Optional.ofNullable(act.getClass().getDeclaredAnnotation(State.class))
                     .ifPresent(state -> stateActionMap.put(state.value(),act)));
+        }
     }
 
 
@@ -29,7 +35,9 @@ public abstract class Activity<I,O> {
     }
 
     private StateAction<I,O> stateAction(int state){
-        return stateActionMap.get(state);
+        return Optional.ofNullable(stateActionMap.get(state)).orElse((in, out, activity) -> {
+           log.info("未获取到状态处理器,当前状态为:" + state);
+        });
     }
 
 }

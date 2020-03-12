@@ -16,9 +16,18 @@ public class StateTest {
     @Autowired
     private TradeActivity activity;
 
+    @Autowired
+    private NoneActivity noneActivity;
+
     @Test
     public void stateTest(){
 
         activity.doAction(StateEnum.UN_PROCESSED.getCode(),"in","out");
+    }
+
+    @Test
+    public void  noneActivityTest(){
+
+        noneActivity.doAction(0,"sdfs","sdfsa");
     }
 }
