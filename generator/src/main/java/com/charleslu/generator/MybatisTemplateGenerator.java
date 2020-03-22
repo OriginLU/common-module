@@ -40,6 +40,8 @@ public class MybatisTemplateGenerator {
 
         gc.setActiveRecord(false);
 
+        gc.setDateType(DateType.ONLY_DATE);
+
         /* 自定义文件命名，注意 %s 会自动填充表实体属性！ */
         // gc.setMapperName("%sDao");
         // gc.setXmlName("%sDao");
@@ -54,7 +56,7 @@ public class MybatisTemplateGenerator {
         dsc.setDriverName("com.mysql.jdbc.Driver");
         dsc.setUsername("root");
         dsc.setPassword("123456");
-        dsc.setUrl("jdbc:mysql://internal.mysql.taoqicar.com:3306/test-rbac?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
+        dsc.setUrl("jdbc:mysql://internal.mysql.charleslucar.com:3306/test-rbac?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
         mpg.setDataSource(dsc);
 
         // 策略配置
