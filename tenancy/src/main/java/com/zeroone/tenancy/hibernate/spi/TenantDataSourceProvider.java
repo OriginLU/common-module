@@ -27,7 +27,7 @@ public class TenantDataSourceProvider {
 
     private final Object monitor = new Object();
 
-    private String beanName = "";
+    private String beanName;
 
     private DataSourceProperties dataSourceProperties;
 
@@ -36,6 +36,7 @@ public class TenantDataSourceProvider {
 
     public TenantDataSourceProvider(DataSourceProperties dataSourceProperties,DefaultListableBeanFactory defaultListableBeanFactory) {
 
+        this.beanName = "tenant_provider";
         this.dataSourceProperties = dataSourceProperties;
         this.defaultListableBeanFactory = defaultListableBeanFactory;
     }
