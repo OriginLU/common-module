@@ -8,6 +8,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +26,8 @@ public class HibernateTenancyAutoConfiguration {
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
     @ConditionalOnBean({SpringLiquibase.class})
-    public TenantDataSourceProvider tenantDataSourceProvider(SpringLiquibase springLiquibase,DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory){
-        return new TenantDataSourceProvider(springLiquibase,dataSourceProperties,defaultListableBeanFactory);
+    public TenantDataSourceProvider tenantDataSourceProvider(SpringLiquibase springLiquibase, DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory, ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata){
+        return new TenantDataSourceProvider(springLiquibase,dataSourceProperties,defaultListableBeanFactory,configurationBeanFactoryMetadata);
     }
 
     @Bean

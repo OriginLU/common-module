@@ -10,7 +10,10 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -18,6 +21,7 @@ import org.springframework.util.StringUtils;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,12 +52,15 @@ public class TenantDataSourceProvider {
 
     private DefaultListableBeanFactory defaultListableBeanFactory;
 
+    private ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata;
 
-    public TenantDataSourceProvider(SpringLiquibase springLiquibase,DataSourceProperties dataSourceProperties,DefaultListableBeanFactory defaultListableBeanFactory) {
+
+    public TenantDataSourceProvider(SpringLiquibase springLiquibase, DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory, ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata) {
 
         this.liquibase = springLiquibase;
         this.dataSourceProperties = dataSourceProperties;
         this.defaultListableBeanFactory = defaultListableBeanFactory;
+        this.configurationBeanFactoryMetadata = configurationBeanFactoryMetadata;
     }
 
 
@@ -190,7 +197,8 @@ public class TenantDataSourceProvider {
                 String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
                 for (String beanName : beanNames) {
                     Object bean = defaultListableBeanFactory.getBean(beanName);
-                    if (!AopUtils.isAopProxy(bean)) {
+                    ConfigurationProperties annotation = getAnnotation(bean, beanName);
+                    if (annotation != null){
                         this.beanName = beanName;
                         break;
                     }
@@ -198,11 +206,18 @@ public class TenantDataSourceProvider {
             }
         }
         //3.调用spring自带bean工厂,初始化 bean
-        defaultListableBeanFactory.initializeBean(dataSource,beanName);
+        defaultListableBeanFactory.applyBeanPostProcessorsBeforeInitialization(dataSource,beanName);
 
         return dataSource;
     }
 
+    private  ConfigurationProperties getAnnotation(Object bean, String beanName) {
+        ConfigurationProperties annotation = this.configurationBeanFactoryMetadata.findFactoryAnnotation(beanName,  ConfigurationProperties.class);
+        if (annotation == null) {
+            annotation = AnnotationUtils.findAnnotation(bean.getClass(),  ConfigurationProperties.class);
+        }
+        return annotation;
+    }
     /**
      * 检查数据库是否存在，不存在则创建数据库
      */
