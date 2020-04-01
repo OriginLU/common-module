@@ -51,7 +51,6 @@ public class TenantDataSourceProvider {
 
     public TenantDataSourceProvider(SpringLiquibase springLiquibase,DataSourceProperties dataSourceProperties,DefaultListableBeanFactory defaultListableBeanFactory) {
 
-        this.beanName = "tenant_provider";
         this.liquibase = springLiquibase;
         this.dataSourceProperties = dataSourceProperties;
         this.defaultListableBeanFactory = defaultListableBeanFactory;
