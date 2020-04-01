@@ -78,22 +78,16 @@ public class TenantDataSourceProvider {
         return null;
     }
 
-    public void add(DataSourceConfigInfo config) {
+    private void addDataSource0(String tenantCode,DataSource dataSource,boolean requireOverride) {
 
-        log.debug("add data source:{}", config);
-        if (null == config) {
-            log.warn("data source configuration information is empty");
-            return;
-        }
-        synchronized (config.getTenantCode()) {
-            if (DATA_SOURCE_CONTEXT.containsKey(config.getTenantCode())) {
-                if (BooleanUtils.isTrue(config.getRequireOverride())) {
-                    remove(config.getTenantCode());
+        synchronized (monitor) {
+            if (DATA_SOURCE_CONTEXT.containsKey(tenantCode)) {
+                if (BooleanUtils.isTrue(requireOverride)) {
+                    remove(tenantCode);
                 }
                 return;
             }
-            DataSource hikariDataSource = createDataSource(config);
-            DATA_SOURCE_CONTEXT.put(config.getTenantCode(), hikariDataSource);
+            DATA_SOURCE_CONTEXT.put(tenantCode, dataSource);
         }
     }
 
@@ -124,6 +118,7 @@ public class TenantDataSourceProvider {
      * 添加数据源
      */
     public void addDataSource(DataSourceConfigInfo config) {
+
         log.info("add datasource :{} ", config);
         if (null == config) {
             log.warn("remote datasource is empty.");
@@ -132,17 +127,17 @@ public class TenantDataSourceProvider {
         if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != TenantDataSourceProvider.get(config.getTenantCode())) {
             throw new IllegalStateException("datasource init has error");
         }
-        initDataSource(config);
+        Optional.ofNullable(getDataSource(config)).ifPresent( ds -> addDataSource0(config.getTenantCode(),ds,config.getRequireOverride()));
     }
 
     /**
      * 初始化数据源
      */
-    public void initDataSource(DataSourceConfigInfo config) {
+    public DataSource getDataSource(DataSourceConfigInfo config) {
 
+        DataSource dataSource = null;
         log.info("init datasource :{} ", config);
         try {
-            DataSource dataSource = null;
             try {
                 //尝试连接租户指定数据源
                 dataSource = createDataSource(config);
@@ -162,6 +157,7 @@ public class TenantDataSourceProvider {
         } catch (SQLException e) {
             log.error("init datasource failed", e);
         }
+        return dataSource;
     }
 
     private void checkConnectionValidity(DataSource dataSource) throws SQLException {
