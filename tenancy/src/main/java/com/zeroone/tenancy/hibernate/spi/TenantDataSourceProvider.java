@@ -63,6 +63,7 @@ public class TenantDataSourceProvider {
     }
 
     public void add(DataSourceConfigInfo config) {
+
         log.debug("add data source:{}", config);
         if (null == config) {
             log.warn("data source configuration information is empty");
@@ -104,6 +105,7 @@ public class TenantDataSourceProvider {
                     Object bean = defaultListableBeanFactory.getBean(beanName);
                     if (!AopUtils.isAopProxy(bean)) {
                         this.beanName = beanName;
+                        break;
                     }
                 }
             }
