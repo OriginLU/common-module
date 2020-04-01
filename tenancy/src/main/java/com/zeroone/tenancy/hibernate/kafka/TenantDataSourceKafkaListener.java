@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.hibernate.kafka;
 
-import com.zeroone.tenancy.hibernate.service.MultiTenantDataSourceService;
+import com.zeroone.tenancy.hibernate.spi.TenantDataSourceProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,11 +11,11 @@ import java.util.Optional;
 public class TenantDataSourceKafkaListener {
 
 
-    private MultiTenantDataSourceService tenantDataSourceService;
+    private TenantDataSourceProvider tenantDataSourceService;
 
 
-    public TenantDataSourceKafkaListener(MultiTenantDataSourceService tenantDataSourceService) {
-        this.tenantDataSourceService = tenantDataSourceService;
+    public TenantDataSourceKafkaListener(TenantDataSourceProvider tenantDataSourceProvider) {
+        this.tenantDataSourceService = tenantDataSourceProvider;
     }
 
     /**

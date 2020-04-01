@@ -2,7 +2,6 @@ package com.zeroone.tenancy.hibernate.autoconfigure;
 
 
 import com.zeroone.tenancy.hibernate.kafka.TenantDataSourceKafkaListener;
-import com.zeroone.tenancy.hibernate.service.MultiTenantDataSourceService;
 import com.zeroone.tenancy.hibernate.spi.TenantDataSourceProvider;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -25,20 +24,15 @@ public class HibernateTenancyAutoConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
-    public TenantDataSourceProvider tenantDataSourceProvider(DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory){
-        return new TenantDataSourceProvider(dataSourceProperties,defaultListableBeanFactory);
+    @ConditionalOnBean({SpringLiquibase.class})
+    public TenantDataSourceProvider tenantDataSourceProvider(SpringLiquibase springLiquibase,DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory){
+        return new TenantDataSourceProvider(springLiquibase,dataSourceProperties,defaultListableBeanFactory);
     }
 
     @Bean
-    @ConditionalOnBean({TenantDataSourceProvider.class, SpringLiquibase.class})
-    public MultiTenantDataSourceService multiTenantDataSourceService(TenantDataSourceProvider tenantDataSourceProvider,SpringLiquibase springLiquibase){
-        return new MultiTenantDataSourceService(springLiquibase,tenantDataSourceProvider);
-    }
-
-    @Bean
-    @ConditionalOnBean({MultiTenantDataSourceService.class})
+    @ConditionalOnBean({TenantDataSourceProvider.class})
     @ConditionalOnProperty("spring.kafka.bootstrap-servers")
-    public TenantDataSourceKafkaListener tenantDataSourceKafkaListener(MultiTenantDataSourceService multiTenantDataSourceService){
-        return new TenantDataSourceKafkaListener(multiTenantDataSourceService);
+    public TenantDataSourceKafkaListener tenantDataSourceKafkaListener(TenantDataSourceProvider tenantDataSourceProvider){
+        return new TenantDataSourceKafkaListener(tenantDataSourceProvider);
     }
 }
