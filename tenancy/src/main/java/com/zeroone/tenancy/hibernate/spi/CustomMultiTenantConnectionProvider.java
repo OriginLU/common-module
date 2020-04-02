@@ -21,11 +21,11 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     @Override
     protected DataSource selectAnyDataSource() {
-        return TenantDataSourceProvider.get(TenantIdentifierHelper.DEFAULT);
+        return selectDataSource(TenantIdentifierHelper.DEFAULT);
     }
 
     @Override
     protected DataSource selectDataSource(String tenantIdentifier) {
-        return TenantDataSourceProvider.get(tenantIdentifier);
+        return TenantDataSourceContext.getTenantDataSource(tenantIdentifier);
     }
 }

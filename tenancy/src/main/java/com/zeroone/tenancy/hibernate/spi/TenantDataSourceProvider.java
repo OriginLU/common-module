@@ -38,46 +38,71 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TenantDataSourceProvider implements InitializingBean {
 
 
-    private static final Map<String, DataSource> DATA_SOURCE_CONTEXT = new ConcurrentHashMap<>();
+    private final Map<String, DataSource> beanMap = new ConcurrentHashMap<>();
 
+    /**
+     * 默认的liquibase名称
+     */
     private  static final String LIQUIBASE_BEAN_NAME = "liquibase";
 
     private final Object monitor = new Object();
 
-    private String beanName;
-
-    private SpringLiquibase liquibase;
-
-    private DataSourceProperties dataSourceProperties;
-
+    /**
+     * 是否初始化
+     */
     private boolean isInit = false;
 
+    /**
+     * 默认字符集
+     */
     private String charset;
 
+    /**
+     * datasource默认bean名称
+     */
+    private String beanName;
+
+    /**
+     * liquibase配置
+     */
+    private SpringLiquibase liquibase;
+
+    /**
+     * 数据源配置
+     */
+    private DataSourceProperties dataSourceProperties;
+
+    /**
+     * spring上下文
+     */
     private DefaultListableBeanFactory defaultListableBeanFactory;
 
+    /**
+     * 配置bean工厂元数据信息
+     */
     private ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata;
 
 
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
+        TenantDataSourceContext.setTenantDataSourceContext(this);
     }
 
 
     /**
      * 根据传进来的tenantCode决定返回的数据源
      */
-    public static DataSource get(String tenantCode) {
+    public DataSource get(String tenantCode) {
 
         if (!StringUtils.hasText(tenantCode)) {
             log.warn("tenant code is empty");
             return null;
         }
-        if (DATA_SOURCE_CONTEXT.containsKey(tenantCode)) {
+        if (beanMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            return DATA_SOURCE_CONTEXT.get(tenantCode);
+            return beanMap.get(tenantCode);
         }
-        if (DATA_SOURCE_CONTEXT.isEmpty()) {
+        if (beanMap.isEmpty()) {
             log.warn("default data source doesn't init, please wait.");
             return null;
         }
@@ -87,13 +112,13 @@ public class TenantDataSourceProvider implements InitializingBean {
     private void addDataSource0(String tenantCode,DataSource dataSource,boolean requireOverride) {
 
         synchronized (monitor) {
-            if (DATA_SOURCE_CONTEXT.containsKey(tenantCode)) {
+            if (beanMap.containsKey(tenantCode)) {
                 if (BooleanUtils.isTrue(requireOverride)) {
                     remove(tenantCode);
                 }
                 return;
             }
-            DATA_SOURCE_CONTEXT.put(tenantCode, dataSource);
+            beanMap.put(tenantCode, dataSource);
         }
     }
 
@@ -105,9 +130,9 @@ public class TenantDataSourceProvider implements InitializingBean {
         if (StringUtils.hasText(tenantCode)) {
             return;
         }
-        if (DATA_SOURCE_CONTEXT.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
+        if (beanMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
 
-            DataSource dataSource = DATA_SOURCE_CONTEXT.get(tenantCode);
+            DataSource dataSource = beanMap.get(tenantCode);
             if (dataSource instanceof Closeable){
                 try {
                     ((Closeable)dataSource).close();
@@ -115,7 +140,7 @@ public class TenantDataSourceProvider implements InitializingBean {
                     log.error("close data source error:",e);
                 }
             }
-            DATA_SOURCE_CONTEXT.remove(tenantCode);
+            beanMap.remove(tenantCode);
         }
     }
 
@@ -130,7 +155,7 @@ public class TenantDataSourceProvider implements InitializingBean {
             log.warn("remote datasource is empty.");
             return;
         }
-        if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != TenantDataSourceProvider.get(config.getTenantCode())) {
+        if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != get(config.getTenantCode())) {
             throw new IllegalStateException("datasource init has error");
         }
         Optional.ofNullable(getDataSource(config)).ifPresent( ds -> addDataSource0(config.getTenantCode(),ds,config.getRequireOverride()));
@@ -152,7 +177,7 @@ public class TenantDataSourceProvider implements InitializingBean {
             } catch (Exception e) {
                 //异常则在默认数据源同实例下创建一个数据库
                 log.error("connect to tenant datasource failed:{}", e.getMessage());
-                final Connection defaultConnection = TenantDataSourceProvider.get(TenantIdentifierHelper.DEFAULT).getConnection();
+                Connection defaultConnection = get(TenantIdentifierHelper.DEFAULT).getConnection();
                 createDataBaseIfNecessary(config.getTenantCode(), config.getDatabase(), defaultConnection);
                 dataSource = Optional.ofNullable(dataSource).orElseGet(() -> createDataSource(config));
                 initDataBase(dataSource);
@@ -191,6 +216,7 @@ public class TenantDataSourceProvider implements InitializingBean {
                 String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
                 Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
                         .findFirst().ifPresent(beanName -> this.beanName = beanName);
+                beanMap.put(TenantIdentifierHelper.DEFAULT,(DataSource) defaultListableBeanFactory.getBean(beanName));
                 isInit = true;
             }
         }
