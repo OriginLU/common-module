@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.hibernate.interceptor;
 
-import com.zeroone.tenancy.hibernate.spi.TenantDataSourceProvider;
+import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
 import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -15,12 +15,12 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(TenantInterceptor.class);
 
-    private final TenantDataSourceProvider tenantDataSourceProvider;
+    private final HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider;
 
 //    private final Set<TenantMissHandleInterface> tenantMissHandleInterfaces;
 
-    public TenantInterceptor(TenantDataSourceProvider tenantDataSourceService) {
-        this.tenantDataSourceProvider = tenantDataSourceService;
+    public TenantInterceptor(HibernateTenantDataSourceProvider tenantDataSourceService) {
+        this.hibernateTenantDataSourceProvider = tenantDataSourceService;
 //        this.tenantMissHandleInterfaces = tenantMissHandleInterfaces;
     }
 

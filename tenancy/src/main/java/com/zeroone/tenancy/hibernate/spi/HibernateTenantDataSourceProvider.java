@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 租户数据源加载器
  */
 @Slf4j
-public class TenantDataSourceProvider implements InitializingBean {
+public class HibernateTenantDataSourceProvider implements InitializingBean {
 
 
     private final Map<String, DataSource> beanMap = new ConcurrentHashMap<>();
@@ -45,6 +45,9 @@ public class TenantDataSourceProvider implements InitializingBean {
      */
     private  static final String LIQUIBASE_BEAN_NAME = "liquibase";
 
+    /**
+     * monitor lock
+     */
     private final Object monitor = new Object();
 
     /**
@@ -83,9 +86,9 @@ public class TenantDataSourceProvider implements InitializingBean {
     private ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata;
 
 
-    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
+    public HibernateTenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
-        TenantDataSourceContext.setTenantDataSourceContext(this);
+        HibernateTenantDataSourceContext.setHibernateTenantDataSourceContext(this);
     }
 
 

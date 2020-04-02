@@ -2,7 +2,7 @@ package com.zeroone.tenancy.hibernate.autoconfigure;
 
 
 import com.zeroone.tenancy.hibernate.kafka.TenantDataSourceKafkaListener;
-import com.zeroone.tenancy.hibernate.spi.TenantDataSourceProvider;
+import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -24,14 +24,14 @@ public class HibernateTenancyAutoConfiguration {
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
     @ConditionalOnBean({SpringLiquibase.class})
-    public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
-        return new TenantDataSourceProvider(defaultListableBeanFactory);
+    public HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
+        return new HibernateTenantDataSourceProvider(defaultListableBeanFactory);
     }
 
     @Bean
-    @ConditionalOnBean({TenantDataSourceProvider.class})
+    @ConditionalOnBean({HibernateTenantDataSourceProvider.class})
     @ConditionalOnProperty("spring.kafka.bootstrap-servers")
-    public TenantDataSourceKafkaListener tenantDataSourceKafkaListener(TenantDataSourceProvider tenantDataSourceProvider){
-        return new TenantDataSourceKafkaListener(tenantDataSourceProvider);
+    public TenantDataSourceKafkaListener tenantDataSourceKafkaListener(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider){
+        return new TenantDataSourceKafkaListener(hibernateTenantDataSourceProvider);
     }
 }

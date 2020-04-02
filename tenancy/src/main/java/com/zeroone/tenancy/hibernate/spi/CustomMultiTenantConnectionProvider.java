@@ -26,6 +26,6 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     @Override
     protected DataSource selectDataSource(String tenantIdentifier) {
-        return TenantDataSourceContext.getTenantDataSource(tenantIdentifier);
+        return HibernateTenantDataSourceContext.getTenantDataSource(tenantIdentifier);
     }
 }
