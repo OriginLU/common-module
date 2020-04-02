@@ -7,6 +7,7 @@ import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -24,6 +25,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 租户数据源加载器
  */
 @Slf4j
-public class TenantDataSourceProvider {
+public class TenantDataSourceProvider implements InitializingBean {
 
 
     private static final Map<String, DataSource> DATA_SOURCE_CONTEXT = new ConcurrentHashMap<>();
@@ -42,21 +44,21 @@ public class TenantDataSourceProvider {
 
     private String beanName;
 
-    private String charset;
-
     private SpringLiquibase liquibase;
 
     private DataSourceProperties dataSourceProperties;
+
+    private boolean isInit = false;
+
+    private String charset;
 
     private DefaultListableBeanFactory defaultListableBeanFactory;
 
     private ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata;
 
 
-    public TenantDataSourceProvider(SpringLiquibase springLiquibase, DataSourceProperties dataSourceProperties, DefaultListableBeanFactory defaultListableBeanFactory, ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata) {
+    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory, ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata) {
 
-        this.liquibase = springLiquibase;
-        this.dataSourceProperties = dataSourceProperties;
         this.defaultListableBeanFactory = defaultListableBeanFactory;
         this.configurationBeanFactoryMetadata = configurationBeanFactoryMetadata;
     }
@@ -178,9 +180,21 @@ public class TenantDataSourceProvider {
      * 使用spring自带的数据源生成工具@see {@link org.springframework.boot.jdbc.DataSourceBuilder}
      */
     public DataSource createDataSource(DataSourceConfigInfo config) {
-        log.info("generate data source:{}", config);
 
-        //1.创建datasource实例
+        log.info("generate data source:{}", config);
+        //1.获取初始化的bean name,通过该bean模板来初始化对应的数据源对象
+        if (!isInit){
+            synchronized (monitor){
+                this.liquibase = defaultListableBeanFactory.getBean(SpringLiquibase.class);
+                this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
+                String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
+                Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
+                        .findFirst().ifPresent(beanName -> this.beanName = beanName);
+                isInit = true;
+            }
+        }
+
+        //2.创建datasource实例
         DataSource dataSource = DataSourceBuilder.create(dataSourceProperties.getClassLoader())
                 .type(dataSourceProperties.getType())
                 .driverClassName(dataSourceProperties.determineDriverClassName())
@@ -189,20 +203,6 @@ public class TenantDataSourceProvider {
                 .username(config.getUsername()).build();
 
 
-        //2.获取初始化的bean name,通过该bean模板来初始化对应的数据源对象
-        if (!StringUtils.hasText(beanName)){
-            synchronized (monitor){
-                String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
-                for (String beanName : beanNames) {
-                    Object bean = defaultListableBeanFactory.getBean(beanName);
-                    ConfigurationProperties annotation = getAnnotation(bean, beanName);
-                    if (annotation != null){
-                        this.beanName = beanName;
-                        break;
-                    }
-                }
-            }
-        }
         //3.调用spring自带bean工厂,初始化 bean
         defaultListableBeanFactory.applyBeanPostProcessorsBeforeInitialization(dataSource,beanName);
 
@@ -286,5 +286,13 @@ public class TenantDataSourceProvider {
         } catch (Exception e) {
             log.error("init database failed, {}", dataSource, e);
         }
+    }
+
+    /**
+     * 用于初始化多租户系统
+     */
+    @Override
+    public void afterPropertiesSet(){
+
     }
 }
