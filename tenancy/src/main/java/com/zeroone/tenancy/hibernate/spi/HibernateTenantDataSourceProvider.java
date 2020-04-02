@@ -234,21 +234,7 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
     public DataSource createDataSource(DataSourceConfigInfo config) {
 
         log.info("generate data source:{}", config);
-        //1.获取初始化的bean name,通过该bean模板来初始化对应的数据源对象
-        if (!isInit){
-            synchronized (monitor){
-                this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
-                this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
-                this.configurationBeanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
-                String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
-                Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
-                        .findFirst().ifPresent(beanName -> this.beanName = beanName);
-                beanMap.put(TenantIdentifierHelper.DEFAULT,(DataSource) defaultListableBeanFactory.getBean(beanName));
-                isInit = true;
-            }
-        }
-
-        //2.创建datasource实例
+        //1.创建datasource实例
         DataSource dataSource = DataSourceBuilder.create(dataSourceProperties.getClassLoader())
                 .type(dataSourceProperties.getType())
                 .driverClassName(dataSourceProperties.determineDriverClassName())
@@ -257,7 +243,7 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
                 .username(config.getUsername()).build();
 
 
-        //3.调用spring自带bean工厂,初始化 bean
+        //2.调用spring自带bean工厂,初始化 bean
         defaultListableBeanFactory.applyBeanPostProcessorsBeforeInitialization(dataSource,beanName);
 
         return dataSource;
@@ -348,5 +334,25 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
     @Override
     public void afterPropertiesSet(){
 
+        //1.执行bean后续的初始化工作
+        postInitProperties();
+        //2.初始化多租户数据源
+
     }
+
+    private void postInitProperties() {
+
+        synchronized (monitor){
+
+            this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
+            this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
+            this.configurationBeanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
+            String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
+            Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
+                    .findFirst().ifPresent(beanName -> this.beanName = beanName);
+            beanMap.put(TenantIdentifierHelper.DEFAULT,(DataSource) defaultListableBeanFactory.getBean(beanName));
+            isInit = true;
+        }
+    }
+
 }
