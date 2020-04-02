@@ -1,5 +1,6 @@
 package com.zeroone.tenancy.hibernate.spi;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.hibernate.constants.MysqlConstants;
 import com.zeroone.tenancy.hibernate.model.DataSourceConfigInfo;
@@ -14,6 +15,7 @@ import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetad
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -161,13 +163,32 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
         if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != get(config.getTenantCode())) {
             throw new IllegalStateException("datasource init has error");
         }
-        Optional.ofNullable(getDataSource(config)).ifPresent( ds -> addDataSource0(config.getTenantCode(),ds,config.getRequireOverride()));
+        Optional.ofNullable(offerDataSource(config)).ifPresent(ds -> addDataSource0(config.getTenantCode(),ds,config.getRequireOverride()));
+    }
+
+    /**
+     * 检查数据源有效性
+     */
+    public boolean checkDatasource(String tenantCode){
+
+        log.info("check datasource :{}", tenantCode);
+        DataSource dataSource = get(tenantCode);
+        try {
+            if (dataSource == null){
+                return false;
+            }
+            checkConnectionValidity(dataSource);
+            return true;
+        } catch (Exception e) {
+            log.error("tenant[{}] datasource happen error:{}",tenantCode, Throwables.getRootCause(e).getMessage());
+            return false;
+        }
     }
 
     /**
      * 初始化数据源
      */
-    public DataSource getDataSource(DataSourceConfigInfo config) {
+    public DataSource offerDataSource(DataSourceConfigInfo config) {
 
         DataSource dataSource = null;
         log.info("init datasource :{} ", config);
@@ -196,10 +217,13 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
 
     private void checkConnectionValidity(DataSource dataSource) throws SQLException {
 
-        try (PreparedStatement prepareStatement = getPrepareStatement(dataSource.getConnection(), MysqlConstants.TEST_QUERY)) {
+        Connection connection = DataSourceUtils.doGetConnection(dataSource);
+        try (PreparedStatement prepareStatement = getPrepareStatement(connection, MysqlConstants.TEST_QUERY)) {
             if (prepareStatement.execute()) {
                 throw new IllegalStateException("connection is not available");
             }
+        }finally {
+            DataSourceUtils.releaseConnection(connection,dataSource);
         }
     }
 
