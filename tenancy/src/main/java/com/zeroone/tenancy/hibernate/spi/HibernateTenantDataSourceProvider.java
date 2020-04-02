@@ -53,11 +53,6 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
     private final Object monitor = new Object();
 
     /**
-     * 是否初始化
-     */
-    private boolean isInit = false;
-
-    /**
      * 默认字符集
      */
     private String charset;
@@ -351,7 +346,6 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
             Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
                     .findFirst().ifPresent(beanName -> this.beanName = beanName);
             beanMap.put(TenantIdentifierHelper.DEFAULT,(DataSource) defaultListableBeanFactory.getBean(beanName));
-            isInit = true;
         }
     }
 
