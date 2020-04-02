@@ -57,10 +57,8 @@ public class TenantDataSourceProvider implements InitializingBean {
     private ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata;
 
 
-    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory, ConfigurationBeanFactoryMetadata configurationBeanFactoryMetadata) {
-
+    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
-        this.configurationBeanFactoryMetadata = configurationBeanFactoryMetadata;
     }
 
 
@@ -187,6 +185,7 @@ public class TenantDataSourceProvider implements InitializingBean {
             synchronized (monitor){
                 this.liquibase = defaultListableBeanFactory.getBean(SpringLiquibase.class);
                 this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
+                this.configurationBeanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
                 String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
                 Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b),b) != null)
                         .findFirst().ifPresent(beanName -> this.beanName = beanName);
