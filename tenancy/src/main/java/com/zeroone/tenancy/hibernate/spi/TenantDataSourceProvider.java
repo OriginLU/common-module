@@ -40,6 +40,8 @@ public class TenantDataSourceProvider implements InitializingBean {
 
     private static final Map<String, DataSource> DATA_SOURCE_CONTEXT = new ConcurrentHashMap<>();
 
+    private  static final String LIQUIBASE_BEAN_NAME = "liquibase";
+
     private final Object monitor = new Object();
 
     private String beanName;
@@ -183,7 +185,7 @@ public class TenantDataSourceProvider implements InitializingBean {
         //1.获取初始化的bean name,通过该bean模板来初始化对应的数据源对象
         if (!isInit){
             synchronized (monitor){
-                this.liquibase = defaultListableBeanFactory.getBean(SpringLiquibase.class);
+                this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
                 this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
                 this.configurationBeanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
                 String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
