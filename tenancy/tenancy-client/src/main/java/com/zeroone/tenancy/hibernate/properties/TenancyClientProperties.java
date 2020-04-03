@@ -24,7 +24,7 @@ import java.util.Optional;
 @ToString
 @Configuration
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
-public class TenancyProperties implements BeanPostProcessor {
+public class TenancyClientProperties implements BeanPostProcessor {
 
     private static final String INSTANCE_NAME_KEY = "spring.application.name";
 

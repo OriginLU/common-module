@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.model;
+package com.zeroone.tenancy.dto;
 
 import lombok.Data;
 import lombok.ToString;

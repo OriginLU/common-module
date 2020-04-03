@@ -71,6 +71,11 @@
             <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.zeroone</groupId>
+            <artifactId>tenancy-model</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

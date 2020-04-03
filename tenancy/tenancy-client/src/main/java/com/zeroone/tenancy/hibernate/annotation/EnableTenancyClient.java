@@ -9,6 +9,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(HibernateTenancyAutoConfiguration.class)
-public @interface EnableTenancy {
+public @interface EnableTenancyClient {
 
 }

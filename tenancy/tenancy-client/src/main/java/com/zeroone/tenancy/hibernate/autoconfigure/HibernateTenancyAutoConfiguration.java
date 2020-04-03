@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.hibernate.autoconfigure;
 
 
-import com.zeroone.tenancy.hibernate.properties.TenancyProperties;
+import com.zeroone.tenancy.hibernate.properties.TenancyClientProperties;
 import com.zeroone.tenancy.hibernate.runner.HibernateTenancy;
 import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -25,7 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableScheduling
-@EnableConfigurationProperties({LiquibaseProperties.class,TenancyProperties.class})
+@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 @ConditionalOnProperty(prefix = "spring.jpa.properties.hibernate",name = {"tenant_identifier_resolver", "multi_tenant_connection_provider"})
 public class HibernateTenancyAutoConfiguration {
 
@@ -58,7 +58,7 @@ public class HibernateTenancyAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean({HibernateTenantDataSourceProvider.class})
-    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyProperties tenancyProperties){
+    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
         return new HibernateTenancy(hibernateTenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
     }
 

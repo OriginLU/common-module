@@ -3,7 +3,7 @@ package com.zeroone.tenancy.hibernate.spi;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.hibernate.constants.MysqlConstants;
-import com.zeroone.tenancy.hibernate.model.DataSourceInfo;
+import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;

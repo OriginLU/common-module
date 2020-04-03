@@ -1,8 +1,8 @@
 package com.zeroone.tenancy.hibernate.runner;
 
+import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.hibernate.constants.TenancyApiConstants;
-import com.zeroone.tenancy.hibernate.model.DataSourceInfo;
-import com.zeroone.tenancy.hibernate.properties.TenancyProperties;
+import com.zeroone.tenancy.hibernate.properties.TenancyClientProperties;
 import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
@@ -26,20 +26,20 @@ public class HibernateTenancy implements SmartInitializingSingleton, Initializin
 
     private RestTemplate restTemplate;
 
-    private TenancyProperties tenancyProperties;
+    private TenancyClientProperties tenancyClientProperties;
 
     private ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers;
 
-    public HibernateTenancy(HibernateTenantDataSourceProvider provider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyProperties tenancyProperties) {
+    public HibernateTenancy(HibernateTenantDataSourceProvider provider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyClientProperties) {
         this.provider = provider;
         this.restTemplateCustomizers = restTemplateCustomizers;
-        this.tenancyProperties = tenancyProperties;
+        this.tenancyClientProperties = tenancyClientProperties;
     }
 
 
     private List<DataSourceInfo> getAvailableConfigInfo() {
 
-        return restTemplate.exchange(getRequestUri(tenancyProperties.getTenantServerName(), TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyProperties.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<List<DataSourceInfo>>() {
+        return restTemplate.exchange(getRequestUri(tenancyClientProperties.getTenantServerName(), TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientProperties.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<List<DataSourceInfo>>() {
         }).getBody();
     }
 
