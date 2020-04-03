@@ -55,4 +55,3 @@ eureka:
 tenancy:
   client:
    tenant-server-name: uaaaccount
-   instant-name: pay

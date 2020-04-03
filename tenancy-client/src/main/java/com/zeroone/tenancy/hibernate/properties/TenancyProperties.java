@@ -3,6 +3,7 @@ package com.zeroone.tenancy.hibernate.properties;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +23,7 @@ public class TenancyProperties {
     /**
      * 实例名称
      */
+    @Value("${spring.application.name}")
     private String instantName;
 
 }

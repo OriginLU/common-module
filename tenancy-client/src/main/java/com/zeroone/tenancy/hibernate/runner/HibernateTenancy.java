@@ -7,8 +7,6 @@ import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -38,14 +36,6 @@ public class HibernateTenancy implements SmartInitializingSingleton, Initializin
         this.tenancyProperties = tenancyProperties;
     }
 
-//    @Override
-//    public void afterPropertiesSet(){
-//
-//        //1.获取有效配置信息进行多租户的初始化
-//        List<DataSourceInfo> configs = getAvailableConfigInfo();
-//        //2.初始化
-//        configs.forEach(provider::addDataSource);
-//    }
 
     private List<DataSourceInfo> getAvailableConfigInfo() {
 
