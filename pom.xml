@@ -16,8 +16,7 @@
         <module>generator</module>
         <module>design-patterns</module>
         <module>middleware</module>
-        <module>tenancy-client</module>
-        <module>tenancy-demo</module>
+        <module>tenancy</module>
     </modules>
 
     <properties>
