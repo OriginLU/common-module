@@ -23,6 +23,7 @@
         <!--system properties -->
         <java.version>1.8</java.version>
         <language.encoding>utf-8</language.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--project properties -->
         <jwt.token.version>0.10.5</jwt.token.version>
