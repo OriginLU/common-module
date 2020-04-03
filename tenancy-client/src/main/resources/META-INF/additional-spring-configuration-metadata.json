@@ -1,0 +1,15 @@
+{
+  "properties": [
+    {
+      "name": "tenancy.client.tenant-server-name",
+      "type": "java.lang.String",
+      "description": "tenant server name.",
+      "defaultValue": "uaaaccount"
+    },
+    {
+      "name": "tenancy.client.instant-name",
+      "type": "java.lang.String",
+      "defaultValue": "pay"
+    }
+  ]
+}

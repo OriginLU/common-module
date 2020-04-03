@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <property name="now" value="sysdate" dbms="oracle"/>
+    <property name="now" value="now()" dbms="mysql"/>
+    <property name="now" value="now()" dbms="postgresql"/>
+
+    <changeSet author="HP (generated)" id="1566180338354-1">
+        <createTable tableName="channel">
+            <column autoIncrement="true" name="id" remarks="主键" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" remarks="渠道名称" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20190821101439" author="lzh">
+        <addColumn tableName="channel">
+            <column name="create_time" remarks="创建时间" type="datetime(6)"/>
+            <column name="modify_time" remarks="更新时间" type="datetime(6)"/>
+            <column name="delete_status" remarks="删除状态" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190821130252" author="lzh">
+        <addColumn tableName="channel">
+            <column name="ch_type" remarks="渠道类型" type="int"><constraints unique="true"></constraints></column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="20190822095155" author="lzh">
+        <insert tableName="channel">
+            <column name="id" valueNumeric="1"></column>
+            <column name="name" value="通联"></column>
+            <column name="ch_type" valueNumeric="0"></column>
+            <column name="delete_status" valueBoolean="false"></column>
+            <column name="create_time" valueDate="${now}"></column>
+        </insert>
+        <insert tableName="channel">
+            <column name="id" valueNumeric="2"></column>
+            <column name="name" value="华夏"></column>
+            <column name="ch_type" valueNumeric="1"></column>
+            <column name="delete_status" valueBoolean="false"></column>
+            <column name="create_time" valueDate="${now}"></column>
+        </insert>
+        <insert tableName="channel">
+            <column name="id" valueNumeric="3"></column>
+            <column name="name" value="网商"></column>
+            <column name="ch_type" valueNumeric="2"></column>
+            <column name="delete_status" valueBoolean="false"></column>
+            <column name="create_time" valueDate="${now}"></column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20191227103107" author="lzh">
+        <dropTable tableName="channel"/>
+    </changeSet>
+</databaseChangeLog>

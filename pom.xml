@@ -16,6 +16,8 @@
         <module>generator</module>
         <module>design-patterns</module>
         <module>middleware</module>
+        <module>tenancy-client</module>
+        <module>tenancy-demo</module>
     </modules>
 
     <properties>
@@ -207,6 +209,8 @@
                 <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
             </dependency>
+
+
 
         </dependencies>
     </dependencyManagement>

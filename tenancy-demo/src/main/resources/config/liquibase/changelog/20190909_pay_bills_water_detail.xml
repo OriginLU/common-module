@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="LZL" id="201909091034666666">
+        <createTable tableName="pay_bills_water_detail">
+            <column autoIncrement="true" name="id" remarks="主键" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="pay_bills_id" remarks="账单id" type="BIGINT"/>
+            <column name="water_number" remarks="交易流水号" type="VARCHAR(512)"/>
+            <column name="transaction_name" remarks="交易名称(0.月供还款1.服务费)" type="integer"/>
+            <column name="actual_amount_due" remarks="交易金额" type="decimal(10,5)"></column>
+            <column name="service_charge" remarks="手续费" type="decimal(10,5)"/>
+            <column name="actual_funding_interest" remarks="核销月供罚息" type="decimal(10,5)"/>
+            <column name="actual_monthly_interest" remarks="核销月供利息" type="decimal(10,5)"></column>
+            <column name="actual_monthly_principal" remarks="核销月供本金" type="decimal(10,5)"/>
+            <column name="actual_cooperator_interest" remarks="核销服务费罚息" type="decimal(10,5)"/>
+            <column name="actual_cooperator_service_fee" remarks="核销合作商服务费" type="decimal(10,5)"></column>
+            <column name="pay_type" remarks="支付通道（1.通联2.华夏虚拟账户）" type="integer"></column>
+            <column name="pay_time" remarks="交易时间" type="datetime"></column>
+            <column name="pay_account" remarks="付款账户" type="VARCHAR(512)"></column>
+            <column name="pay_number" remarks="付款账号" type="VARCHAR(512)"></column>
+            <column name="receive_account" remarks="收款账户" type="VARCHAR(512)"></column>
+            <column name="receive_number" remarks="收款账号" type="VARCHAR(512)"></column>
+            <column name="creat_time" remarks="创建时间" type="datetime"></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2019091610421111" author="lzl">
+        <renameColumn tableName="pay_bills_water_detail" oldColumnName="creat_time" newColumnName="create_time" columnDataType="datetime"></renameColumn>
+    </changeSet>
+
+    <changeSet id="2019091610422222" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="user_id" remarks="客户id" type="BIGINT"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2019091610433333" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="cooperator_id" remarks="合作商id" type="BIGINT"/>
+            <column name="contract_number" remarks="合同编号" type="VARCHAR(512)"/>
+            <column name="customer_type" remarks="客户类型（1.个人客户）" type="integer"/>
+            <column name="user_name" remarks="客户名称" type="VARCHAR(512)"/>
+            <column name="id_card" remarks="证件号码" type="VARCHAR(512)"></column>
+            <column name="frame_number" remarks="车架号" type="VARCHAR(512)"/>
+            <column name="car_number" remarks="车牌号" type="VARCHAR(512)"></column>
+            <column name="total_periods" remarks="总期数" type="integer"></column>
+            <column name="periods" remarks="期数" type="integer"></column>
+            <column name="pay_date" remarks="还款日" type="datetime"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2019092019551111" author="lzl">
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_amount_due" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_funding_interest" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_monthly_interest" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_monthly_principal" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_cooperator_interest" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="actual_cooperator_service_fee" newDataType="decimal(15,5)"></modifyDataType>
+        <modifyDataType tableName="pay_bills_water_detail" columnName="service_charge" newDataType="decimal(15,5)"></modifyDataType>
+    </changeSet>
+
+    <changeSet id="2019092311051111" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="pay_bills_out_id" remarks="账单对外id" type="BIGINT"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2019110516032222" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="payTypeOffline" remarks="到账方式" type="VARCHAR(512)"></column>
+            <column name="desc" remarks="描述" type="VARCHAR(512)"></column>
+            <column name="ele_cert_url" remarks="电子凭证url" type="VARCHAR(2048)"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191105174711111" author="lzl">
+        <renameColumn tableName="pay_bills_water_detail" oldColumnName="desc" newColumnName="describe_detail" columnDataType="VARCHAR(512)"></renameColumn>
+    </changeSet>
+
+    <changeSet id="2019110517472222" author="lzl">
+        <renameColumn tableName="pay_bills_water_detail" oldColumnName="payTypeOffline" newColumnName="pay_type_offline" columnDataType="VARCHAR(512)"></renameColumn>
+    </changeSet>
+    <changeSet id="2019110510311111" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="push_erp_status" remarks="推送erp结果状态 1.未推送 0.已推送" type="integer"></column>
+            <column name="push_erp_msg" remarks="erp推送结果详情" type="VARCHAR(512)"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2019111414109999" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="push_bas_status" remarks="推送bas结果状态 0|成功,1|失败" type="integer"></column>
+            <column name="push_bas_msg" remarks="bas推送结果详情" type="VARCHAR(512)"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2019112114112222" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="back_status" remarks="为1标记是用户还款合作商流水记录" type="integer"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="201911252014111" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="channel_code" remarks="通道编码" type="VARCHAR(512)"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="201912231410111" author="lqq">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="remark" remarks="用来记录客户扫码支付方式：微信/支付宝/qq钱包" type="VARCHAR(512)"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="2020021409491111" author="lzl">
+        <addColumn tableName="pay_bills_water_detail">
+            <column name="business_code" remarks="业务类型" type="integer"></column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

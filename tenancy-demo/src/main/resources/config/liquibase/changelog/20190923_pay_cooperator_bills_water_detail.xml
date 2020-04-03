@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="LZL" id="2019092314089999">
+        <createTable tableName="pay_cooperator_bills_water_detail">
+            <column autoIncrement="true" name="id" remarks="主键" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="pay_cooperator_bills_id" remarks="合作商代偿明细id" type="BIGINT"/>
+            <column name="water_number" remarks="交易流水号" type="VARCHAR(512)"/>
+            <column name="actual_amount_due" remarks="交易金额" type="decimal(15,5)"></column>
+            <column name="service_charge" remarks="手续费" type="decimal(10,5)"/>
+            <column name="actual_funding_interest" remarks="核销月供罚息" type="decimal(15,5)"/>
+            <column name="actual_monthly_interest" remarks="核销月供利息" type="decimal(15,5)"></column>
+            <column name="actual_monthly_principal" remarks="核销月供本金" type="decimal(15,5)"/>
+            <column name="pay_type" remarks="支付通道（0通联1.华夏虚拟账户）" type="integer"></column>
+            <column name="pay_time" remarks="交易时间" type="datetime"></column>
+            <column name="pay_account" remarks="付款账户" type="VARCHAR(512)"></column>
+            <column name="pay_number" remarks="付款账号" type="VARCHAR(512)"></column>
+            <column name="receive_account" remarks="收款账户" type="VARCHAR(512)"></column>
+            <column name="receive_number" remarks="收款账号" type="VARCHAR(512)"></column>
+            <column name="creat_time" remarks="创建时间" type="datetime"></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2019092812221111" author="lzl">
+        <renameColumn tableName="pay_cooperator_bills_water_detail" oldColumnName="creat_time" newColumnName="create_time" columnDataType="datetime"></renameColumn>
+    </changeSet>
+
+    <changeSet id="2019101010291111" author="lzl">
+        <addColumn tableName="pay_cooperator_bills_water_detail">
+            <column name="bussiness_name" remarks="交易名称 0.月供垫付" type="integer"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="201911306666" author="lzl">
+        <addColumn tableName="pay_cooperator_bills_water_detail">
+            <column name="channel_code" remarks="通道编码" type="VARCHAR(512)"></column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

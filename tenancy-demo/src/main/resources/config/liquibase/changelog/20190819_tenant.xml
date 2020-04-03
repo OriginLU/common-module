@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="HP (generated)" id="1566180338354-1">
+        <createTable tableName="merchant">
+            <column name="id" remarks="主键" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" remarks="商户名称" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="20190819181751" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="code" remarks="商户码" type="VARCHAR(50)"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="20190821181751" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="cert_code" remarks="统一信用代码" type="VARCHAR(50)"></column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20190821101441" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="create_time" remarks="创建时间" type="datetime(6)"/>
+            <column name="modify_time" remarks="更新时间" type="datetime(6)"/>
+            <column name="delete_status" remarks="删除状态" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190821130817" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="w_type" remarks="类型" type="int"></column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20190830163329-1" author="lzh">
+        <modifyDataType tableName="merchant" columnName="id" newDataType="bigint"></modifyDataType>
+        <addAutoIncrement tableName="merchant" columnDataType="bigint" columnName="id"></addAutoIncrement>
+    </changeSet>
+
+    <changeSet id="20190910130747" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="external_message" remarks="拓展信息" type="text"></column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20190910153019" author="lzh">
+        <dropColumn tableName="merchant" columnName="w_type"></dropColumn>
+    </changeSet>
+
+
+    <changeSet id="20190926132246" author="lzh">
+        <addColumn tableName="merchant">
+            <column name="partner_id" remarks="拓展信息" type="bigint">
+                <constraints unique="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20190927094716" author="lzh">
+        <dropColumn tableName="merchant" columnName="external_message"></dropColumn>
+    </changeSet>
+
+
+    <changeSet id="20191227103108" author="lzh">
+        <dropTable tableName="merchant"/>
+    </changeSet>
+</databaseChangeLog>

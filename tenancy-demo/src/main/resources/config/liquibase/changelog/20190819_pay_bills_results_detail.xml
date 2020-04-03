@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="LZL" id="201908211508">
+        <createTable tableName="pay_bills_results_detail">
+            <column autoIncrement="true" name="id" remarks="主键" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="pay_bills_id" remarks="账单id" type="BIGINT"></column>
+            <column name="pay_status" remarks="还款状态" type="integer"/>
+            <column name="results_detail" remarks="还款结果明细" type="VARCHAR(512)"/>
+            <column name="update_time" remarks="开发时间" type="datetime"></column>
+            <column name="creat_time" remarks="创建时间" type="datetime"></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2019090212291111" author="lzl">
+        <renameColumn tableName="pay_bills_results_detail" oldColumnName="creat_time" newColumnName="create_time" columnDataType="datetime"></renameColumn>
+    </changeSet>
+</databaseChangeLog>
