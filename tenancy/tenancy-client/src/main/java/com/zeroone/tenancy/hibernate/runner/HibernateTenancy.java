@@ -21,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 
 public class HibernateTenancy implements SmartInitializingSingleton, InitializingBean {
