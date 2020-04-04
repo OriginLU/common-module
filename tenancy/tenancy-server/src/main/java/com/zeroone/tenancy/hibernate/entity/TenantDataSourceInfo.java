@@ -16,6 +16,7 @@ import java.util.Date;
 @Accessors(chain = true)
 @ToString
 @Entity
+@Table(name = "t_tenant_data_source_info")
 public class TenantDataSourceInfo implements Serializable {
 
 
