@@ -3,10 +3,14 @@ package com.zeroone.tenancy.hibernate.properties;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
@@ -15,10 +19,11 @@ import org.springframework.util.StringUtils;
 @ToString
 @Configuration
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
-public class TenancyClientProperties implements SmartInitializingSingleton {
+public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAware {
 
     private static final String INSTANCE_NAME_KEY = "spring.application.name";
 
+    private Environment environment;
     /**
      * 数据源服务名称
      */
@@ -30,34 +35,17 @@ public class TenancyClientProperties implements SmartInitializingSingleton {
     private String instantName;
 
 
-
     @Override
-    public void afterSingletonsInstantiated() {
-
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (!StringUtils.hasText(instantName)){
-            this.instantName = EnvironmentHelper.getProperty(INSTANCE_NAME_KEY);
+            this.instantName = getEnvironment().getProperty(INSTANCE_NAME_KEY);
         }
+        return bean;
     }
 
-
-    @Configuration
-    static class EnvironmentHelper implements EnvironmentAware{
-
-
-        private static  Environment ENV;
-
-        @Override
-        public void setEnvironment(Environment environment) {
-            ENV = environment;
-        }
-
-        public static String getProperty(String key){
-            return ENV.getProperty(key);
-        }
-
-        public static String getProperty(String key,String defaultValue){
-            return ENV.getProperty(key,defaultValue);
-        }
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
 }

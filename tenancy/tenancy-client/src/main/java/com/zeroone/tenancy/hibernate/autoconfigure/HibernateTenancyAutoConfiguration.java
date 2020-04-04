@@ -27,7 +27,6 @@ import java.util.List;
 @Configuration
 @EnableScheduling
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
-@ConditionalOnProperty(prefix = "spring.jpa.properties.hibernate",name = {"multiTenancy","tenant_identifier_resolver", "multi_tenant_connection_provider"})
 public class HibernateTenancyAutoConfiguration {
 
 
@@ -40,7 +39,6 @@ public class HibernateTenancyAutoConfiguration {
 
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource")
     public HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
         return new HibernateTenantDataSourceProvider(defaultListableBeanFactory);
     }
