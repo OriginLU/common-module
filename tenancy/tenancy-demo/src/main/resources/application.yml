@@ -35,9 +35,6 @@ spring:
     show-sql: true
     #配置mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    properties:
-      hibernate.tenant_identifier_resolver: com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver
-      hibernate.multi_tenant_connection_provider: com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider
 
 eureka:
   instance:

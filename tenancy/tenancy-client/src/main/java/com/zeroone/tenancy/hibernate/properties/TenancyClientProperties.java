@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -24,11 +25,12 @@ import java.util.Optional;
 @ToString
 @Configuration
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
-public class TenancyClientProperties implements BeanPostProcessor {
+public class TenancyClientProperties implements SmartInitializingSingleton {
 
     private static final String INSTANCE_NAME_KEY = "spring.application.name";
 
 
+    private  Environment environment;
 
     /**
      * 数据源服务名称
@@ -43,14 +45,12 @@ public class TenancyClientProperties implements BeanPostProcessor {
 
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public void afterSingletonsInstantiated() {
 
         if (!StringUtils.hasText(instantName)){
             this.instantName = EnvironmentHelper.getProperty(INSTANCE_NAME_KEY);
         }
-        return bean;
     }
-
 
 
     @Configuration

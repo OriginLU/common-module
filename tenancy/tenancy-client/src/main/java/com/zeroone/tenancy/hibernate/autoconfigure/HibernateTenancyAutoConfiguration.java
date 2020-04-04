@@ -10,6 +10,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -58,8 +59,8 @@ public class HibernateTenancyAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean({HibernateTenantDataSourceProvider.class})
-    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
-        return new HibernateTenancy(hibernateTenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
+    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, JpaProperties jpaProperties, TenancyClientProperties tenancyProperties){
+        return new HibernateTenancy(hibernateTenantDataSourceProvider,restTemplateCustomizers,jpaProperties,tenancyProperties);
     }
 
 //    @Bean
