@@ -3,21 +3,29 @@ package com.zeroone.tenancy.hibernate.spi;
 
 import javax.sql.DataSource;
 
+/**
+ * 租户数据源上下文
+ */
 public class HibernateTenantDataSourceContext {
 
-    private static HibernateTenantDataSourceProvider PROVIDER;
+
+    private static HibernateTenantDataSourceContext INSTANCE;
+
+    private final HibernateTenantDataSourceProvider provider;
 
 
-    public static void setHibernateTenantDataSourceContext(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider) {
-        PROVIDER = hibernateTenantDataSourceProvider;
+    private HibernateTenantDataSourceContext(HibernateTenantDataSourceProvider provider) {
+        this.provider = provider;
     }
 
+    static void setHibernateTenantDataSourceContext(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider) {
+        HibernateTenantDataSourceContext.INSTANCE = new HibernateTenantDataSourceContext(hibernateTenantDataSourceProvider);
+    }
 
 
     public static DataSource getTenantDataSource(String tenantIdentifier){
-        return PROVIDER.getDataSource(tenantIdentifier);
+        return INSTANCE.provider.getDataSource(tenantIdentifier);
     }
-
 
 
 
