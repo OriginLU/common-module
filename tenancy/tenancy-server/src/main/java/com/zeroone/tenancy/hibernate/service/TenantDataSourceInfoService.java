@@ -6,6 +6,7 @@ import com.zeroone.tenancy.enums.DataSourceStateEnum;
 import com.zeroone.tenancy.hibernate.entity.TenantDataSourceInfo;
 import com.zeroone.tenancy.hibernate.repository.TenantDataSourceInfoRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
@@ -18,12 +19,9 @@ import java.util.Optional;
 public class TenantDataSourceInfoService {
 
 
+    @Autowired
     private TenantDataSourceInfoRepository tenantDataSourceInfoRepository;
 
-
-    public TenantDataSourceInfoService(TenantDataSourceInfoRepository tenantDataSourceInfoRepository) {
-        this.tenantDataSourceInfoRepository = tenantDataSourceInfoRepository;
-    }
 
 
 

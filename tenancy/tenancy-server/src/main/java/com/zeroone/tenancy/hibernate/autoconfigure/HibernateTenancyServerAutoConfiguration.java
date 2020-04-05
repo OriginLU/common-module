@@ -42,14 +42,16 @@ public class HibernateTenancyServerAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(TenantDataSourceInfoRepository.class)
-    public TenantDataSourceInfoService tenantDataSourceInfoService(TenantDataSourceInfoRepository tenantDataSourceInfoRepository){
-        return new TenantDataSourceInfoService(tenantDataSourceInfoRepository);
+    public TenantDataSourceInfoService tenantDataSourceInfoService(){
+        return new TenantDataSourceInfoService();
     }
 
+    @Bean
+    @ConditionalOnBean(TenantDataSourceInfoService.class)
+    public TenantDataSourceConfigResource tenantDataSourceConfigResource(){
 
-//    public TenantDataSourceConfigResource tenantDataSourceConfigResource(RequestMappingHandlerMapping requestMappingHandlerMapping, DefaultListableBeanFactory defaultListableBeanFactory){
-//
-//    }
+        return new TenantDataSourceConfigResource();
+    }
 
 
 }
