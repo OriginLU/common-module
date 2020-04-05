@@ -11,7 +11,6 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 @EnableTenancyClient
 @EnableDiscoveryClient
 @EnableEurekaClient
-@EntityScan
 public class TenancyApplication {
 
 

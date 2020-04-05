@@ -1,5 +1,6 @@
 package com.zeroone.tenancy.demo.configuration;
 
+import com.zeroone.tenancy.demo.controller.TestController;
 import com.zeroone.tenancy.demo.entity.BankAccount;
 import com.zeroone.tenancy.demo.repository.BankAccountRepository;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,6 @@ import javax.persistence.EntityManager;
 public class JpaConfiguration {
 
 
-
-
     @Bean
     public BankAccountRepository bankAccountRepository(EntityManager entityManager){
 
@@ -21,6 +20,12 @@ public class JpaConfiguration {
         factoryBean.setEntityManager(entityManager);
         factoryBean.afterPropertiesSet();
         return factoryBean.getObject();
+    }
+
+
+    @Bean
+    public TestController testController(){
+        return new TestController();
     }
 
 }
