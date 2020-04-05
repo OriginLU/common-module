@@ -60,7 +60,7 @@ public class TenantDataSourceInfo implements Serializable {
 
 
     @Column(name = "require_override")
-    private Integer requireOverride;
+    private Boolean requireOverride;
 
     /**
      * 数据源状态
@@ -68,9 +68,15 @@ public class TenantDataSourceInfo implements Serializable {
     @Column(name = "state")
     private Integer state;
 
+    /**
+     * 创建时间
+     */
     @Column(name = "create_time")
     private Date createTime;
 
+    /**
+     * 修改时间
+     */
     @Column(name = "modify_time")
     private Date modifyTime;
 }
