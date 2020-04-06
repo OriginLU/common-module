@@ -39,7 +39,7 @@ public class HibernateTenancyAutoConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public JpaProperties jpaProperties(JpaProperties jpaProperties){
-        //2.添加多租户默认配置
+        //添加多租户默认配置
         Map<String, String> properties = jpaProperties.getProperties();
         //配置多租户策略
         properties.putIfAbsent(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
@@ -47,6 +47,7 @@ public class HibernateTenancyAutoConfiguration {
         properties.putIfAbsent(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, CustomMultiTenantIdentifierResolver.class.getName());
         //配置多租户ID链接提供器
         properties.putIfAbsent(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, CustomMultiTenantConnectionProvider.class.getName());
+
         return jpaProperties;
     }
 

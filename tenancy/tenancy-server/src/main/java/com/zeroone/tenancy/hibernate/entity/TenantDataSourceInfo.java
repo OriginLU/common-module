@@ -35,7 +35,7 @@ public class TenantDataSourceInfo implements Serializable {
     /**
      * 数据库
      */
-    @Column(name = "database")
+    @Column(name = "database_name")
     private String database;
     /**
      * 用户名
