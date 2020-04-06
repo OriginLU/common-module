@@ -1,9 +1,9 @@
 package com.zeroone.tenancy.demo;
 
 
-import com.zeroone.tenancy.demo.controller.TestController;
 import com.zeroone.tenancy.demo.entity.BankAccount;
 import com.zeroone.tenancy.demo.repository.BankAccountRepository;
+import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,20 +23,13 @@ public class JpaTest {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
-
-    @Autowired
-    private TestController testController;
     @Test
     public void repositoryTest(){
+
+        TenantIdentifierHelper.setTenant("1000");
 
         Optional<BankAccount> optionalBankAccount = bankAccountRepository.findById(1L);
 
         optionalBankAccount.ifPresent(bankAccount -> log.info(bankAccount.toString()));
-    }
-
-    @Test
-    public void testController(){
-        testController.testApi();
-        testController.getBankAccount(1L);
     }
 }

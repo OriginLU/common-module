@@ -3,7 +3,11 @@ package com.zeroone.tenancy.hibernate.autoconfigure;
 
 import com.zeroone.tenancy.hibernate.properties.TenancyClientProperties;
 import com.zeroone.tenancy.hibernate.runner.HibernateTenancy;
+import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
+import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.hibernate.spi.HibernateTenantDataSourceProvider;
+import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -17,16 +21,34 @@ import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableScheduling
-@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
+@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class,JpaProperties.class})
 public class HibernateTenancyAutoConfiguration {
 
+
+
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public JpaProperties jpaProperties(JpaProperties jpaProperties){
+        //2.添加多租户默认配置
+        Map<String, String> properties = jpaProperties.getProperties();
+        //配置多租户策略
+        properties.putIfAbsent(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
+        //配置多租户租户ID解析器
+        properties.putIfAbsent(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, CustomMultiTenantIdentifierResolver.class.getName());
+        //配置多租户ID链接提供器
+        properties.putIfAbsent(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, CustomMultiTenantConnectionProvider.class.getName());
+        return jpaProperties;
+    }
 
     @Bean
     @Qualifier("loadBalanceRestTemplate")
@@ -55,8 +77,8 @@ public class HibernateTenancyAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean({HibernateTenantDataSourceProvider.class})
-    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, JpaProperties jpaProperties, TenancyClientProperties tenancyProperties){
-        return new HibernateTenancy(hibernateTenantDataSourceProvider,restTemplateCustomizers,jpaProperties,tenancyProperties);
+    public HibernateTenancy hibernateTenancy(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
+        return new HibernateTenancy(hibernateTenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
     }
 
 //    @Bean
