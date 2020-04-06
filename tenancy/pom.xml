@@ -17,6 +17,7 @@
         <module>tenancy-demo</module>
         <module>tenancy-server</module>
         <module>tenancy-model</module>
+        <module>tenency-server-demo</module>
     </modules>
 
 
@@ -25,6 +26,20 @@
             <dependency>
                 <groupId>com.zeroone</groupId>
                 <artifactId>tenancy-model</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zeroone</groupId>
+                <artifactId>tenancy-client</artifactId>
+                <version>${project.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.zeroone</groupId>
+                <artifactId>tenancy-server</artifactId>
                 <version>${project.version}</version>
                 <scope>compile</scope>
             </dependency>
