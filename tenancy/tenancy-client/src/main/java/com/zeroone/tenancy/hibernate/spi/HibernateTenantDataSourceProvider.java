@@ -180,6 +180,15 @@ public class HibernateTenantDataSourceProvider implements InitializingBean {
         }
     }
 
+
+    /**
+     * 检查数据源有效性
+     */
+    public boolean existsDatasource(String tenantCode) {
+
+        return getDataSource(tenantCode) != null;
+    }
+
     /**
      * 获取数据源
      */
