@@ -1,8 +1,8 @@
 package com.zeroone.tenancy.demo;
 
 
-import com.zeroone.tenancy.demo.entity.BankAccount;
-import com.zeroone.tenancy.demo.repository.BankAccountRepository;
+import com.zeroone.tenancy.server.entity.BankAccount;
+import com.zeroone.tenancy.server.repository.BankAccountRepository;
 import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

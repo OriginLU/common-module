@@ -17,21 +17,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("com.zeroone.tenancy.hibernate.repository")
 public class HibernateTenancyServerAutoConfiguration {
 
-
-//    /**
-//     * create TenantDataSourceInfoRepository
-//     */
-//    @Bean
-//    public TenantDataSourceInfoRepository tenantDataSourceInfoRepository(EntityManager entityManager, ObjectProvider<EntityPathResolver> resolver){
-//
-//        JpaRepositoryFactoryBean<TenantDataSourceInfoRepository, TenantDataSourceInfo, Integer> factoryBean = new JpaRepositoryFactoryBean<>(TenantDataSourceInfoRepository.class);
-//
-//        factoryBean.setEntityManager(entityManager);
-//        factoryBean.setEntityPathResolver(resolver);
-//        factoryBean.afterPropertiesSet();
-//        return factoryBean.getObject();
-//    }
-
     /**
      * create TenantDataSourceInfoService
      */

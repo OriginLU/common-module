@@ -35,5 +35,7 @@ spring:
     show-sql: true
     #配置mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
 
 
