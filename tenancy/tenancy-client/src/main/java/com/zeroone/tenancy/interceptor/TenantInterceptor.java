@@ -3,6 +3,7 @@ package com.zeroone.tenancy.interceptor;
 import com.zeroone.tenancy.constants.TenancyConstants;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
+import com.zeroone.tenancy.runner.TenancyInitializer;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,12 +22,15 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
 
     private final TenantDataSourceProvider provider;
 
+    private final TenancyInitializer tenancyInitializer;
+
     private final Set<TenantCodeMissHandler> missHandlers;
 
-    public TenantInterceptor(TenantDataSourceProvider provider, Set<TenantCodeMissHandler> tenantCodeMissHandler) {
+    public TenantInterceptor(TenantDataSourceProvider provider, Set<TenantCodeMissHandler> tenantCodeMissHandler,TenancyInitializer tenancyInitializer) {
 
         this.provider = provider;
         this.missHandlers = tenantCodeMissHandler;
+        this.tenancyInitializer = tenancyInitializer;
     }
 
     @Override
@@ -38,13 +42,11 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
             log.warn("current tenant code not found : uri -> {}", request.getRequestURI());
             throw new IllegalStateException("tenant code not found");
         }
-        if (provider.existsDatasource(tenantCode)) {
+        //检查数据源是否存在,不存在则初始化
+        if (!provider.existsDatasource(tenantCode) && !tenancyInitializer.initTenantDataSource(tenantCode)) {
             //添加数据源
+            throw new IllegalStateException("tenant code not found");
         }
-        // mongo he mysql 都没有配置则报异常
-//        if (provider.checkDataSource(tenantCode, null)) {
-//            throw new IllegalStateException("tenant code not found");
-//        }
         //设置租户信息
         TenantIdentifierHelper.setTenant(tenantCode);
         return true;
@@ -52,8 +54,7 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
 
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
-                                @Nullable Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) {
         log.debug("TenantInterceptor removeTenant:{}", TenantIdentifierHelper.getTenant());
         //释放资源
         TenantIdentifierHelper.remove();

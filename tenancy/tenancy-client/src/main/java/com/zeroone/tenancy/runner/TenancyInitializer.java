@@ -67,4 +67,12 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
             }
         });
     }
+
+    /**
+     * 初始化是否成功
+     */
+    public boolean initTenantDataSource(String tenantCode) {
+
+        return false;
+    }
 }
