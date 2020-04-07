@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.hibernate.spi;
 
-import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
+import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 import java.util.Optional;

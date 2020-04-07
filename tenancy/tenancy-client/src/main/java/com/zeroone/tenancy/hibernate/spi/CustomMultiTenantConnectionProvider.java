@@ -1,6 +1,7 @@
 package com.zeroone.tenancy.hibernate.spi;
 
-import com.zeroone.tenancy.hibernate.utils.TenantIdentifierHelper;
+import com.zeroone.tenancy.utils.TenantIdentifierHelper;
+import com.zeroone.tenancy.provider.TenantDataSourceContext;
 import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 
 import javax.sql.DataSource;
@@ -26,6 +27,6 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     @Override
     protected DataSource selectDataSource(String tenantIdentifier) {
-        return HibernateTenantDataSourceContext.getTenantDataSource(tenantIdentifier);
+        return TenantDataSourceContext.getTenantDataSource(tenantIdentifier);
     }
 }

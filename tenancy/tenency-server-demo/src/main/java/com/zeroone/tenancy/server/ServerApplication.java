@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.server;
 
-import com.zeroone.tenancy.hibernate.annotation.EnableTenancyServer;
+import com.zeroone.tenancy.annotation.EnableTenancyServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
