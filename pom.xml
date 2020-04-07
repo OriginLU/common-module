@@ -17,7 +17,6 @@
         <module>design-patterns</module>
         <module>middleware</module>
         <module>tenancy</module>
-        <module>tenancy-server-demo</module>
     </modules>
 
     <properties>

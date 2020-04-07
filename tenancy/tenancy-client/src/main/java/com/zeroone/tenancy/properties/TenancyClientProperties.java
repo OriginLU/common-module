@@ -20,6 +20,8 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
 
     private static final String INSTANCE_NAME_KEY = "spring.application.name";
 
+    private final Interceptor interceptor = new Interceptor();
+
     private Environment environment;
     /**
      * 数据源服务名称
@@ -43,6 +45,15 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
+    }
+
+    @Data
+    @Accessors(chain = true)
+    @ToString
+    public static class Interceptor{
+
+        private String excludeUrls;
+
     }
 
 }

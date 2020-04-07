@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.runner;
 
-import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.constants.TenancyApiConstants;
+import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import org.springframework.beans.factory.InitializingBean;
@@ -39,12 +39,12 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
 
     private List<DataSourceInfo> getAvailableConfigInfo() {
 
-        return restTemplate.exchange(getRequestUri(tenancyClientProperties.getTenantServerName(), TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientProperties.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<List<DataSourceInfo>>() {
+        return restTemplate.exchange(getRequestUri(TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientProperties.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<List<DataSourceInfo>>() {
         }).getBody();
     }
 
-    private String getRequestUri(String serverName, String uri, Object... replace) {
-        return String.format("http://" + serverName + uri, replace);
+    private String getRequestUri(String uri, Object... replace) {
+        return String.format("http://" + tenancyClientProperties.getTenantServerName() + uri, replace);
     }
 
 
@@ -69,10 +69,13 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
     }
 
     /**
-     * 初始化是否成功
+     * 初始化租户数据源
      */
     public boolean initTenantDataSource(String tenantCode) {
 
-        return false;
+        String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenancyClientProperties.getInstantName(),1);
+        DataSourceInfo result = restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST,DataSourceInfo.class).getBody();
+        provider.addDataSource(result);
+        return provider.existsDatasource(tenantCode);
     }
 }
