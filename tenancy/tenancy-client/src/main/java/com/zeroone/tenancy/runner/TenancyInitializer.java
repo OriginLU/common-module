@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 
-public class HibernateTenancy implements SmartInitializingSingleton, InitializingBean {
+public class TenancyInitializer implements SmartInitializingSingleton, InitializingBean {
 
 
     public static final HttpEntity<Void> DEFAULT_REQUEST = new HttpEntity<>(new HttpHeaders());
@@ -30,7 +30,7 @@ public class HibernateTenancy implements SmartInitializingSingleton, Initializin
 
     private ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers;
 
-    public HibernateTenancy(TenantDataSourceProvider provider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyClientProperties) {
+    public TenancyInitializer(TenantDataSourceProvider provider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyClientProperties) {
         this.provider = provider;
         this.restTemplateCustomizers = restTemplateCustomizers;
         this.tenancyClientProperties = tenancyClientProperties;

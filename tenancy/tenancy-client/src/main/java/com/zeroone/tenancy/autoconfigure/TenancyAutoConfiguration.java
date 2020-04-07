@@ -2,7 +2,7 @@ package com.zeroone.tenancy.autoconfigure;
 
 
 import com.zeroone.tenancy.properties.TenancyClientProperties;
-import com.zeroone.tenancy.runner.HibernateTenancy;
+import com.zeroone.tenancy.runner.TenancyInitializer;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
@@ -32,7 +32,7 @@ import java.util.Map;
 @Configuration
 @EnableScheduling
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class,JpaProperties.class})
-public class HibernateTenancyAutoConfiguration {
+public class TenancyAutoConfiguration {
 
 
 
@@ -60,7 +60,7 @@ public class HibernateTenancyAutoConfiguration {
 
 
     @Bean
-    public TenantDataSourceProvider hibernateTenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
+    public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
         return new TenantDataSourceProvider(defaultListableBeanFactory);
     }
 
@@ -78,8 +78,8 @@ public class HibernateTenancyAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean({TenantDataSourceProvider.class})
-    public HibernateTenancy hibernateTenancy(TenantDataSourceProvider tenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
-        return new HibernateTenancy(tenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
+    public TenancyInitializer tenancyInitializer(TenantDataSourceProvider tenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
+        return new TenancyInitializer(tenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
     }
 
 //    @Bean

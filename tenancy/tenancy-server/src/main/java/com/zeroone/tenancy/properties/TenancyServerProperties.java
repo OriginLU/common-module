@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.properties;
+package com.zeroone.tenancy.properties;
 
 import lombok.Data;
 import lombok.ToString;
