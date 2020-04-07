@@ -2,39 +2,37 @@ package com.zeroone.tenancy.autoconfigure;
 
 
 import com.google.common.collect.Lists;
+import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
+import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
-import com.zeroone.tenancy.runner.TenancyInitializer;
-import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
-import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
+import com.zeroone.tenancy.runner.TenancyInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Configuration
 @EnableScheduling
@@ -42,9 +40,10 @@ import java.util.*;
 public class TenancyAutoConfiguration {
 
 
-
+    /**
+     * override bean to configure default multi-tenancy
+     */
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     public JpaProperties jpaProperties(JpaProperties jpaProperties){
         //添加多租户默认配置
         Map<String, String> properties = jpaProperties.getProperties();
@@ -56,13 +55,6 @@ public class TenancyAutoConfiguration {
         properties.putIfAbsent(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, CustomMultiTenantConnectionProvider.class.getName());
 
         return jpaProperties;
-    }
-
-    @Bean
-    @Qualifier("loadBalanceRestTemplate")
-    @LoadBalanced
-    public RestTemplate restTemplate(){
-        return new RestTemplate();
     }
 
 
@@ -131,7 +123,7 @@ public class TenancyAutoConfiguration {
         @Override
         public void addInterceptors(InterceptorRegistry registry) {
 
-            log.debug("add tenantInterceptor");
+            log.debug("add tenant interceptor");
             // 请求拦截
             List<String> allExcludes = Lists.newArrayList(excludes);
             String excludeUrls = tenancyClientProperties.getInterceptor().getExcludeUrls();
