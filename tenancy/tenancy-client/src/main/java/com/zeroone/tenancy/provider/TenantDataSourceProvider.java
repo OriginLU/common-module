@@ -161,6 +161,27 @@ public class TenantDataSourceProvider implements InitializingBean {
         Optional.ofNullable(offerDataSource(config)).ifPresent(ds -> addDataSource0(config.getTenantCode(), ds, config.getRequireOverride()));
     }
 
+    public void addDataSourceNotInitial(DataSourceInfo config) {
+
+        log.info("add datasource not initial:{} ", config);
+        if (null == config) {
+            log.warn("remote datasource is empty.");
+            return;
+        }
+        if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != getDataSource(config.getTenantCode())) {
+            throw new IllegalStateException("datasource init has error");
+        }
+
+        try {
+            DataSource dataSource = createDataSource(config);
+            //2.检查数据源的有效性
+            checkConnectionValidity(dataSource);
+            addDataSource0(config.getTenantCode(), dataSource, config.getRequireOverride());
+        } catch (SQLException e) {
+            log.error("add datasource error:{}",e.toString());
+        }
+    }
+
     /**
      * 检查数据源有效性
      */

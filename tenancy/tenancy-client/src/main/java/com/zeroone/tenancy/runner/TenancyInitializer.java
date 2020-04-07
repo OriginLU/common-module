@@ -52,7 +52,7 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
     public void afterSingletonsInstantiated() {
         //1.获取有效配置信息进行多租户的初始化
         List<DataSourceInfo> configs = getAvailableConfigInfo();
-        //2.初始化
+        //2.启动默认执行数据库初始化操作
         configs.forEach(provider::addDataSource);
     }
 
@@ -73,9 +73,9 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
      */
     public boolean initTenantDataSource(String tenantCode) {
 
-        String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenancyClientProperties.getInstantName(),1);
+        String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenancyClientProperties.getInstantName(),"mysql");
         DataSourceInfo result = restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST,DataSourceInfo.class).getBody();
-        provider.addDataSource(result);
+        provider.addDataSourceNotInitial(result);
         return provider.existsDatasource(tenantCode);
     }
 }
