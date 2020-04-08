@@ -113,11 +113,11 @@ public class TenancyAutoConfiguration {
 
         private TenancyInitializer tenancyInitializer;
 
-        public TenancyInterceptorConfiguration(TenantDataSourceProvider tenantDataSourceProvider,TenancyClientProperties tenancyClientProperties,TenancyInitializer tenancyInitializer,@Autowired(required = false) Set<TenantCodeMissHandler> tenantCodeMissHandlers) {
+        public TenancyInterceptorConfiguration(TenantDataSourceProvider tenantDataSourceProvider,TenancyClientProperties tenancyClientProperties,TenancyInitializer tenancyInitializer, ObjectProvider<Set<TenantCodeMissHandler>> missHandlerProvider) {
             this.tenantDataSourceProvider = tenantDataSourceProvider;
             this.tenancyClientProperties = tenancyClientProperties;
-            this.tenantCodeMissHandlers = tenantCodeMissHandlers;
             this.tenancyInitializer = tenancyInitializer;
+            missHandlerProvider.ifAvailable(missHandler -> this.tenantCodeMissHandlers = missHandler);
         }
 
         @Override
