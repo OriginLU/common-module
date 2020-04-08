@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
