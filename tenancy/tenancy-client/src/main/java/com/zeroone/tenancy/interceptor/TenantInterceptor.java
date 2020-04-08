@@ -55,7 +55,7 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) {
-        log.debug("TenantInterceptor removeTenant:{}", TenantIdentifierHelper.getTenant());
+        log.debug("tenant interceptor remove tenant:{}", TenantIdentifierHelper.getTenant());
         //释放资源
         TenantIdentifierHelper.remove();
     }
