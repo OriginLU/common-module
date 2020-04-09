@@ -21,7 +21,7 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
 
     @Override
     protected DataSource resolveSpecifiedDataSource(Object dataSource) throws IllegalArgumentException {
-       throw new IllegalArgumentException("unsupport this operation");
+       throw new IllegalArgumentException("unsupported this operation");
     }
 
     @Override
