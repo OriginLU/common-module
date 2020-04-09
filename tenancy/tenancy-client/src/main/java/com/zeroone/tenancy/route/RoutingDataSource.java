@@ -15,8 +15,14 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
 
     public RoutingDataSource(TenantDataSourceProvider tenantDataSourceProvider) {
         this.tenantDataSourceProvider = tenantDataSourceProvider;
+        this.setDefaultTargetDataSource(tenantDataSourceProvider.getDataSource(TenantIdentifierHelper.DEFAULT));
     }
 
+
+    @Override
+    protected DataSource resolveSpecifiedDataSource(Object dataSource) throws IllegalArgumentException {
+       throw new IllegalArgumentException("unsupport this operation");
+    }
 
     @Override
     protected DataSource determineTargetDataSource() {
