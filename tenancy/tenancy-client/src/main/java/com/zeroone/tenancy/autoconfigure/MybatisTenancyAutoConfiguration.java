@@ -1,18 +1,15 @@
 package com.zeroone.tenancy.autoconfigure;
 
+import com.zeroone.tenancy.mybatis.route.RoutingDataSource;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
-import com.zeroone.tenancy.route.RoutingDataSource;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
-import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,12 +26,10 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @org.springframework.context.annotation.Configuration
-@ConditionalOnClass(MybatisProperties.class)
+@ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 @EnableConfigurationProperties(MybatisProperties.class)
 public class MybatisTenancyAutoConfiguration {
 
-
-    private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
 
     private final MybatisProperties properties;
 

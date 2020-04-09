@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.route;
+package com.zeroone.tenancy.mybatis.route;
 
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
