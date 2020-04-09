@@ -2,21 +2,16 @@ package com.zeroone.tenancy.autoconfigure;
 
 
 import com.google.common.collect.Lists;
-import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
-import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.runner.TenancyInitializer;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
@@ -30,31 +25,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration
 @EnableScheduling
-@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class,JpaProperties.class})
+@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 public class TenancyAutoConfiguration {
-
-
-    /**
-     * override bean to configure default multi-tenancy
-     */
-    @Bean
-    public JpaProperties jpaProperties(JpaProperties jpaProperties){
-        //添加多租户默认配置
-        Map<String, String> properties = jpaProperties.getProperties();
-        //配置多租户策略
-        properties.putIfAbsent(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
-        //配置多租户租户ID解析器
-        properties.putIfAbsent(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, CustomMultiTenantIdentifierResolver.class.getName());
-        //配置多租户ID链接提供器
-        properties.putIfAbsent(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, CustomMultiTenantConnectionProvider.class.getName());
-
-        return jpaProperties;
-    }
 
 
     @Bean
