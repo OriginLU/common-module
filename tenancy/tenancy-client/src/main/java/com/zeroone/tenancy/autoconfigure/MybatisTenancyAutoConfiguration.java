@@ -22,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @org.springframework.context.annotation.Configuration
@@ -55,7 +54,7 @@ public class MybatisTenancyAutoConfiguration {
 
 
     @Bean
-    public DataSource routingDataSource(TenantDataSourceProvider provider){
+    public RoutingDataSource routingDataSource(TenantDataSourceProvider provider){
         return new RoutingDataSource(provider);
     }
 
