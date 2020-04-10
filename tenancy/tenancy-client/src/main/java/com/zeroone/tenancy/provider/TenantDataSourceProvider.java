@@ -109,6 +109,11 @@ public class TenantDataSourceProvider implements InitializingBean {
         return null;
     }
 
+
+    public Map<String, DataSource> getDataSourceMap(){
+        return this.beanMap;
+    }
+
     private void addDataSource0(String tenantCode, DataSource dataSource, boolean requireOverride) {
 
         synchronized (monitor) {
