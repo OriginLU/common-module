@@ -25,9 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 商户数据源切面处理
- *
- * @Author tanglh
- * @Date 2018/11/29 10:12
  */
 @Aspect
 public class TenancyDataSourceAspect{
@@ -96,7 +93,7 @@ public class TenancyDataSourceAspect{
         }
 
         if (tenantCodes.size() > 1) {
-            log.info("result is the last executed,method:{}, tenantCodes:{}", method, tenantCodes);
+            log.info("result is the last executed,method:{}, tenant codes:{}", method, tenantCodes);
         }
         return result;
     }
@@ -109,7 +106,7 @@ public class TenancyDataSourceAspect{
             TenantIdentifierHelper.setTenant(tenantCode);
             pool.execute(() -> ReflectionUtils.invokeMethod(method, joinPoint.getTarget()));
         } catch (Exception e) {
-            log.error("invoking method :{},tenantCode:{} Throwable:{}", method.getName(),tenantCode, e);
+            log.error("invoking method :{},tenant code:{} throwable:{}", method.getName(),tenantCode, e);
         } finally {
             log.debug("the tenant is {} invoking method finally. ", TenantIdentifierHelper.getTenant());
             TenantIdentifierHelper.remove();
@@ -126,7 +123,7 @@ public class TenancyDataSourceAspect{
             result = joinPoint.proceed();
         } catch (Throwable e) {
             // 防止某个数据源操作异常导致其他数据源无法操作
-            log.error("invoking method :{},tenantCode:{} Throwable:{}", method.getName(),tenantCode, e);
+            log.error("invoking method :{},tenant code:{} throwable:{}", method.getName(),tenantCode, e);
         } finally {
             log.debug("the tenant is {} invoking method finally. ", TenantIdentifierHelper.getTenant());
             TenantIdentifierHelper.remove();

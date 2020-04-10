@@ -2,6 +2,7 @@ package com.zeroone.tenancy.autoconfigure;
 
 
 import com.google.common.collect.Lists;
+import com.zeroone.tenancy.aop.TenancyDataSourceAspect;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
@@ -109,6 +110,11 @@ public class TenancyAutoConfiguration {
             registry.addInterceptor(new TenantInterceptor(tenantDataSourceProvider, tenantCodeMissHandlers,tenancyInitializer))
                     .addPathPatterns("/**").excludePathPatterns(allExcludes.toArray(new String[0]));
         }
+    }
+
+    @Bean
+    public TenancyDataSourceAspect tenancyDataSourceAspect(TenantDataSourceProvider tenantDataSourceProvider){
+        return new TenancyDataSourceAspect(tenantDataSourceProvider);
     }
 
 //    @Bean
