@@ -66,7 +66,7 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
     private String getTenantCode(HttpServletRequest request) {
         String tenantCode = request.getHeader(TenancyConstants.TENANT_CODE);
         if (StringUtils.isBlank(tenantCode) && !CollectionUtils.isEmpty(missHandlers)) {
-            return missHandlers.stream().filter(h -> h.match(request)).findFirst().map(h -> h.getTenantCode(request)).orElseGet(() -> null);
+            return missHandlers.stream().filter(h -> h.match(request)).findFirst().map(h -> h.getTenantCode(request)).orElse(null);
         }
         return tenantCode;
     }
