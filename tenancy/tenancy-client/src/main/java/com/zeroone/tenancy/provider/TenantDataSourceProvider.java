@@ -8,7 +8,6 @@ import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -37,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 租户数据源加载器
  */
 @Slf4j
-public class TenantDataSourceProvider implements InitializingBean {
+public class TenantDataSourceProvider{
 
 
     private final Map<String, DataSource> beanMap = new ConcurrentHashMap<>();
@@ -85,7 +84,26 @@ public class TenantDataSourceProvider implements InitializingBean {
 
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
+        InitialProperties();
         TenantDataSourceContext.setTenantDataSourceContext(this);
+    }
+
+    private void InitialProperties() {
+
+        //1.获取liquibase bean
+        this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
+        //2.获取bean配置
+        this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
+        //3.获取beanFactoryMeta
+        this.beanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
+        //4.获取初始化bean名称
+        String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
+        //5.获取数据源配置工厂bean的名称，为后续初始化做准备
+        Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b), b) != null)
+                .findFirst().ifPresent(beanName -> this.beanName = beanName);
+        //6.添加默认数据源
+        beanMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
+
     }
 
 
@@ -361,33 +379,7 @@ public class TenantDataSourceProvider implements InitializingBean {
         }
     }
 
-    /**
-     * 用于初始化多租户系统
-     */
-    @Override
-    public void afterPropertiesSet() {
 
-        //1.执行bean后续的初始化工作
-        postInitProperties();
 
-    }
-
-    private void postInitProperties() {
-
-        //1.获取liquibase bean
-        this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
-        //2.获取bean配置
-        this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
-        //3.获取beanFactoryMeta
-        this.beanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
-        //4.获取初始化bean名称
-        String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
-        //5.获取数据源配置工厂bean的名称，为后续初始化做准备
-        Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b), b) != null)
-                .findFirst().ifPresent(beanName -> this.beanName = beanName);
-        //6.添加默认数据源
-        beanMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
-
-    }
 
 }
