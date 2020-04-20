@@ -1,4 +1,4 @@
-package com.charleslu.console.entity;
+package com.zeroone.console.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
