@@ -2,6 +2,7 @@ package com.charleslu.console.security.config;
 
 import com.charleslu.console.security.CustomUserDetailsService;
 import com.charleslu.console.security.filter.JwtAuthenticationTokenFilter;
+import com.charleslu.console.security.handler.JwtAuthenticationEntryPoint;
 import com.charleslu.console.security.utils.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
@@ -67,6 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     /**
+     * yml中可以配置需要忽略的url地址集合
      * config ignore urls
      */
     @Override
@@ -85,7 +90,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .anyRequest().authenticated().and()
+                .anyRequest().authenticated().and().formLogin().permitAll().and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 // since we use jwt, session is not necessary
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

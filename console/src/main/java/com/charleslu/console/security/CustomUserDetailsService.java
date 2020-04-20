@@ -1,5 +1,7 @@
 package com.charleslu.console.security;
 
+import com.charleslu.console.entity.User;
+import com.charleslu.console.security.utils.PasswordEncoderHelper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +17,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+
+        User user = new User(username, PasswordEncoderHelper.encode("123456"));
+        return new CustomUserDetail(user);
+    }
+
+    public void updateUserPassword(String username, String password) {
+
     }
 }
