@@ -5,8 +5,7 @@ server:
 #config security ignore urls
 custom:
   security:
-    ingore:
-        urls: /swagger**/**
+    ignore-urls: /swagger**/**,/v1/auth/login
 
 
 #spring config

@@ -3,6 +3,7 @@ package com.zeroone.console.security.config;
 import com.zeroone.console.security.CustomUserDetailsService;
 import com.zeroone.console.security.filter.JwtAuthenticationTokenFilter;
 import com.zeroone.console.security.handler.JwtAuthenticationEntryPoint;
+import com.zeroone.console.security.properties.WebSecurityProperties;
 import com.zeroone.console.security.utils.JwtTokenHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -36,11 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String AUTHORIZATION_TOKEN = "access_token";
 
-    private static final String IGNORE_KEY = "custom.security.ingore.urls";
-
-    @Autowired
-    private Environment env;
-
     @Autowired
     private JwtTokenHelper jwtTokenHelper;
 
@@ -49,6 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
+    private WebSecurityProperties webSecurityProperties;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -77,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web){
 
-        String ignoreUrls = env.getProperty(IGNORE_KEY, "/**");
+        String ignoreUrls = webSecurityProperties.getIgnoreUrls();
         for (String s : ignoreUrls.trim().split(SECURITY_IGNORE_URLS_SPILT_CHAR)) {
             web.ignoring().mvcMatchers(s.trim());
         }
