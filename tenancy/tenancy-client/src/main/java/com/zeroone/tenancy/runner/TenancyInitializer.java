@@ -22,13 +22,13 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
 
     public static final HttpEntity<Void> DEFAULT_REQUEST = new HttpEntity<>(new HttpHeaders());
 
-    private TenantDataSourceProvider provider;
+    private final TenantDataSourceProvider provider;
 
     private RestTemplate restTemplate;
 
-    private TenancyClientProperties tenancyClientProperties;
+    private final TenancyClientProperties tenancyClientProperties;
 
-    private ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers;
+    private final ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers;
 
     public TenancyInitializer(TenantDataSourceProvider provider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyClientProperties) {
         this.provider = provider;
