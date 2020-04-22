@@ -36,8 +36,6 @@ import java.util.Set;
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 public class TenancyAutoConfiguration {
 
-    private static final String[] HEADER_NAMES = new String[]{"micro-service", "tq_app_id", "user_id", "client_b_v", "os", "imei", "token", "phone", "platform", "uuid"};
-
 
     @Bean
     public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
@@ -123,11 +121,6 @@ public class TenancyAutoConfiguration {
         return new TenancyDataSourceAspect(tenantDataSourceProvider);
     }
 
-    @Bean
-    @Primary
-    public RequestInterceptor requestInterceptor() {
-        return new HeaderInterceptor(HEADER_NAMES);
-    }
 
 //    @Bean
 //    @ConditionalOnBean({HibernateTenantDataSourceProvider.class})

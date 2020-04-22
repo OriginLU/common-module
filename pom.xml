@@ -14,7 +14,6 @@
         <module>common</module>
         <module>model</module>
         <module>generator</module>
-        <module>design-patterns</module>
         <module>middleware</module>
         <module>tenancy</module>
     </modules>
@@ -297,7 +296,7 @@
 
     <profiles>
 
-        <!--specified the developement environment-->
+        <!--specified the development environment-->
         <profile>
             <id>dev</id>
             <properties>
