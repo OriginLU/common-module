@@ -74,7 +74,7 @@ public class TenantDataSourceProvider{
     /**
      * spring上下文
      */
-    private DefaultListableBeanFactory defaultListableBeanFactory;
+    private final DefaultListableBeanFactory defaultListableBeanFactory;
 
     /**
      * 配置bean工厂元数据信息

@@ -15,3 +15,5 @@ spring:
     password: 123456
     url: jdbc:mysql://internal.mysql.taoqicar.com:3306/pay_platform_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
 
+#mybatis:
+#  type-aliases-package:

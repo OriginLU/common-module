@@ -30,11 +30,11 @@ spring:
     multipart:
       max-file-size: 30MB
       max-request-size: 50MB
-  jpa:
-    #配置数据显示
-    show-sql: true
-    #配置mysql
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+#  jpa:
+#    #配置数据显示
+#    show-sql: true
+#    #配置mysql
+#    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 eureka:
   instance:

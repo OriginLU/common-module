@@ -18,7 +18,7 @@ public class User extends BaseEntity {
     /**
      * 用户名称
      */
-    private String userName;
+    private String username;
 
     /**
      * 用户密码

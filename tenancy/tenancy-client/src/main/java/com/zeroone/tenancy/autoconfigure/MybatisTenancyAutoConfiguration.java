@@ -53,18 +53,19 @@ public class MybatisTenancyAutoConfiguration {
     }
 
 
-    @Bean
-    public RoutingDataSource routingDataSource(TenantDataSourceProvider provider){
-        return new RoutingDataSource(provider);
-    }
-
-
+    /**
+     * 在使用liquibase场景情况下，为了避免bean冲突出现需要自定义构造{@link RoutingDataSource}，liquibase构造时，会取唯一的datasource
+     * 详细查看@see {@link org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration.LiquibaseConfiguration#LiquibaseConfiguration(org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties, org.springframework.boot.autoconfigure.jdbc.DataSourceProperties, org.springframework.core.io.ResourceLoader, org.springframework.beans.factory.ObjectProvider, org.springframework.beans.factory.ObjectProvider)}
+     */
     @Bean
     @ConditionalOnMissingBean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SqlSessionFactory sqlSessionFactory(RoutingDataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(TenantDataSourceProvider provider) throws Exception {
+
+        RoutingDataSource routingDataSource = new RoutingDataSource(provider);
+
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
-        factory.setDataSource(dataSource);
+        factory.setDataSource(routingDataSource);
         factory.setVfs(SpringBootVFS.class);
         if (StringUtils.hasText(this.properties.getConfigLocation())) {
             factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));

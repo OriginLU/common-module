@@ -2,17 +2,25 @@ package com.zeroone.tenancy.autoconfigure;
 
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean;
 
+import javax.persistence.EntityManager;
 import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties({JpaProperties.class})
+@ConditionalOnClass({ LocalContainerEntityManagerFactoryBean.class, EntityManager.class })
 public class HibernateTenancyAutoConfiguration {
 
     /**
