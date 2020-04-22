@@ -56,7 +56,7 @@ public class MybatisTemplateGenerator {
         dsc.setDriverName("com.mysql.jdbc.Driver");
         dsc.setUsername("root");
         dsc.setPassword("123456");
-        dsc.setUrl("jdbc:mysql://internal.mysql.charleslucar.com:3306/test-rbac?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
+        dsc.setUrl("jdbc:mysql://internal.mysql.taoqicar.com:3306/test-rbac?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8");
         mpg.setDataSource(dsc);
 
         // 策略配置
@@ -140,8 +140,8 @@ public class MybatisTemplateGenerator {
         // 放置自己项目的 src/main/resources/templates 目录下, 默认名称一下可以不配置，也可以自定义模板名称
          TemplateConfig tc = new TemplateConfig();
         // tc.setController("...");
-//         tc.setEntity("templates/entity.vm");
-         tc.setMapper("templates/mapper.xml.vm");
+         tc.setEntity("templates/entity.vm");
+         tc.setMapper("templates/mapper.java.vm");
         // tc.setXml("...");
         // tc.setService("...");
         // tc.setServiceImpl("...");

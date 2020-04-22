@@ -3,11 +3,13 @@ package com.zeroone.tenancy.autoconfigure;
 
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.aop.TenancyDataSourceAspect;
+import com.zeroone.tenancy.interceptor.HeaderInterceptor;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.runner.TenancyInitializer;
+import feign.RequestInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -18,6 +20,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfigurati
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StringUtils;
@@ -32,6 +35,8 @@ import java.util.Set;
 @EnableScheduling
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 public class TenancyAutoConfiguration {
+
+    private static final String[] HEADER_NAMES = new String[]{"micro-service", "tq_app_id", "user_id", "client_b_v", "os", "imei", "token", "phone", "platform", "uuid"};
 
 
     @Bean
@@ -81,13 +86,14 @@ public class TenancyAutoConfiguration {
                 "/health/**"
         };
 
-        private TenantDataSourceProvider tenantDataSourceProvider;
+        private final TenantDataSourceProvider tenantDataSourceProvider;
 
-        private TenancyClientProperties tenancyClientProperties;
+        private final TenancyClientProperties tenancyClientProperties;
+
+        private final TenancyInitializer tenancyInitializer;
 
         private Set<TenantCodeMissHandler> tenantCodeMissHandlers;
 
-        private TenancyInitializer tenancyInitializer;
 
         public TenancyInterceptorConfiguration(TenantDataSourceProvider tenantDataSourceProvider,TenancyClientProperties tenancyClientProperties,TenancyInitializer tenancyInitializer, ObjectProvider<Set<TenantCodeMissHandler>> missHandlerProvider) {
             this.tenantDataSourceProvider = tenantDataSourceProvider;
@@ -115,6 +121,12 @@ public class TenancyAutoConfiguration {
     @Bean
     public TenancyDataSourceAspect tenancyDataSourceAspect(TenantDataSourceProvider tenantDataSourceProvider){
         return new TenancyDataSourceAspect(tenantDataSourceProvider);
+    }
+
+    @Bean
+    @Primary
+    public RequestInterceptor requestInterceptor() {
+        return new HeaderInterceptor(HEADER_NAMES);
     }
 
 //    @Bean

@@ -4,7 +4,7 @@
     <property name="PROJECT_NAME" value="console"/>
 
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径--> 
-    <property name="LOG_HOME" value="@logback.path@"/>
+    <property name="LOG_HOME" value="@logging.path@"/>
 
 
     <!-- 控制台输出 --> 
