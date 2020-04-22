@@ -44,7 +44,7 @@ public class TenancyDataSourceAspect{
 
 
 
-    private TenantDataSourceProvider tenantDataSourceProvider;
+    private final TenantDataSourceProvider tenantDataSourceProvider;
 
     public TenancyDataSourceAspect(TenantDataSourceProvider tenantDataSourceProvider) {
         this.tenantDataSourceProvider = tenantDataSourceProvider;
