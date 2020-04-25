@@ -1,4 +1,4 @@
-package com.charleslu.design.patterns.state;
+package com.zeroone.design.patterns.state;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;

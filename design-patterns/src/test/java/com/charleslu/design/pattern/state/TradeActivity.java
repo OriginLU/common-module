@@ -1,7 +1,7 @@
 package com.charleslu.design.pattern.state;
 
-import com.charleslu.design.patterns.state.Activity;
-import com.charleslu.design.patterns.state.StateAction;
+import com.zeroone.design.patterns.state.Activity;
+import com.zeroone.design.patterns.state.StateAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

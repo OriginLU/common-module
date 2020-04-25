@@ -1,8 +1,8 @@
 package com.charleslu.design.pattern.state;
 
-import com.charleslu.design.patterns.state.Activity;
-import com.charleslu.design.patterns.state.State;
-import com.charleslu.design.patterns.state.StateAction;
+import com.zeroone.design.patterns.state.Activity;
+import com.zeroone.design.patterns.state.State;
+import com.zeroone.design.patterns.state.StateAction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

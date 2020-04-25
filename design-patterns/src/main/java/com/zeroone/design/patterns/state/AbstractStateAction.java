@@ -1,4 +1,4 @@
-package com.charleslu.design.patterns.state;
+package com.zeroone.design.patterns.state;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
