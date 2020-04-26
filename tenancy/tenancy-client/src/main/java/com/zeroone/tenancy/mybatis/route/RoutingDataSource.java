@@ -2,12 +2,14 @@ package com.zeroone.tenancy.mybatis.route;
 
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.jdbc.datasource.AbstractDataSource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 
-public class RoutingDataSource extends AbstractRoutingDataSource {
+public class RoutingDataSource extends AbstractDataSource {
 
 
     private final TenantDataSourceProvider tenantDataSourceProvider;
@@ -15,22 +17,23 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
 
     public RoutingDataSource(TenantDataSourceProvider tenantDataSourceProvider) {
         this.tenantDataSourceProvider = tenantDataSourceProvider;
-        this.setDefaultTargetDataSource(tenantDataSourceProvider.getDataSource(TenantIdentifierHelper.DEFAULT));
-    }
-
-
-    @Override
-    protected DataSource resolveSpecifiedDataSource(Object dataSource) throws IllegalArgumentException {
-       throw new IllegalArgumentException("unsupported this operation");
     }
 
     @Override
+    public Connection getConnection() throws SQLException {
+        return determineTargetDataSource().getConnection();
+    }
+
+    @Override
+    public Connection getConnection(String username, String password) throws SQLException {
+        return determineTargetDataSource().getConnection(username, password);
+    }
+
     protected DataSource determineTargetDataSource() {
-        return tenantDataSourceProvider.getDataSource(TenantIdentifierHelper.getTenant());
+        return tenantDataSourceProvider.getDataSource(determineCurrentLookupKey());
     }
 
-    @Override
-    protected Object determineCurrentLookupKey() {
+    protected String determineCurrentLookupKey() {
         return Optional.ofNullable(TenantIdentifierHelper.getTenant()).orElse(TenantIdentifierHelper.DEFAULT);
     }
 }
