@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.autoconfigure;
 
-import com.zeroone.tenancy.mybatis.route.RoutingDataSource;
+import com.zeroone.tenancy.mybatis.datasource.RoutingDataSource;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
