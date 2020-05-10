@@ -49,6 +49,7 @@
         <commons.dbutils.version>1.6</commons.dbutils.version>
 
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-resource-plugins.version>3.1.0</maven-resource-plugins.version>
     </properties>
 
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
@@ -287,6 +288,23 @@
                     <configuration>
                         <!--suppress UnresolvedMavenProperty -->
                         <mainClass>${start-class}</mainClass>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resource-plugins.version}</version>
+                    <configuration>
+                        <encoding>utf-8</encoding>
+                        <useDefaultDelimiters>true</useDefaultDelimiters>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
                     </configuration>
                 </plugin>
             </plugins>
