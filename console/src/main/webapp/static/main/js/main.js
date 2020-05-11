@@ -22,7 +22,7 @@ $(".logout").on("click",function () {
 
             console.log(data);
 
-            layer.msg('系统异常',{icon:2,shift:6});
+            swal("系统异常", {button: false,icon:"error",timer:1000});
         }
     })
 });
