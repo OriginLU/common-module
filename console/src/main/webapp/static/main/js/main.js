@@ -1,5 +1,3 @@
-layer.config({extend: 'moon/style.css', skin: 'layer-ext-moon'});
-
 $(".logout").on("click",function () {
 
     $.ajax({
@@ -14,7 +12,7 @@ $(".logout").on("click",function () {
             }
             else
             {
-                layer.msg(data.message,{icon:2,shift:6});
+                swal(data.message, {button: false,icon:"error",timer:1000});
             }
 
         },
@@ -27,37 +25,37 @@ $(".logout").on("click",function () {
     })
 });
 
-// //初始化菜单
-// $.ajax({
-//
-//     url:'/authPermission/getMenus',
-//     dataType: 'json',
-//     async:false,//此步操作很重要
-//     success:function (data) {
-//         if (data.code === 0)
-//         {
-//             let result = data.data;
-//
-//             Render.userName($('.login-user'),result.userName);
-//             Render.navigation($('#side-menu'),result.menus);
-//
-//             $('.secret-change').each(function () {
-//
-//                 let attr = $(this).attr('id');
-//                 $(this).val(result[attr]);
-//             });
-//         }
-//         else
-//         {
-//             layer.msg(data.message,{icon:2,shift:6});
-//         }
-//     },
-//     error:function (data) {
-//
-//         console.log(data);
-//         layer.msg('系统异常',{icon:2,shift:6});
-//     }
-// });
+//初始化菜单
+$.ajax({
+
+    url:'/authPermission/getMenus',
+    dataType: 'json',
+    async:false,//此步操作很重要
+    success:function (data) {
+        if (data.code === 0)
+        {
+            let result = data.data;
+
+            Render.userName($('.login-user'),result.userName);
+            Render.navigation($('#side-menu'),result.menus);
+
+            $('.secret-change').each(function () {
+
+                let attr = $(this).attr('id');
+                $(this).val(result[attr]);
+            });
+        }
+        else
+        {
+            swal(data.message, {button: false,icon:"error",timer:1000});
+        }
+    },
+    error:function (data) {
+
+        console.log(data);
+        swal('菜单初始化失败，请联系管理员！！！', {button: false,icon:"error",timer:1000});
+    }
+});
 
 $('.modify-secret').on('click',function () {
     $('#modify-dialog').modal('show');
@@ -72,21 +70,20 @@ $("#saveModify").on('click',function () {
         || param['newPassword'] === undefined
         ||  param['confirmNewPassword'] === undefined)
     {
-        layer.msg('输入不全，请补全参数',{icon:2,shift:6});
-
+        swal('输入不全，请补全参数', {button: false,icon:"error",timer:1000});
         return;
     }
 
     if (param['currentPassword'] === param['newPassword']
         || param['currentPassword'] === param['confirmNewPassword'])
     {
-        layer.msg('新密码不能与旧密码相同',{icon:2,shift:6});
+        swal('新密码不能与旧密码相同', {button: false,icon:"error",timer:1000});
         return;
     }
 
     if (param['newPassword'] !== param['confirmNewPassword'])
     {
-        layer.msg('两次输入密码不一致',{icon:2,shift:6});
+        swal('两次输入密码不一致', {button: false,icon:"error",timer:1000});
         return;
     }
 
@@ -105,7 +102,7 @@ $("#saveModify").on('click',function () {
             if (data.code === 0)
             {
                 $('#modify-dialog').modal('hide');
-                layer.msg('密码修改成功',{icon:1});
+                swal('密码修改成功', {button: false,icon:"success",timer:1000});
             }
             else
             {
@@ -115,8 +112,7 @@ $("#saveModify").on('click',function () {
         error:function (data) {
 
             console.log(data);
-
-            layer.msg('系统异常',{icon:2,shift:6});
+            swal('系统异常', {button: false,icon:"error",timer:1000});
         }
     });
 
