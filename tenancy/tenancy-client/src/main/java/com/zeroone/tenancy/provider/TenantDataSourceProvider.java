@@ -84,11 +84,11 @@ public class TenantDataSourceProvider{
 
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
-        InitialProperties();
+        initialProperties();
         TenantDataSourceContext.setTenantDataSourceContext(this);
     }
 
-    private void InitialProperties() {
+    private void initialProperties() {
 
         //1.获取liquibase bean
         this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
