@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>系统菜单</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--bootstrap基础引用 start-->
+    <script type="text/javascript" src="plugins/jquery/jquery.min.js"></script>
+    <link rel="stylesheet" href="plugins/bootstrap/frame/bootstrap.min.css">
+    <link rel="stylesheet" href="plugins/bootstrap/frame/style.css">
+    <script type="text/javascript" src="plugins/bootstrap/frame/bootstrap.min.js"></script>
+    <!--bootstrap基础引用 end-->
+    <!--bootstrap-treeview start-->
+    <link rel="stylesheet" type="text/css" href="plugins/bootstrap/treeview/bootstrap-treeview.min.css">
+    <script type="text/javascript" src="plugins/bootstrap/treeview/bootstrap-treeview.js"></script>
+    <!--bootstrap-treeview end-->
+    <!--bootstrap-dialog start-->
+    <link rel="stylesheet" type="text/css" href="plugins/bootstrap/dialog/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="plugins/bootstrap/dialog/bootstrap-dialog.min.js"></script>
+    <!--bootstrap-dialog end-->
+
+    <!--bootstrap图标样式-->
+    <link href="plugins/bootstrap/frame/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <!--bootstrap图标样式插件-->
+    <link rel="stylesheet" type="text/css" href="plugins/bootstrap/icon/bootstrap-iconpicker.min.css">
+
+    <script type="text/javascript" src="menu/customPlugin.js"></script>
+    <script type="text/javascript" src="common/param.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            let leftTree = $('#left-tree');
+            onLoad();
+
+            BindEvent();
+
+            //页面加载
+            function onLoad() {
+                //渲染树
+                $('#left-tree').treeview({
+                    data: getTree(),
+                    levels: 1,
+                    onNodeSelected: function (event, node) {
+                        $('#editName').val(node.text);
+                    },
+                    showCheckbox: false//是否显示多选
+                });
+            }
+
+            //事件注册
+            function BindEvent() {
+                //保存-新增
+                $("#Save").on('click',function () {
+                    $('#addOperation-dialog').modal('hide');
+                    //静态添加节点
+                    let parentNode = leftTree.treeview('getSelected');
+                    let node = {
+                        text: $('#addName').val()
+                    };
+                    leftTree.treeview('addNode', [node, parentNode]);
+
+                    let param = Plain.getParam('.menu-add');
+                    let icon = $("#btn-icon-add input[type='text']").val();
+                    if (icon !== undefined && icon !== '')
+                    {
+                        param['img'] = icon;
+                    }
+                    $.ajax({
+
+                        url:'/saveMenu',
+                        dataType:'json',
+                        method:'post',
+                        data:param,
+                        success:function (data) {
+
+                        },
+                        error:function (data) {
+
+                        }
+                    });
+
+                });
+            }
+
+            //保存-编辑
+            $('#Edit').on('click',function () {
+                let node = leftTree.treeview('getSelected');
+                let newNode = {
+                    text: $('#editName').val()
+                };
+                leftTree.treeview('updateNode', [node, newNode]);
+
+                let param = Plain.getParam('.menu-edit');
+                let icon = $("#btn-icon-edit input[type='hidden']").val();
+                if (icon !== undefined && icon !== '')
+                {
+                    param['img'] = icon;
+                }
+                $.ajax({
+
+                    url:'/menuEdit',
+                    dataType:'json',
+                    method:'post',
+                    data:param,
+                    success:function (data) {
+
+                    },
+                    error:function (data) {
+
+                    }
+                });
+                $('#editShow').hide();
+            });
+
+
+            //显示-添加
+            $("#btnAdd").on('click',function () {
+                let node = $('#left-tree').treeview('getSelected');
+                if (node.length === 0)
+                {
+                    $.showMsgText('请选择节点');
+                    return;
+                }
+                if (node[0].level >= 3)
+                {
+                    $.showMsgText('最多只能添加三级菜单');
+                    return;
+                }
+                let pid = node[0].parentId;
+                if(pid !== undefined)
+                {
+                    $("input[name='parentId'][class*='menu-add']").val(pid);
+                }
+                $('#addName').val('');
+                $('#addOperation-dialog').modal('show');
+
+            });
+
+            //显示-编辑
+            $("#btnEdit").on('click',function () {
+
+                let node = $('#left-tree').treeview('getSelected');
+                let pid = node[0].parentId;
+                let text = node[0].text;
+                let img = node[0].img;
+                if(pid !== undefined)
+                {
+                    $("input[name='parentId'][class*='menu-edit']").val(pid);
+                }
+                if(text !== undefined)
+                {
+                    $("input[name='name'][class*='menu-edit']").val(text);
+                }
+                if (img !== undefined)
+                {
+                    $("#btn-color-edit i").removeClass().addClass('fa ' + img);
+                    $("#btn-color-edit input[type='hidden']").val(img);
+                }
+                $('#editShow').show();
+
+            });
+            //删除
+            $("#btnDel").on('click',function () {
+                let node = leftTree.treeview('getSelected');
+                if (node.length === 0) {
+                    $.showMsgText('请选择节点');
+                    return;
+                }
+
+                BootstrapDialog.confirm({
+                    title: '提示',
+                    message: '确定删除此节点?',
+                    size: BootstrapDialog.SIZE_SMALL,
+                    type: BootstrapDialog.TYPE_DEFAULT,
+                    closable: true,
+                    btnCancelLabel: '取消',
+                    btnOKLabel: '确定',
+                    callback: function (result) {
+                        if (result) {
+                            del();
+                        }
+                    }
+                });
+
+                function del() {
+
+                    $('#left-tree').treeview('removeNode', [node, {silent: true}]);
+                }
+
+            });
+            $("#btnMove").on('click',function () {
+                $.showMsgText('更新中...');
+            });
+
+            //获取树数据
+            function getTree() {
+                return [
+                    {
+                        text: "一年级",
+                        id: "1",
+                        name : '一年级',
+                        parentId: 0,
+                        nodes: [
+                            {
+                                text: "一班",
+                                id: "2",
+                                nodes: [
+                                    {
+                                        text: "物理"
+                                    },
+                                    {
+                                        text: "化学"
+                                    }
+                                ]
+                            },
+                            {
+                                text: "二班"
+                            }
+                        ]
+                    },
+                    {
+                        text: "二年级"
+                    },
+                    {
+                        text: "三年级"
+                    },
+                    {
+                        text: "四年级"
+                    },
+                    {
+                        text: "五年级"
+                    }
+                ];
+            }
+
+            /*-----页面pannel内容区高度自适应 start-----*/
+            $(window).resize(function () {
+                setCenterHeight();
+            });
+            setCenterHeight();
+
+            function setCenterHeight() {
+                var height = $(window).height();
+                var centerHight = height - 240;
+                $(".right_centent").height(centerHight).css("overflow", "auto");
+            }
+
+            /*-----页面pannel内容区高度自适应 end-----*/
+        });
+
+
+    </script>
+</head>
+<body style="padding: 10px;">
+
+<header class="container" style="margin-bottom: 35px;">
+    <div class="row">
+        <div class="col-md-12">
+            <button id="btnAdd" class="btn btn-w-m btn-primary dim">添加菜单</button>
+            <button id="btnEdit" class="btn btn-w-m btn-warning dim">编辑菜单</button>
+            <button id="btnDel" class="btn btn-w-m btn-danger dim">删除菜单</button>
+        </div>
+    </div>
+</header>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">菜单树</h3>
+                </div>
+                <div class="panel-body right_centent" style="">
+                    <div id="left-tree"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="panel panel-warning"  style="display:none;" id="editShow">
+                <div class="panel-heading">
+                    <h3 class="panel-title">编辑区</h3>
+                </div>
+                <!--编辑操作权限 start-->
+                <div class="panel-body right_centent">
+                    <div >
+                        <div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2  control-label">父节点ID</label>
+                                <input name="parentId" type="text" class="form-control col-sm-5  menu-edit" style="width:50%;" readonly/>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2  control-label">菜单名称</label>
+                                <input name="name" type="text" class="form-control col-sm-5  menu-edit" style="width:50%;"/>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2 control-label">链接地址</label>
+                                <input name="resourceLink" type="text" class="form-control col-lg-5 menu-edit" style="width:50%;"/>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color-edit" class="input-sm  col-sm-2 control-label">菜单图标</label>
+                                <button id="btn-color-edit" class="btn btn-primary" data-iconset="fontawesome" data-icon="fa-wifi" role="iconpicker"></button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <input id="Edit" class="btn btn-warning" type="button" value="确定"/>
+                            <input id="Edit_cancel" class="btn btn-default" type="button"
+                                   style="margin-left:80px;display:none;" value="取消"/>
+                        </div>
+                    </div>
+                </div>
+                <!--编辑操作权限 end-->
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <!--弹出框 新增权限 start-->
+    <div class="modal fade" id="addOperation-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content radius_5">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">新增</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2  control-label">父节点ID</label>
+                                <input name="parentId" type="text" class="form-control col-sm-5  menu-add" style="width:50%;" readonly/>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2  control-label">菜单名称</label>
+                                <input name="name" type="text" class="form-control col-sm-5  menu-add" style="width:50%;"/>
+                            </div>
+                            <div class="form-group col-lg-12">
+                                <label for="btn-color" class="input-sm col-sm-2 control-label">链接地址</label>
+                                <input name="resourceLink" type="text" class="form-control col-lg-5 menu-add" style="width:50%;"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="btn-color" class="col-sm-2 control-label">菜单图标</label>
+                                <div class="col-sm-10" id="btn-color">
+                                    <div id="btn-icon-add" data-iconset="fontawesome" data-icon="fas fa-chart-area"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: none;">
+                        <button id="Save" type="button" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <!--弹出框 新增权限 end-->
+
+</div>
+
+<script type="text/javascript" src="plugins/bootstrap/icon/bootstrap-iconpicker-iconset-all.min.js"></script>
+<script type="text/javascript" src="plugins/bootstrap/icon/bootstrap-iconpicker.min.js"></script>
+
+<script>
+    $('#btn-icon-add').iconpicker({
+        rows: 5,
+        cols: 10,
+        align: 'left'
+    });
+
+</script>
+
+</body>
+</html>
