@@ -16,6 +16,7 @@
         <module>generator</module>
         <module>middleware</module>
         <module>tenancy</module>
+        <module>eureka-server</module>
     </modules>
 
     <properties>

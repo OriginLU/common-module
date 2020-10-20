@@ -6,8 +6,9 @@ import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -35,9 +36,10 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 租户数据源加载器
  */
-@Slf4j
 public class TenantDataSourceProvider{
 
+
+    private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
 
     private final Map<String, DataSource> beanMap = new ConcurrentHashMap<>();
 
