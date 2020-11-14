@@ -1,17 +1,12 @@
-package com.zo.middleware;
+package com.charleslu.design.pattern;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * @author Charles
- * @since 2020-03-29
- */
 @SpringBootApplication
-public class MiddlewareApplication {
+public class DesignApplication {
 
     public static void main(String[] args) {
-
-        SpringApplication.run(MiddlewareApplication.class,args);
+        SpringApplication.run(DesignApplication.class,args);
     }
 }

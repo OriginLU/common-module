@@ -17,6 +17,7 @@
         <module>middleware</module>
         <module>tenancy</module>
         <module>eureka-server</module>
+        <module>kafka-connect-runtime</module>
     </modules>
 
     <properties>
