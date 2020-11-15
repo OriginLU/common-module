@@ -1,8 +1,8 @@
 package com.zeroone.kafka.connect.runtime;
 
+import com.zeroone.kafka.connect.utils.PropertiesLoader;
 import com.zeroone.kafka.connect.utils.ResourceLoader;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.kafka.common.utils.Exit;
 import org.apache.kafka.common.utils.Utils;
 import org.apache.kafka.connect.cli.ConnectDistributed;
@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -35,7 +33,7 @@ public class CustomConnectDistributed extends ConnectDistributed {
 
             String workerPropsFile = args[0];
             Map<String, String> workerProps = !workerPropsFile.isEmpty() ?
-                    Utils.propsToStringMap(loadProps(workerPropsFile)) : Collections.emptyMap();
+                    Utils.propsToStringMap(PropertiesLoader.loadProps(workerPropsFile)) : Collections.emptyMap();
 
             CustomConnectDistributed connectDistributed = new CustomConnectDistributed();
             Connect connect = connectDistributed.startConnect(workerProps);
@@ -49,22 +47,5 @@ public class CustomConnectDistributed extends ConnectDistributed {
         }
     }
 
-    public static Properties loadProps(String filename) throws IOException {
-        Properties props = new Properties();
 
-        if (filename != null) {
-            List<URL> resources = ResourceLoader.getResources(filename);
-            if (CollectionUtils.isEmpty(resources)){
-                throw new IllegalArgumentException("can't find specified properties file [" + filename + "]");
-            }
-
-            URL url = resources.get(0);
-            try (InputStream propStream = url.openStream()) {
-                props.load(propStream);
-            }
-        } else {
-            System.out.println("Did not load any properties since the property file is not specified");
-        }
-        return props;
-    }
 }
