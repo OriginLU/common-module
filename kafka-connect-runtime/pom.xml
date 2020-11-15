@@ -12,6 +12,7 @@
     <artifactId>kafka-connect-runtime</artifactId>
 
 
+    <!-- https://www.pianshen.com/article/51251070774/ -->
     <properties>
         <kafka.version>2.6.0</kafka.version>
         <io.confluent.kafka.connect.jdbc.version>5.5.1</io.confluent.kafka.connect.jdbc.version>
