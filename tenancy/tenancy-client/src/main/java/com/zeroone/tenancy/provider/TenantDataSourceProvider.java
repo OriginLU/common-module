@@ -41,7 +41,7 @@ public class TenantDataSourceProvider{
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
 
-    private final Map<String, DataSource> beanMap = new ConcurrentHashMap<>();
+    private final Map<String, DataSource> dataSourceTenantMap = new ConcurrentHashMap<>();
 
     /**
      * 默认的liquibase名称
@@ -104,7 +104,7 @@ public class TenantDataSourceProvider{
         Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b), b) != null)
                 .findFirst().ifPresent(beanName -> this.beanName = beanName);
         //6.添加默认数据源
-        beanMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
+        dataSourceTenantMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
 
     }
 
@@ -118,11 +118,11 @@ public class TenantDataSourceProvider{
             log.warn("tenant code is empty");
             return null;
         }
-        if (beanMap.containsKey(tenantCode)) {
+        if (dataSourceTenantMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            return beanMap.get(tenantCode);
+            return dataSourceTenantMap.get(tenantCode);
         }
-        if (beanMap.isEmpty()) {
+        if (dataSourceTenantMap.isEmpty()) {
             log.warn("default data source doesn't init, please wait.");
             return null;
         }
@@ -131,19 +131,19 @@ public class TenantDataSourceProvider{
 
 
     public Map<String, DataSource> getDataSourceMap(){
-        return this.beanMap;
+        return this.dataSourceTenantMap;
     }
 
-    private void addDataSource0(String tenantCode, DataSource dataSource, boolean requireOverride) {
+    private void addDataSource(String tenantCode, DataSource dataSource, boolean requireOverride) {
 
         synchronized (monitor) {
-            if (beanMap.containsKey(tenantCode)) {
+            if (dataSourceTenantMap.containsKey(tenantCode)) {
                 if (BooleanUtils.isTrue(requireOverride)) {
                     remove(tenantCode);
                 }
                 return;
             }
-            beanMap.put(tenantCode, dataSource);
+            dataSourceTenantMap.put(tenantCode, dataSource);
         }
     }
 
@@ -155,9 +155,9 @@ public class TenantDataSourceProvider{
         if (StringUtils.hasText(tenantCode)) {
             return;
         }
-        if (beanMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
+        if (dataSourceTenantMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
 
-            DataSource dataSource = beanMap.get(tenantCode);
+            DataSource dataSource = dataSourceTenantMap.get(tenantCode);
             if (dataSource instanceof Closeable) {
                 try {
                     ((Closeable) dataSource).close();
@@ -165,7 +165,7 @@ public class TenantDataSourceProvider{
                     log.error("close data source error:", e);
                 }
             }
-            beanMap.remove(tenantCode);
+            dataSourceTenantMap.remove(tenantCode);
         }
     }
 
@@ -183,7 +183,7 @@ public class TenantDataSourceProvider{
         if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != getDataSource(config.getTenantCode())) {
             throw new IllegalStateException("datasource init has error");
         }
-        Optional.ofNullable(offerDataSource(config)).ifPresent(ds -> addDataSource0(config.getTenantCode(), ds, config.getRequireOverride()));
+        Optional.ofNullable(offerDataSource(config)).ifPresent(ds -> addDataSource(config.getTenantCode(), ds, config.getRequireOverride()));
     }
 
     public void addDataSourceNotInitial(DataSourceInfo config) {
@@ -201,7 +201,7 @@ public class TenantDataSourceProvider{
             DataSource dataSource = createDataSource(config);
             //2.检查数据源的有效性
             checkConnectionValidity(dataSource);
-            addDataSource0(config.getTenantCode(), dataSource, config.getRequireOverride());
+            addDataSource(config.getTenantCode(), dataSource, config.getRequireOverride());
         } catch (SQLException e) {
             log.error("add datasource error:{}",e.toString());
         }

@@ -28,7 +28,7 @@
 
         <!--project properties -->
         <jwt.token.version>0.10.5</jwt.token.version>
-        <google.guava.version>19.0</google.guava.version>
+        <google.guava.version>30.0-jre</google.guava.version>
         <mysql.driver.version>5.1.34</mysql.driver.version>
         <http.client.version>4.5</http.client.version>
         <spring.boot.dependencies.version>2.1.6.RELEASE</spring.boot.dependencies.version>
