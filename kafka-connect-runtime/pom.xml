@@ -23,7 +23,7 @@
     <dependencies>
 
 
-        <!-- kafka connect dependecies start [version is required]-->
+        <!-- kafka connect dependencies start [version is required]-->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>connect-runtime</artifactId>
@@ -65,7 +65,7 @@
             <artifactId>connect-transforms</artifactId>
             <version>${kafka.version}</version>
         </dependency>
-        <!-- kafka connect dependecies end -->
+        <!-- kafka connect dependencies end -->
 
         <!-- debezium source kafka connect start -->
         <dependency>
@@ -73,6 +73,13 @@
             <artifactId>debezium-connector-mysql</artifactId>
             <version>${debezium.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.16</version>
+        </dependency>
+
         <!-- debezium source kafka connect end -->
 
         <!-- kafka connect jdbc plugins start -->
@@ -82,10 +89,6 @@
             <version>${io.confluent.kafka.connect.jdbc.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-        </dependency>
         <!-- kafka connect jdbc plugins end -->
 
         <dependency>
