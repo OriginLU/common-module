@@ -38,9 +38,6 @@
             <fileSet>
                 <directory>${project.build.directory}/classes</directory>
                 <outputDirectory>/</outputDirectory>
-                <excludes>
-                    <exclude>assembly/*.*</exclude>
-                </excludes>
             </fileSet>
 
         <!--
