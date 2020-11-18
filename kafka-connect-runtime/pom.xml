@@ -110,6 +110,14 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>assembly/*.*</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <!-- config maven compiler version -->
             <plugin>
@@ -121,7 +129,29 @@
                     <encoding>utf-8</encoding>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <!-- 对项目的组装进行配置 -->
+                <configuration>
+                    <!-- 指定assembly插件的配置文件所在位置 -->
+                    <descriptors>
+                        <descriptor>src/main/resources/assembly/package.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- 将组装绑定到maven生命周期的哪一阶段 -->
+                        <phase>package</phase>
+                        <goals>
+                            <!-- 指定assembly插件的打包方式-->
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
         </plugins>
     </build>
