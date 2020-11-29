@@ -43,6 +43,17 @@
             <artifactId>velocity-engine-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.googlecode.aviator</groupId>
+            <artifactId>aviator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+
+
     </dependencies>
 
 </project>

@@ -50,6 +50,8 @@
         <nacos.version>1.1.3</nacos.version>
         <commons.dbutils.version>1.6</commons.dbutils.version>
         <mybatis.mapper.version>2.1.5</mybatis.mapper.version>
+        <aviator.version>5.2.0</aviator.version>
+        <bean.utils>1.9.4</bean.utils>
 
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-resource-plugins.version>3.1.0</maven-resource-plugins.version>
@@ -224,6 +226,18 @@
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity-engine-core</artifactId>
                 <version>${velocity.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.aviator</groupId>
+                <artifactId>aviator</artifactId>
+                <version>${aviator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${bean.utils}</version>
             </dependency>
 
 
