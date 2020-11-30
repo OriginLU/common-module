@@ -20,12 +20,12 @@ public class MultiTenancyUtil {
     /**
      * 调用者租户信息
      */
-    private static ThreadLocal<String> callerTenant = new ThreadLocal<>();
+    private static final ThreadLocal<String> callerTenant = new ThreadLocal<>();
 
     /**
      * 多租户工具类执行线程池
      */
-    private static ExecutorService pool = ThreadPoolProxyFactory.createThreadPoolExecutor(
+    private static final ExecutorService pool = ThreadPoolProxyFactory.createThreadPoolExecutor(
             5,
             200,
             0L,
@@ -38,20 +38,35 @@ public class MultiTenancyUtil {
      * 在指定租户下执行方法并返回结果
      *
      * @param executeTenantCode 指定租户
-     * @param supplier   执行方法
-     * @param <T>        返回类型
+     * @param callable          执行方法
+     * @param <T>               返回类型
      * @return 执行结果
      */
-    public static <T> T executeWithReturn(final String executeTenantCode, final Supplier<T> supplier) {
-        log.debug("execute with return:{},{}", executeTenantCode, supplier);
-        checkNeedCrossLibrary(executeTenantCode);
-        return execute(executeTenantCode, Boolean.TRUE, supplier);
+    public static <T> T syncExecute(String executeTenantCode, Callable<T> callable) {
+        log.debug("execute with return:{},{}", executeTenantCode, callable);
+        checkTenantCode(executeTenantCode);
+        return execute(executeTenantCode, callable, true);
+    }
+
+    /**
+     * 在指定租户下执行方法并返回结果
+     *
+     * @param executeTenantCode 指定租户
+     * @param runnable          执行方法
+     */
+    public static void syncExecute(String executeTenantCode, Runnable runnable) {
+        log.debug("execute without return:{},{}", executeTenantCode, runnable);
+        checkTenantCode(executeTenantCode);
+        execute(executeTenantCode, () -> {
+            runnable.run();
+            return null;
+        }, true);
     }
 
     /**
      * 校验是否需要跨库执行
      */
-    private static void checkNeedCrossLibrary(final String executeTenantCode) {
+    private static void checkTenantCode(final String executeTenantCode) {
         Assert.hasText(executeTenantCode, "租户编码不能为空");
     }
 
@@ -59,40 +74,42 @@ public class MultiTenancyUtil {
      * 在指定租户下执行方法无返回结果
      *
      * @param executeTenantCode 指定租户
-     * @param supplier   执行方法
-     * @param <T>        返回类型
+     * @param runnable          执行方法
+     * @param <T>               返回类型
      */
-    public static <T> void executeWithoutReturn(final String executeTenantCode, final Supplier<T> supplier) {
-        log.debug("execute without return:{},{}", executeTenantCode, supplier);
-        checkNeedCrossLibrary(executeTenantCode);
-        execute(executeTenantCode, Boolean.FALSE, supplier);
+    public static <T> void asyncExecute(final String executeTenantCode, final Runnable runnable) {
+        log.debug("execute without return:{},{}", executeTenantCode, runnable);
+        checkTenantCode(executeTenantCode);
+        execute(executeTenantCode, () -> {
+            runnable.run();
+            return null;
+        }, false);
     }
 
     /**
      * 在指定租户下异步执行方法
      *
-     * @param executeTenantCode     执行租户编码
-     * @param needReturn            是否需要返回
-     * @param supplier              执行方法
-     * @param <T>                   返回类型
+     * @param executeTenantCode 执行租户编码
+     * @param callable          执行方法
+     * @param <T>               返回类型
      * @return 执行结果
      */
-    private static <T> T execute(final String executeTenantCode, final boolean needReturn, final Supplier<T> supplier) {
+    private static <T> T execute(String executeTenantCode, Callable<T> callable, boolean sync) {
         String currentTenantCode = TenantIdentifierHelper.getTenant();
-        log.debug("current tenant:{} execute another tenant:{} of {}", currentTenantCode, executeTenantCode, supplier);
+        log.debug("current tenant:{} execute another tenant:{} of {}", currentTenantCode, executeTenantCode, callable);
         try {
-            if (needReturn) {
+            if (sync) {
                 // 带返回值执行异步执行
-                Future<T> future = pool.submit(() -> execute(currentTenantCode, executeTenantCode, supplier));
+                Future<T> future = pool.submit(() -> execute(currentTenantCode, executeTenantCode, callable));
                 return future.get();
             } else {
-                // 异步执行方法
-                pool.execute(() -> execute(currentTenantCode, executeTenantCode, supplier));
+                pool.execute(() -> execute(currentTenantCode, executeTenantCode, callable));
             }
             return null;
         } catch (Exception e) {
             log.error("async execute failed. tenant code:{},caller:{}", executeTenantCode, getCallerTenant(), e);
-            throw new IllegalStateException("processed error", e);
+            throwUncheck(e);
+            return null;
         }
     }
 
@@ -100,34 +117,41 @@ public class MultiTenancyUtil {
     /**
      * 在默认租户下执行
      *
-     * @param supplier   执行方法
-     * @param <T>        返回类型
+     * @param callable 执行方法
+     * @param <T>      返回类型
      * @return 执行结果
      */
-    public static <T> T executeInDefault(final Supplier<T> supplier) {
-        log.debug("execute in default:{}", supplier);
-        return execute(TenantIdentifierHelper.DEFAULT, Boolean.TRUE, supplier);
+    public static <T> T executeInDefault(final Callable<T> callable) {
+        log.debug("execute in default:{}", callable);
+        return execute(TenantIdentifierHelper.DEFAULT, callable,true);
     }
 
 
     /**
      * 带当前租户执行
      */
-    private static <T> T execute(String currentTenantCode, String executeTenantCode, Supplier<T> supplier) {
+    private static <V> V execute(String tenantCode, String executeTenantCode, Callable<V> callable) {
         try {
             //设置执行租户
             TenantIdentifierHelper.setTenant(executeTenantCode);
-            setCallerTenant(currentTenantCode);
-            return supplier.get();
+            setCallerTenant(tenantCode);
+            return callable.call();
+        } catch (Exception e) {
+            throwUncheck(e);
+            return null;
         } finally {
             remove();
             TenantIdentifierHelper.remove();
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static <E extends Throwable> void throwUncheck(Throwable e) throws E {
+        throw (E) e;
+    }
+
     /**
      * 设置租户
-     *
      */
     private static void setCallerTenant(String tenantCode) {
         if (null != tenantCode) {
