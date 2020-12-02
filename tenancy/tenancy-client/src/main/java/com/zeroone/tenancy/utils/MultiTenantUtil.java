@@ -7,14 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.*;
-import java.util.function.Supplier;
 
 /**
  * 多租户工具类
  */
-public class MultiTenancyUtil {
+public class MultiTenantUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(MultiTenancyUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(MultiTenantUtil.class);
 
 
     /**
