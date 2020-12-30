@@ -1,0 +1,64 @@
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:53000/eureka/
+    instance:
+        instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+        preferIpAddress: true
+feign:
+    compression:
+        request:
+            enabled: true
+            mime-types:
+            - text/xml
+            - application/xml
+            - application/json
+            min-request-size: 2048
+        response:
+            enabled: true
+    hystrix:
+        enabled: true
+logging:
+    level:
+        org:
+            springframework:
+                web: info
+        root: debug
+management:
+    endpoints:
+        web:
+            exposure:
+                include: refresh,health,info,env
+server:
+    port: 53020
+    servlet:
+        context-path: /uaa
+    tomcat:
+        protocol_header: x-forwarded-proto
+        remote_ip_header: x-forwarded-for
+    use-forward-headers: true
+spring:
+    application:
+        name: uaa
+#    datasource:
+#        driver-class-name: com.mysql.jdbc.Driver
+#        password: mysql
+#        url: jdbc:mysql://localhost:3306/user_db?useUnicode=true
+#        username: root
+#    freemarker:
+#        charset: UTF-8
+#        content-type: text/html
+#        enabled: true
+#        request-context-attribute: rc
+#        suffix: .html
+    http:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
+    main:
+        allow-bean-definition-overriding: true
+    mvc:
+        throw-exception-if-no-handler-found: true
+    resources:
+        add-mappings: false
