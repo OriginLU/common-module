@@ -19,6 +19,7 @@
         <module>eureka-server</module>
         <module>kafka-connect-runtime</module>
         <module>uaa</module>
+        <module>agent</module>
     </modules>
 
     <properties>
@@ -58,6 +59,7 @@
 
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-resource-plugins.version>3.1.0</maven-resource-plugins.version>
+        <javassist.version>3.26.0-GA</javassist.version>
     </properties>
 
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
@@ -76,6 +78,12 @@
                 <version>${spring.boot.dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
             </dependency>
 
 <!--            <dependency>-->
