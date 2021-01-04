@@ -1,4 +1,8 @@
 server:
+  tomcat:
+    max-threads: 1000
+    min-spare-threads: 30
+    uri-encoding: utf-8
   port: 8889
 
 

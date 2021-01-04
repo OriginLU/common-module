@@ -27,7 +27,7 @@ public class LogTransformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 
-//        log.info("transform class name : {}",className);
+        log.info("transform class name : {}",className);
 
         if (!className.equals("com/zeroone/agent/attach/AgentAttach")){
             return classfileBuffer;
@@ -48,13 +48,11 @@ public class LogTransformer implements ClassFileTransformer {
             //设置方法日志
             for (CtMethod ctMethod : methods) {
 
-
                 String name = ctMethod.getName();
-//                log.info("transform method :{}",name);
                 //打印参数类型
                 CtClass[] parameterTypes = ctMethod.getParameterTypes();
                 String log;
-//                if (parameterTypes.length  != 0){
+                if (parameterTypes.length  != 0){
                     String parameterTypeNames = Arrays.stream(parameterTypes).map(CtClass::getName).collect(Collectors.joining(","));
                     //打印参数
                     MethodInfo methodInfo = ctMethod.getMethodInfo();
@@ -66,9 +64,9 @@ public class LogTransformer implements ClassFileTransformer {
                     String args = IntStream.range(0, parameterTypes.length).mapToObj(index -> "{}").collect(Collectors.joining(","));
                     //设置打印参数
                     log = "log.info(\"" + prefix + args + "\"" + "," + variableName + ");";
-//                }else {
-//                    log = "log.info(\"" + format("invoke method :{}",name) + "\");";
-//                }
+                }else {
+                    log = "log.info(\"" + format("invoke method :{}",name) + "\");";
+                }
                 ctMethod.insertBefore(log);
             }
             return ctClass.toBytecode();
