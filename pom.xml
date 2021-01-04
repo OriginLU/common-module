@@ -60,6 +60,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-resource-plugins.version>3.1.0</maven-resource-plugins.version>
         <javassist.version>3.26.0-GA</javassist.version>
+        <byte.buddy.version>1.10.18</byte.buddy.version>
     </properties>
 
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
@@ -263,7 +264,20 @@
                 <version>${codec.version}</version>
             </dependency>
 
+            <!-- 字节码生成操作工具 -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte.buddy.version}</version>
+            </dependency>
 
+
+            <!-- 字节码生成操作工具 -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte.buddy.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
