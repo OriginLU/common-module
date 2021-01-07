@@ -47,7 +47,26 @@ public class NativeQueryHibernateTemplate extends HibernateTemplate {
     @SuppressWarnings("unchecked")
     public <T> List<T> findByNativeQuery(String queryString,Class<T> resultClass){
 
-        String resultSetName = sqlResultNameMap.computeIfAbsent(resultClass,k -> {
+        String resultSetName = getResultSetName(resultClass);
+
+        return super.execute(session -> session.createSQLQuery(queryString).setResultSetMapping(resultSetName).list());
+    }
+    /**
+     *
+     * @param queryString  manual sql for query
+     * @param resultClass it must be annotated by {@link SqlResultSetMapping}
+     * @return return unique result
+     */
+    public <T> T findOneByNativeQuery(String queryString,Class<T> resultClass){
+
+        String resultSetName = getResultSetName(resultClass);
+        return resultClass.cast(super.execute(session -> session.createSQLQuery(queryString).setResultSetMapping(resultSetName).uniqueResult()));
+    }
+
+
+    private <T> String getResultSetName(Class<T> resultClass) {
+
+        return sqlResultNameMap.computeIfAbsent(resultClass, k -> {
 
             SqlResultSetMapping sqlResultSetMapping = k.getDeclaredAnnotation(SqlResultSetMapping.class);
             if (sqlResultSetMapping == null){
@@ -65,18 +84,9 @@ public class NativeQueryHibernateTemplate extends HibernateTemplate {
             }
             return name;
         });
-
-        return super.execute(session -> session.createSQLQuery(queryString).setResultSetMapping(resultSetName).list());
     }
 
-    public <T> T findOneByNativeQuery(String queryString,Class<T> resultClass){
 
-        List<T> results = findByNativeQuery(queryString, resultClass);
-        if (CollectionUtils.isEmpty(results)){
-            return null;
-        }
-        return results.get(0);
-    }
 
 
 }
