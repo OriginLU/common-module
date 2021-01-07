@@ -38,7 +38,12 @@ public class NativeQueryHibernateTemplate extends HibernateTemplate {
     }
 
 
-
+    /**
+     *
+     * @param queryString  manual sql for query
+     * @param resultClass it must be annotated by {@link SqlResultSetMapping}
+     * @return return list result
+     */
     @SuppressWarnings("unchecked")
     public <T> List<T> findByNativeQuery(String queryString,Class<T> resultClass){
 
