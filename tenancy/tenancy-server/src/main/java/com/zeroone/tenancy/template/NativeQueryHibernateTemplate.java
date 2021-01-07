@@ -49,7 +49,10 @@ public class NativeQueryHibernateTemplate extends HibernateTemplate {
 
         String resultSetName = getResultSetName(resultClass);
 
-        return super.execute(session -> session.createSQLQuery(queryString).setResultSetMapping(resultSetName).list());
+        return super.execute(session -> session
+                .createSQLQuery(queryString)
+                .setResultSetMapping(resultSetName)
+                .list());
     }
     /**
      *
@@ -60,7 +63,10 @@ public class NativeQueryHibernateTemplate extends HibernateTemplate {
     public <T> T findOneByNativeQuery(String queryString,Class<T> resultClass){
 
         String resultSetName = getResultSetName(resultClass);
-        return resultClass.cast(super.execute(session -> session.createSQLQuery(queryString).setResultSetMapping(resultSetName).uniqueResult()));
+        return resultClass.cast(super.execute(session -> session
+                .createSQLQuery(queryString)
+                .setResultSetMapping(resultSetName)
+                .uniqueResult()));
     }
 
 
