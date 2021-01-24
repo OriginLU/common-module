@@ -6,6 +6,8 @@ import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
+import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +19,15 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.PrintWriter;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,9 @@ public class TenantDataSourceProvider{
 
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
+
+
+    private final Map<String,DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
 
     private final Map<String, DataSource> dataSourceTenantMap = new ConcurrentHashMap<>();
 
@@ -268,6 +272,51 @@ public class TenantDataSourceProvider{
         }
         return dataSource;
     }
+    
+    public void createDataBaseIfNecessary(List<DataSourceInfo> dataSourceInfos){
+
+        if (CollectionUtils.isEmpty(dataSourceInfos)){
+            return;
+        }
+
+        DbUtils.loadDriver(dataSourceProperties.getDriverClassName());
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(dataSourceProperties.getUrl(), dataSourceProperties.getUsername(), dataSourceProperties.getPassword());
+
+            QueryRunner queryRunner = new QueryRunner();
+
+            for (DataSourceInfo dataSourceInfo : dataSourceInfos) {
+
+                //判断数据是否存在
+                boolean isAbsent  = queryRunner.query(connection,
+                        MysqlConstants.QUERY_SCHEMA_SQL,
+                        rs -> rs.getInt(1) == 0,
+                        dataSourceInfo.getDatabase());
+
+                if (isAbsent){
+                    //创建数据库
+                    queryRunner.execute(connection, MysqlConstants.CREATE_DATABASE_SQL,dataSourceInfo.getDatabase(),MysqlConstants.DEFAULT_CHARSET);
+                    //设置数据库
+                    queryRunner.execute(connection, MysqlConstants.USE_DATABASE_SQL,dataSourceInfo.getDatabase());
+                }
+                //liquibase初始化数据表
+                initializeDataBase(connection);
+                dataSourceInfoMap.put(dataSourceInfo.getTenantCode(),dataSourceInfo);
+            }
+
+        }catch (Exception e){
+            log.error("init database error",e);
+            throw new IllegalStateException(e);
+
+        }finally {
+            DbUtils.closeQuietly(connection);
+        }
+
+
+
+    }
+    
 
     private void checkConnectionValidity(DataSource dataSource) throws SQLException {
 
@@ -382,6 +431,68 @@ public class TenantDataSourceProvider{
     }
 
 
+    private void initializeDataBase(Connection connection) {
+
+        log.debug("current datasource:{}", connection);
+        try {
+            log.info("start init database by liquibase");
+            liquibase.setDataSource(wrap(connection));
+            liquibase.afterPropertiesSet();
+            log.info("success init database by liquibase");
+        } catch (Exception e) {
+            log.error("init database failed, {}", connection, e);
+        }
+    }
+
+    private DataSource wrap(Connection connection) {
+
+        return new DataSource() {
+            @Override
+            public Connection getConnection()  {
+                return connection;
+            }
+
+            @Override
+            public Connection getConnection(String username, String password)  {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public <T> T unwrap(Class<T> iface) throws SQLException {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean isWrapperFor(Class<?> iface) throws SQLException {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public PrintWriter getLogWriter() throws SQLException {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void setLogWriter(PrintWriter out) throws SQLException {
+
+            }
+
+            @Override
+            public void setLoginTimeout(int seconds) throws SQLException {
+
+            }
+
+            @Override
+            public int getLoginTimeout() throws SQLException {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
 
 
 }
