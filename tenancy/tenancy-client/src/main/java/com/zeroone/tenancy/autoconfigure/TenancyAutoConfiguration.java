@@ -11,6 +11,7 @@ import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.mybatis.datasource.RoutingDataSource;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
+import com.zeroone.tenancy.runner.TenancyHealthChecker;
 import com.zeroone.tenancy.runner.TenancyInitializer;
 import com.zeroone.tenancy.utils.ResourceUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +98,11 @@ public class TenancyAutoConfiguration {
         return new TenancyDataSourceAspect(tenantDataSourceProvider);
     }
 
+    @Bean
+    public TenancyHealthChecker tenancyHealthChecker(TenantDataSourceProvider provider){
+        return new TenancyHealthChecker(provider);
+    }
+
 
     /**
      * 配置多租户拦截器
@@ -110,6 +116,7 @@ public class TenancyAutoConfiguration {
          * 需要过滤的链接
          */
         private final String[] excludes = {
+                "/tenancy/**",
                 "/index.html",
                 "/management/**",
                 "/v2/api-docs",
