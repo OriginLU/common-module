@@ -1,7 +1,6 @@
 package com.zeroone.tenancy.provider;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
 import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
@@ -18,9 +17,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
@@ -28,24 +25,21 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 租户数据源加载器
  */
-public class TenantDataSourceProvider{
+public class TenantDataSourceProvider {
 
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
 
 
-    private final Map<String,DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
 
-    private final Map<String, DataSource> dataSourceTenantMap = new ConcurrentHashMap<>();
+    private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
     /**
      * 默认的liquibase名称
@@ -108,7 +102,7 @@ public class TenantDataSourceProvider{
         Arrays.stream(beanNames).filter(b -> getAnnotation(defaultListableBeanFactory.getBean(b), b) != null)
                 .findFirst().ifPresent(beanName -> this.beanName = beanName);
         //6.添加默认数据源
-        dataSourceTenantMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
+        dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
 
     }
 
@@ -122,11 +116,33 @@ public class TenantDataSourceProvider{
             log.warn("tenant code is empty");
             return null;
         }
-        if (dataSourceTenantMap.containsKey(tenantCode)) {
+        if (dataSourceMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            return dataSourceTenantMap.get(tenantCode);
+            return dataSourceMap.get(tenantCode);
         }
-        if (dataSourceTenantMap.isEmpty()) {
+
+        if (dataSourceInfoMap.containsKey(tenantCode)) {
+
+            synchronized (monitor) {
+                if (dataSourceMap.containsKey(tenantCode)) {
+                    return dataSourceMap.get(tenantCode);
+                }
+                DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(tenantCode);
+                try {
+                    //1.创建数据源
+                    DataSource dataSource = createDataSource(dataSourceInfo);
+                    //2.检查数据源的有效性
+                    checkConnectionValidity(dataSource);
+                    //3.设置数据源缓存
+                    dataSourceMap.put(tenantCode, dataSource);
+                    return dataSource;
+                } catch (SQLException e) {
+                    throw new IllegalStateException("create data source occurred error", e);
+                }
+            }
+        }
+
+        if (dataSourceMap.isEmpty()) {
             log.warn("default data source doesn't init, please wait.");
             return null;
         }
@@ -134,20 +150,17 @@ public class TenantDataSourceProvider{
     }
 
 
-    public Map<String, DataSource> getDataSourceMap(){
-        return this.dataSourceTenantMap;
+    public Map<String, DataSource> getDataSourceMap() {
+        return this.dataSourceMap;
     }
 
-    private void addDataSource(String tenantCode, DataSource dataSource, boolean requireOverride) {
+    private void overrideDataSource(String tenantCode, DataSource dataSource, boolean requireOverride) {
 
         synchronized (monitor) {
-            if (dataSourceTenantMap.containsKey(tenantCode)) {
-                if (BooleanUtils.isTrue(requireOverride)) {
-                    remove(tenantCode);
-                }
-                return;
+            if (dataSourceMap.containsKey(tenantCode) && BooleanUtils.isTrue(requireOverride)) {
+                remove(tenantCode);
             }
-            dataSourceTenantMap.put(tenantCode, dataSource);
+            dataSourceMap.put(tenantCode, dataSource);
         }
     }
 
@@ -159,9 +172,9 @@ public class TenantDataSourceProvider{
         if (StringUtils.hasText(tenantCode)) {
             return;
         }
-        if (dataSourceTenantMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
+        if (dataSourceMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
 
-            DataSource dataSource = dataSourceTenantMap.get(tenantCode);
+            DataSource dataSource = dataSourceMap.get(tenantCode);
             if (dataSource instanceof Closeable) {
                 try {
                     ((Closeable) dataSource).close();
@@ -169,7 +182,7 @@ public class TenantDataSourceProvider{
                     log.error("close data source error:", e);
                 }
             }
-            dataSourceTenantMap.remove(tenantCode);
+            dataSourceMap.remove(tenantCode);
         }
     }
 
@@ -177,37 +190,34 @@ public class TenantDataSourceProvider{
     /**
      * 添加数据源
      */
-    public void addDataSource(DataSourceInfo config) {
+    public synchronized void addDataSource(DataSourceInfo config) {
 
         log.info("add datasource :{} ", config);
         if (null == config) {
             log.warn("remote datasource is empty.");
             return;
         }
-        if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != getDataSource(config.getTenantCode())) {
-            throw new IllegalStateException("datasource init has error");
-        }
-        Optional.ofNullable(offerDataSource(config)).ifPresent(ds -> addDataSource(config.getTenantCode(), ds, config.getRequireOverride()));
-    }
-
-    public void addDataSourceNotInitial(DataSourceInfo config) {
-
-        log.info("add datasource not initial:{} ", config);
-        if (null == config) {
-            log.warn("remote datasource is empty.");
+        //判断是否需要重写
+        String tenantCode = config.getTenantCode();
+        if (BooleanUtils.isTrue(config.getRequireOverride())
+                && dataSourceMap.containsKey(tenantCode)
+                && dataSourceInfoMap.containsKey(tenantCode)) {
+            DataSource dataSource = createDataSource(config);
+            overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
+            dataSourceInfoMap.put(tenantCode,config);
             return;
         }
-        if (BooleanUtils.isNotTrue(config.getRequireOverride()) && null != getDataSource(config.getTenantCode())) {
-            throw new IllegalStateException("datasource init has error");
-        }
 
+        prepareDataSourceInfo(Collections.singletonList(config));
         try {
+            //1.创建数据源
             DataSource dataSource = createDataSource(config);
             //2.检查数据源的有效性
             checkConnectionValidity(dataSource);
-            addDataSource(config.getTenantCode(), dataSource, config.getRequireOverride());
+            //3.设置数据源缓存
+            dataSourceMap.put(tenantCode, dataSource);
         } catch (SQLException e) {
-            log.error("add datasource error:{}",e.toString());
+            throw  new IllegalStateException(e);
         }
     }
 
@@ -240,89 +250,63 @@ public class TenantDataSourceProvider{
     }
 
     /**
-     * 获取数据源
+     * 准备数据源
+     * 1.检查是否存在数据源
+     * 2.创建数据源
      */
-    public DataSource offerDataSource(DataSourceInfo config) {
+    public void prepareDataSourceInfo(List<DataSourceInfo> dataSourceInfos) {
 
-        DataSource dataSource = null;
-        log.info("init datasource :{} ", config);
-        try {
-            try {
-                //1.创建数据源
-                dataSource = createDataSource(config);
-                //2.检查数据源的有效性
-                checkConnectionValidity(dataSource);
-                //3.使用liquibase进行数据源初始化
-                initializeDataBase(dataSource);
-            } catch (Exception e) {
-                log.error("connect to tenant datasource failed:{}", e.getMessage());
-                Connection defaultConnection = getDataSource(TenantIdentifierHelper.DEFAULT).getConnection();
-                //检查数据库是否存在，不存在进行数据库创建
-                createDataBaseIfNecessary(config.getTenantCode(), config.getDatabase(), defaultConnection);
-                //创建数据源
-                dataSource = Optional.ofNullable(dataSource).orElseGet(() -> createDataSource(config));
-                //初始化数据库
-                initializeDataBase(dataSource);
-                if (null != defaultConnection) {
-                    defaultConnection.close();
-                }
-            }
-        } catch (SQLException e) {
-            log.error("init datasource failed", e);
-        }
-        return dataSource;
-    }
-    
-    public void createDataBaseIfNecessary(List<DataSourceInfo> dataSourceInfos){
-
-        if (CollectionUtils.isEmpty(dataSourceInfos)){
+        if (CollectionUtils.isEmpty(dataSourceInfos)) {
             return;
         }
 
         DbUtils.loadDriver(dataSourceProperties.getDriverClassName());
-        Connection connection = null;
         try {
-            connection = DriverManager.getConnection(dataSourceProperties.getUrl(), dataSourceProperties.getUsername(), dataSourceProperties.getPassword());
 
             QueryRunner queryRunner = new QueryRunner();
-
             for (DataSourceInfo dataSourceInfo : dataSourceInfos) {
 
+                Connection connection = DriverManager.getConnection(dataSourceProperties.getUrl(), dataSourceProperties.getUsername(), dataSourceProperties.getPassword());
+
+                if (dataSourceInfo.getIsEnable() != null && !dataSourceInfo.getIsEnable()) {
+                    continue;
+                }
                 //判断数据是否存在
-                boolean isAbsent  = queryRunner.query(connection,
+                boolean isAbsent = queryRunner.query(connection,
                         MysqlConstants.QUERY_SCHEMA_SQL,
-                        rs -> rs.getInt(1) == 0,
+                        rs ->  rs.next() && rs.getInt(1) == 0,
                         dataSourceInfo.getDatabase());
 
-                if (isAbsent){
-                    //创建数据库
-                    queryRunner.execute(connection, MysqlConstants.CREATE_DATABASE_SQL,dataSourceInfo.getDatabase(),MysqlConstants.DEFAULT_CHARSET);
-                    //设置数据库
-                    queryRunner.execute(connection, MysqlConstants.USE_DATABASE_SQL,dataSourceInfo.getDatabase());
+                if (isAbsent) {
+                    //1.创建数据库
+                    queryRunner.execute(connection, MysqlConstants.CREATE_DATABASE_SQL, dataSourceInfo.getDatabase(), MysqlConstants.DEFAULT_CHARSET);
+                    //2.设置数据库
+                    queryRunner.execute(connection, MysqlConstants.USE_DATABASE_SQL, dataSourceInfo.getDatabase());
                 }
                 //liquibase初始化数据表
                 initializeDataBase(connection);
-                dataSourceInfoMap.put(dataSourceInfo.getTenantCode(),dataSourceInfo);
+                dataSourceInfoMap.put(dataSourceInfo.getTenantCode(), dataSourceInfo);
             }
 
-        }catch (Exception e){
-            log.error("init database error",e);
+        } catch (Exception e) {
+            log.error("init database error", e);
             throw new IllegalStateException(e);
 
-        }finally {
-            DbUtils.closeQuietly(connection);
         }
 
 
-
     }
-    
+
 
     private void checkConnectionValidity(DataSource dataSource) throws SQLException {
 
         Connection connection = DataSourceUtils.doGetConnection(dataSource);
-        try (PreparedStatement prepareStatement = getPrepareStatement(connection, MysqlConstants.TEST_QUERY)) {
-            prepareStatement.execute();
+
+        try {
+            QueryRunner queryRunner = new QueryRunner();
+            if (queryRunner.execute(connection, MysqlConstants.TEST_QUERY) != 1) {
+                throw new IllegalStateException("connection error");
+            }
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -358,82 +342,9 @@ public class TenantDataSourceProvider{
         return annotation;
     }
 
-    /**
-     * 检查数据库是否存在，不存在则创建数据库
-     */
-    private void createDataBaseIfNecessary(String tenantIdentifier, String databaseName, Connection connection) {
-
-        if (TenantIdentifierHelper.DEFAULT.equals(tenantIdentifier)) {
-            return;
-        }
-        if (!StringUtils.hasText(databaseName)) {
-            log.error("cannot get database name");
-            return;
-        }
-        List<PreparedStatement> psSet = Lists.newArrayList();
-        try {
-            log.info("database name:{}", databaseName);
-            //1.check whether database exist，if not exist will be create
-            PreparedStatement ps = getPrepareStatement(connection, MysqlConstants.QUERY_SCHEMA_SQL, databaseName);
-            psSet.add(ps);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next() && rs.getInt(1) == 0) {
-                log.info("database:{} is not exist, system will be auto create:{}", databaseName, databaseName);
-
-                if (StringUtils.isEmpty(charset)) {
-                    charset = MysqlConstants.DEFAULT_CHARSET;
-                    log.debug("charset:{}", charset);
-                }
-                //create database
-                PreparedStatement createStatement = getPrepareStatement(connection, MysqlConstants.CREATE_DATABASE_SQL, databaseName, charset);
-                psSet.add(createStatement);
-                createStatement.execute();
-            }
-            rs.close();
-            PreparedStatement useStatement = getPrepareStatement(connection, MysqlConstants.USE_DATABASE_SQL, databaseName);
-            useStatement.execute();
-            psSet.add(useStatement);
-        } catch (Exception e) {
-            log.error("connect to database:{} failed, connection:{}, exception:{}", databaseName, connection, e);
-        } finally {
-            if (ObjectUtils.isEmpty(psSet)) {
-                psSet.forEach(JdbcUtils::closeStatement);
-            }
-        }
-    }
-
-    private PreparedStatement getPrepareStatement(Connection connection, String sql, Object... args) throws SQLException {
-
-        PreparedStatement ps = connection.prepareStatement(sql);
-        if (!ObjectUtils.isEmpty(args)) {
-            for (int i = 0; i < args.length; i++) {
-                ps.setObject(i + 1, args[i]);
-            }
-        }
-        return ps;
-    }
-
-
-    /**
-     * 使用liquibase初始化数据库
-     */
-    private void initializeDataBase(DataSource dataSource) {
-
-        log.debug("current datasource:{}", dataSource);
-        try {
-            log.info("start init database by liquibase");
-            liquibase.setDataSource(dataSource);
-            liquibase.afterPropertiesSet();
-            log.info("success init database by liquibase");
-        } catch (Exception e) {
-            log.error("init database failed, {}", dataSource, e);
-        }
-    }
-
 
     private void initializeDataBase(Connection connection) {
 
-        log.debug("current datasource:{}", connection);
         try {
             log.info("start init database by liquibase");
             liquibase.setDataSource(wrap(connection));
@@ -448,12 +359,12 @@ public class TenantDataSourceProvider{
 
         return new DataSource() {
             @Override
-            public Connection getConnection()  {
+            public Connection getConnection() {
                 return connection;
             }
 
             @Override
-            public Connection getConnection(String username, String password)  {
+            public Connection getConnection(String username, String password) {
                 throw new UnsupportedOperationException();
             }
 
@@ -468,27 +379,27 @@ public class TenantDataSourceProvider{
             }
 
             @Override
-            public PrintWriter getLogWriter() throws SQLException {
+            public PrintWriter getLogWriter() {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void setLogWriter(PrintWriter out) throws SQLException {
-
-            }
-
-            @Override
-            public void setLoginTimeout(int seconds) throws SQLException {
-
-            }
-
-            @Override
-            public int getLoginTimeout() throws SQLException {
+            public void setLogWriter(PrintWriter out) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            public void setLoginTimeout(int seconds) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int getLoginTimeout() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public java.util.logging.Logger getParentLogger() {
                 throw new UnsupportedOperationException();
             }
         };

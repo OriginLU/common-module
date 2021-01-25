@@ -49,6 +49,9 @@ public class DataSourceInfo {
     private String type;
 
 
+    private Boolean isEnable;
+
+
     private Boolean requireOverride = true;
 
     /**
