@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Data
 @Accessors(chain = true)
 @ToString
@@ -52,7 +54,7 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
     @ToString
     public static class Interceptor{
 
-        private String excludeUrls;
+        private List<String> excludeUrls;
 
     }
 

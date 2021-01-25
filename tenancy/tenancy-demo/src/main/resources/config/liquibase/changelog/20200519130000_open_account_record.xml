@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="lch" id="2020051916256566-1">
+        <createTable tableName="open_account_record">
+            <column name="id" remarks="主键" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="unique_code" type="bigint"/>
+            <column name="req_serial_number" remarks="开户流水号" type="VARCHAR(60)"/>
+            <column name="protocol_number"  remarks="协议号" type="VARCHAR(60)"/>
+            <column name="account_name" remarks="账户名称" type="VARCHAR(60)"/>
+            <column name="account_number" remarks="银行卡号" type="VARCHAR(50)"/>
+            <column name="account_bank_name" remarks="账户银行名称" type="VARCHAR(50)"/>
+            <column name="customer_type" remarks="客户类型 0-企业 1-个人" type="tinyint"/>
+            <column name="tel_phone" remarks="手机号码" type="VARCHAR(50)"/>
+            <column name="contact" remarks="联系人" type="VARCHAR(50)"/>
+            <column name="contact_phone" remarks="联系电话" type="VARCHAR(50)"/>
+            <column name="contact_addr" remarks="联系地址" type="varchar(128)"/>
+            <column name="business_name" remarks="法人姓名" type="varchar(128)"/>
+            <column name="credential_type" remarks="证件类型" type="varchar(20)"/>
+            <column name="credential_code" remarks="证件代码" type="varchar(60)"/>
+            <column name="email" remarks="邮件地址" type="varchar(128)"/>
+            <column name="pay_institution_type" remarks="支付机构代码" type="bigint"/>
+            <column name="channel_name" remarks="通道名称" type="varchar(128)"/>
+            <column name="channel_code" remarks="通道号" type="bigint"/>
+            <column name="open_account_status" remarks="开户状态" type="tinyint"/>
+            <column name="message" remarks="签约返回信息" type="text"/>
+            <column name="sharing_from" remarks="共享支付通道.表示这条用户数据是来自某个支付通道的共享" type="bigint"/>
+            <column name="operation_user" remarks="操作用户" type="varchar(30)"/>
+            <column name="operation_id" remarks="操作用户ID" type="bigint"/>
+            <column name="remark" remarks="备注" type="varchar(128)"/>
+            <column name="create_time" remarks="创建时间" type="datetime"/>
+            <column name="modify_time" remarks="修改时间" type="datetime"/>
+            <column name="delete_status" type="tinyint"/>
+        </createTable>
+        <createIndex tableName="open_account_record" indexName="ix_idNumber_accountNo_channelCode_protocolNo_status" unique="true" >
+            <column  name="credential_code"/>
+            <column  name="account_number"/>
+            <column  name="channel_code"/>
+            <column  name="protocol_number"/>
+            <column  name="open_account_status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="lch" author="202012221653001">
+        <addColumn tableName="open_account_record">
+            <column name="open_source" remarks="开户来源 0-saas 1-52车 3-saas-52车" type="tinyint" afterColumn="sharing_from"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

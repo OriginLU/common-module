@@ -6,23 +6,6 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 
-    <include file="config/liquibase/changelog/20190819_channel.xml" relativeToChangelogFile="false"/>
-    <!--    <include file="config/liquibase/changelog/20190819_contract.xml" relativeToChangelogFile="false"/>-->
-    <include file="config/liquibase/changelog/20190819_tenant.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190819_user_channel.xml" relativeToChangelogFile="false"/>
-    <!--    <include file="config/liquibase/changelog/20190819_user_info.xml" relativeToChangelogFile="false"/>-->
-        <include file="config/liquibase/changelog/20190819_tenant_bank_account.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190819020529_changelog.xml" relativeToChangelogFile="false"/>
-    <!--    <include file="config/liquibase/changelog/20190822_user_channel_tenant_relation.xml" relativeToChangelogFile="false"/>-->
-        <include file="config/liquibase/changelog/20190828102149_open_account_request.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190819_pay_bills.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190819_pay_bills_results_detail.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190904_sub_account.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190909_pay_bills_water_detail.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190923_pay_bills_out.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190923_pay_cooperator_bills.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20190923_pay_cooperator_bills_water_detail.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20191104_pay_bills_interest_reduction.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/liquibase_tenant_config.xml" relativeToChangelogFile="false"/>
-<!--    <include file="config/liquibase/changelog/20200117_temporary_contract.xml" relativeToChangelogFile="false"/>-->
+    <include file="config/liquibase/changelog/20200519130000_open_account_record.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

@@ -303,10 +303,7 @@ public class TenantDataSourceProvider {
         Connection connection = DataSourceUtils.doGetConnection(dataSource);
 
         try {
-            QueryRunner queryRunner = new QueryRunner();
-            if (queryRunner.execute(connection, MysqlConstants.TEST_QUERY) != 1) {
-                throw new IllegalStateException("connection error");
-            }
+             new QueryRunner().execute(connection, MysqlConstants.TEST_QUERY);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
