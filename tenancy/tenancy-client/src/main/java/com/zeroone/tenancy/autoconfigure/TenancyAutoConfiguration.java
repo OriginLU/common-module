@@ -4,6 +4,8 @@ package com.zeroone.tenancy.autoconfigure;
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.annotation.TenancyApi;
 import com.zeroone.tenancy.aop.TenancyDataSourceAspect;
+import com.zeroone.tenancy.event.DatasourceEventListener;
+import com.zeroone.tenancy.event.DatasourceEventPublisher;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
@@ -38,6 +40,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -45,6 +48,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -65,6 +69,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Configuration
+@EnableAsync
 @EnableScheduling
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 public class TenancyAutoConfiguration {
@@ -73,6 +78,16 @@ public class TenancyAutoConfiguration {
     @Bean
     public TenancyMonitor tenancyMonitor(){
         return new TenancyMonitor();
+    }
+
+    @Bean
+    public DatasourceEventPublisher datasourceEventPublisher(ApplicationEventPublisher applicationEventPublisher){
+        return new DatasourceEventPublisher(applicationEventPublisher);
+    }
+
+    @Bean
+    public DatasourceEventListener datasourceEventListener(TenancyMonitor tenancyMonitor){
+        return new DatasourceEventListener(tenancyMonitor);
     }
 
     @Bean

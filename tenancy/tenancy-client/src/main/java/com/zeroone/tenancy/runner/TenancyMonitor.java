@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.runner;
 
+import com.zeroone.tenancy.model.DatasourceActionEvent;
 import com.zeroone.tenancy.model.DatasourceMetrics;
-import com.zeroone.tenancy.model.TenancyTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,20 +19,15 @@ public class TenancyMonitor {
 
     private final Map<String,DatasourceMetrics> metrics = new ConcurrentHashMap<>();
 
-    private final Deque<TenancyTask> tasks = new ArrayDeque<>();
+    private final Deque<DatasourceActionEvent> tasks = new ArrayDeque<>();
 
 
     public void add(DatasourceMetrics datasourceMetrics){
         metrics.put(datasourceMetrics.getTenantCode(),datasourceMetrics);
     }
 
-    public void remove(String tenantCode){
-        metrics.remove(tenantCode);
-    }
-
-
-    public void pushTask(String tenantCode){
-        tasks.push(new TenancyTask(tenantCode,System.currentTimeMillis()));
+    public void pushEvent(DatasourceActionEvent event){
+        tasks.push(event);
     }
 
 
@@ -44,16 +39,9 @@ public class TenancyMonitor {
             return;
         }
 
-        for (TenancyTask tenancyTask = tasks.poll();tenancyTask != null;tenancyTask = tasks.poll() ){
+        for (DatasourceActionEvent event = tasks.poll();event != null;event = tasks.poll() ){
 
-            String tenantCode = tenancyTask.getTenantCode();
-            if (!metrics.containsKey(tenantCode)) {
-                log.warn("not found tenancy metrics:{}",tenantCode);
-                continue;
-            }
-            DatasourceMetrics dbMetrics = metrics.get(tenantCode);
-            dbMetrics.addUseTimes();
-            dbMetrics.setRecentlyUseTime(tenancyTask.getCurrUseTime());
+
         }
 
 

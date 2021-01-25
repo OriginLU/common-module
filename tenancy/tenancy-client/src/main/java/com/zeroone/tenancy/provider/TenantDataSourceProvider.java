@@ -3,8 +3,7 @@ package com.zeroone.tenancy.provider;
 import com.google.common.base.Throwables;
 import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
-import com.zeroone.tenancy.model.DatasourceMetrics;
-import com.zeroone.tenancy.runner.TenancyMonitor;
+import com.zeroone.tenancy.event.DatasourceEventPublisher;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbutils.DbUtils;
@@ -26,8 +25,13 @@ import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -84,8 +88,7 @@ public class TenantDataSourceProvider {
     private ConfigurationBeanFactoryMetadata beanFactoryMetadata;
 
 
-
-    private TenancyMonitor tenancyMonitor;
+    private DatasourceEventPublisher eventPublisher;
 
 
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
@@ -103,7 +106,7 @@ public class TenantDataSourceProvider {
         //3.获取beanFactoryMeta
         this.beanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
         //设置监控
-        this.tenancyMonitor = defaultListableBeanFactory.getBean(TenancyMonitor.class);
+        this.eventPublisher = defaultListableBeanFactory.getBean(DatasourceEventPublisher.class);
         //4.获取初始化bean名称
         String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
         //5.获取数据源配置工厂bean的名称，为后续初始化做准备
@@ -126,7 +129,7 @@ public class TenantDataSourceProvider {
         }
         if (dataSourceMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            tenancyMonitor.pushTask(tenantCode);
+            eventPublisher.publishUsingEvent(this,tenantCode);
             return dataSourceMap.get(tenantCode);
         }
 
@@ -134,7 +137,7 @@ public class TenantDataSourceProvider {
 
             synchronized (monitor) {
                 if (dataSourceMap.containsKey(tenantCode)) {
-                    tenancyMonitor.pushTask(tenantCode);
+                    eventPublisher.publishUsingEvent(this,tenantCode);
                     return dataSourceMap.get(tenantCode);
                 }
                 DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(tenantCode);
@@ -146,7 +149,7 @@ public class TenantDataSourceProvider {
                     //3.设置数据源缓存
                     dataSourceMap.put(tenantCode, dataSource);
                     //4.设置监控指标
-                    addMetrics(dataSourceInfo, tenantCode);
+                    eventPublisher.publishCreateEvent(this,tenantCode);
 
                     return dataSource;
                 } catch (SQLException e) {
@@ -196,7 +199,7 @@ public class TenantDataSourceProvider {
                 }
             }
             dataSourceMap.remove(tenantCode);
-            tenancyMonitor.remove(tenantCode);
+            eventPublisher.publishRemoveEvent(this,tenantCode);
         }
     }
 
@@ -219,9 +222,8 @@ public class TenantDataSourceProvider {
             DataSource dataSource = createDataSource(config);
             //重写数据源
             overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
-            //重写添加监控指标
-            addMetrics(config, tenantCode);
             dataSourceInfoMap.put(tenantCode,config);
+            eventPublisher.publishCreateEvent(this,tenantCode);
 
             return;
         }
@@ -237,17 +239,6 @@ public class TenantDataSourceProvider {
         } catch (SQLException e) {
             throw  new IllegalStateException(e);
         }
-    }
-
-    private void addMetrics(DataSourceInfo config, String tenantCode) {
-
-        DatasourceMetrics datasourceMetrics = new DatasourceMetrics();
-        datasourceMetrics.setDataSourceInfo(config);
-        datasourceMetrics.setCreateTime(System.currentTimeMillis());
-        datasourceMetrics.addUseTimes();
-        datasourceMetrics.setRecentlyUseTime(System.currentTimeMillis());
-        datasourceMetrics.setTenantCode(tenantCode);
-        tenancyMonitor.add(datasourceMetrics);
     }
 
     /**
@@ -315,6 +306,7 @@ public class TenantDataSourceProvider {
                 //liquibase初始化数据表
                 initializeDataBase(connection);
                 dataSourceInfoMap.put(dataSourceInfo.getTenantCode(), dataSourceInfo);
+                eventPublisher.publishInitEvent(this,dataSourceInfo.getTenantCode());
             }
 
         } catch (Exception e) {
@@ -395,12 +387,12 @@ public class TenantDataSourceProvider {
             }
 
             @Override
-            public <T> T unwrap(Class<T> iface) throws SQLException {
+            public <T> T unwrap(Class<T> iface) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public boolean isWrapperFor(Class<?> iface) throws SQLException {
+            public boolean isWrapperFor(Class<?> iface)  {
                 throw new UnsupportedOperationException();
             }
 
