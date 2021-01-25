@@ -13,6 +13,7 @@ import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.runner.TenancyHealthChecker;
 import com.zeroone.tenancy.runner.TenancyInitializer;
+import com.zeroone.tenancy.runner.TenancyMonitor;
 import com.zeroone.tenancy.utils.ResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -68,6 +69,11 @@ import java.util.Set;
 @EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
 public class TenancyAutoConfiguration {
 
+
+    @Bean
+    public TenancyMonitor tenancyMonitor(){
+        return new TenancyMonitor();
+    }
 
     @Bean
     public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory, DataSource dataSource){

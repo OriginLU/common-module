@@ -3,6 +3,8 @@ package com.zeroone.tenancy.provider;
 import com.google.common.base.Throwables;
 import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
+import com.zeroone.tenancy.model.DatasourceMetrics;
+import com.zeroone.tenancy.runner.TenancyMonitor;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbutils.DbUtils;
@@ -82,6 +84,10 @@ public class TenantDataSourceProvider {
     private ConfigurationBeanFactoryMetadata beanFactoryMetadata;
 
 
+
+    private TenancyMonitor tenancyMonitor;
+
+
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
         initialProperties();
@@ -96,6 +102,8 @@ public class TenantDataSourceProvider {
         this.dataSourceProperties = defaultListableBeanFactory.getBean(DataSourceProperties.class);
         //3.获取beanFactoryMeta
         this.beanFactoryMetadata = (ConfigurationBeanFactoryMetadata) defaultListableBeanFactory.getBean(ConfigurationBeanFactoryMetadata.BEAN_NAME);
+        //设置监控
+        this.tenancyMonitor = defaultListableBeanFactory.getBean(TenancyMonitor.class);
         //4.获取初始化bean名称
         String[] beanNames = defaultListableBeanFactory.getBeanNamesForType(dataSourceProperties.getType());
         //5.获取数据源配置工厂bean的名称，为后续初始化做准备
@@ -118,6 +126,7 @@ public class TenantDataSourceProvider {
         }
         if (dataSourceMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
+            tenancyMonitor.pushTask(tenantCode);
             return dataSourceMap.get(tenantCode);
         }
 
@@ -125,6 +134,7 @@ public class TenantDataSourceProvider {
 
             synchronized (monitor) {
                 if (dataSourceMap.containsKey(tenantCode)) {
+                    tenancyMonitor.pushTask(tenantCode);
                     return dataSourceMap.get(tenantCode);
                 }
                 DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(tenantCode);
@@ -135,6 +145,9 @@ public class TenantDataSourceProvider {
                     checkConnectionValidity(dataSource);
                     //3.设置数据源缓存
                     dataSourceMap.put(tenantCode, dataSource);
+                    //4.设置监控指标
+                    addMetrics(dataSourceInfo, tenantCode);
+
                     return dataSource;
                 } catch (SQLException e) {
                     throw new IllegalStateException("create data source occurred error", e);
@@ -183,6 +196,7 @@ public class TenantDataSourceProvider {
                 }
             }
             dataSourceMap.remove(tenantCode);
+            tenancyMonitor.remove(tenantCode);
         }
     }
 
@@ -203,8 +217,12 @@ public class TenantDataSourceProvider {
                 && dataSourceMap.containsKey(tenantCode)
                 && dataSourceInfoMap.containsKey(tenantCode)) {
             DataSource dataSource = createDataSource(config);
+            //重写数据源
             overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
+            //重写添加监控指标
+            addMetrics(config, tenantCode);
             dataSourceInfoMap.put(tenantCode,config);
+
             return;
         }
 
@@ -219,6 +237,17 @@ public class TenantDataSourceProvider {
         } catch (SQLException e) {
             throw  new IllegalStateException(e);
         }
+    }
+
+    private void addMetrics(DataSourceInfo config, String tenantCode) {
+
+        DatasourceMetrics datasourceMetrics = new DatasourceMetrics();
+        datasourceMetrics.setDataSourceInfo(config);
+        datasourceMetrics.setCreateTime(System.currentTimeMillis());
+        datasourceMetrics.addUseTimes();
+        datasourceMetrics.setRecentlyUseTime(System.currentTimeMillis());
+        datasourceMetrics.setTenantCode(tenantCode);
+        tenancyMonitor.add(datasourceMetrics);
     }
 
     /**
