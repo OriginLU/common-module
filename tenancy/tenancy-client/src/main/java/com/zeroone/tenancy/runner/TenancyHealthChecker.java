@@ -54,6 +54,7 @@ public class TenancyHealthChecker{
             //TODO send health beat to server
 
 
+            //执行空闲超时移除逻辑
             if (dataMetrics.getStatus() != DatasourceStatus.RUNNING.getStatus() && !dataMetrics.getTenantCode().equals(TenantIdentifierHelper.DEFAULT)) {
                 return;
             }
@@ -73,7 +74,7 @@ public class TenancyHealthChecker{
 
     public String getTime(Long time){
         if (time == null){
-            return "";
+            return "-1";
         }
         return DateFormatUtils.format(new Date(time),"yyyy-MM-dd HH:mm:ss");
     }

@@ -335,10 +335,4 @@ public class TenancyAutoConfiguration {
         }
     }
 
-//    @Bean
-//    @ConditionalOnBean({HibernateTenantDataSourceProvider.class})
-//    @ConditionalOnProperty("spring.kafka.bootstrap-servers")
-//    public TenantDataSourceKafkaListener tenantDataSourceKafkaListener(HibernateTenantDataSourceProvider hibernateTenantDataSourceProvider){
-//        return new TenantDataSourceKafkaListener(hibernateTenantDataSourceProvider);
-//    }
 }
