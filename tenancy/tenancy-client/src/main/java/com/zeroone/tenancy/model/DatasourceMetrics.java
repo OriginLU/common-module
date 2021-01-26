@@ -14,6 +14,11 @@ public class DatasourceMetrics {
     private String tenantCode;
 
     /**
+     * 数据库初始化时间
+     */
+    private Long initTime;
+
+    /**
      * 创建时间
      */
     private Long createTime;
@@ -33,6 +38,26 @@ public class DatasourceMetrics {
      */
     private DataSourceInfo dataSourceInfo;
 
+    /**
+     * 状态
+     */
+    private Integer status;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Long getInitTime() {
+        return initTime;
+    }
+
+    public void setInitTime(Long initTime) {
+        this.initTime = initTime;
+    }
 
     public String getTenantCode() {
         return tenantCode;

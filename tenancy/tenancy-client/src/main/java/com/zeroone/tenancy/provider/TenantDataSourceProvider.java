@@ -117,6 +117,9 @@ public class TenantDataSourceProvider {
 
     }
 
+    public DataSourceInfo getDatasourceInfo(String tenantCode){
+        return dataSourceInfoMap.get(tenantCode);
+    }
 
     /**
      * 根据传进来的tenantCode决定返回的数据源
@@ -129,7 +132,7 @@ public class TenantDataSourceProvider {
         }
         if (dataSourceMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            eventPublisher.publishUsingEvent(this,tenantCode);
+            eventPublisher.publishRunningEvent(this,tenantCode);
             return dataSourceMap.get(tenantCode);
         }
 
@@ -137,7 +140,7 @@ public class TenantDataSourceProvider {
 
             synchronized (monitor) {
                 if (dataSourceMap.containsKey(tenantCode)) {
-                    eventPublisher.publishUsingEvent(this,tenantCode);
+                    eventPublisher.publishRunningEvent(this,tenantCode);
                     return dataSourceMap.get(tenantCode);
                 }
                 DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(tenantCode);
@@ -149,7 +152,7 @@ public class TenantDataSourceProvider {
                     //3.设置数据源缓存
                     dataSourceMap.put(tenantCode, dataSource);
                     //4.设置监控指标
-                    eventPublisher.publishCreateEvent(this,tenantCode);
+                    eventPublisher.publishRunningEvent(this,tenantCode);
 
                     return dataSource;
                 } catch (SQLException e) {

@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Data
 @Accessors(chain = true)
@@ -20,7 +21,10 @@ import java.util.List;
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
 public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAware {
 
-    private static final String INSTANCE_NAME_KEY = "spring.application.name";
+
+    public final static long DEFAULT_RETRIEVE_TIME = TimeUnit.HOURS.toMillis(1L);
+
+    private final static  String INSTANCE_NAME_KEY = "spring.application.name";
 
     private final Interceptor interceptor = new Interceptor();
 
@@ -34,6 +38,11 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
      * 实例名称
      */
     private String instantName;
+
+    /**
+     * 空闲回收时间
+     */
+    private Long retrieveTime;
 
 
     @Override

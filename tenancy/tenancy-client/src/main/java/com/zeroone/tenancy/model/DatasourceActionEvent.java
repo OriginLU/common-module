@@ -9,7 +9,7 @@ public class DatasourceActionEvent extends EventObject {
     private static final long serialVersionUID = -372474798093840890L;
 
 
-    private Integer action;
+    private Integer status;
 
 
     private String tenantCode;
@@ -28,9 +28,9 @@ public class DatasourceActionEvent extends EventObject {
         super(source);
     }
 
-    public DatasourceActionEvent(Object source, Integer action, String tenantCode, Long eventOccurredTime) {
+    public DatasourceActionEvent(Object source, Integer status, String tenantCode, Long eventOccurredTime) {
         super(source);
-        this.action = action;
+        this.status = status;
         this.tenantCode = tenantCode;
         this.eventOccurredTime = eventOccurredTime;
     }
@@ -40,8 +40,8 @@ public class DatasourceActionEvent extends EventObject {
     }
 
 
-    public Integer getAction() {
-        return action;
+    public Integer getStatus() {
+        return status;
     }
 
 

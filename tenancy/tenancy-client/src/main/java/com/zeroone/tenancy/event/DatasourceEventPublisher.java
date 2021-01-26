@@ -1,8 +1,7 @@
 package com.zeroone.tenancy.event;
 
 
-import com.zeroone.tenancy.dto.DataSourceInfo;
-import com.zeroone.tenancy.enums.DatasourceAction;
+import com.zeroone.tenancy.enums.DatasourceStatus;
 import com.zeroone.tenancy.model.DatasourceActionEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -16,22 +15,22 @@ public class DatasourceEventPublisher {
 
 
     public void publishInitEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceAction.INIT.getAction()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.INIT.getStatus()));
     }
 
 
     public void publishCreateEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode,DatasourceAction.CREATE.getAction()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.CREATE.getStatus()));
     }
 
 
-    public void publishUsingEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode,DatasourceAction.USING.getAction()));
+    public void publishRunningEvent(Object source, String tenantCode){
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.RUNNING.getStatus()));
     }
 
 
     public void publishRemoveEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode,DatasourceAction.REMOVE.getAction()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.REMOVE.getStatus()));
     }
 
 
