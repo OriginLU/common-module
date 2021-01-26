@@ -1,6 +1,5 @@
 package com.zeroone.tenancy.provider;
 
-import com.google.common.base.Throwables;
 import com.zeroone.tenancy.constants.MysqlConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.event.DatasourceEventPublisher;
@@ -28,10 +27,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,6 +40,7 @@ public class TenantDataSourceProvider {
 
 
     private final Map<String, DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
+
 
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
@@ -91,14 +88,14 @@ public class TenantDataSourceProvider {
     private DatasourceEventPublisher eventPublisher;
 
 
+    private final String instanceId;
+
+
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
+
         this.defaultListableBeanFactory = defaultListableBeanFactory;
-        initialProperties();
-        TenantDataSourceContext.setTenantDataSourceContext(this);
-    }
 
-    private void initialProperties() {
-
+        this.instanceId = UUID.randomUUID().toString().replace("-","");
         //1.获取liquibase bean
         this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
         //2.获取bean配置
@@ -115,6 +112,13 @@ public class TenantDataSourceProvider {
         //6.添加默认数据源
         dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
 
+        this.eventPublisher.publishCreateEvent(this,TenantIdentifierHelper.DEFAULT);
+
+        TenantDataSourceContext.setTenantDataSourceContext(this);
+    }
+
+    public String getInstanceId() {
+        return instanceId;
     }
 
     public DataSourceInfo getDatasourceInfo(String tenantCode){
@@ -188,21 +192,26 @@ public class TenantDataSourceProvider {
      */
     public void remove(String tenantCode) {
 
+
         if (!StringUtils.hasText(tenantCode)) {
             return;
         }
-        if (dataSourceMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
 
-            DataSource dataSource = dataSourceMap.get(tenantCode);
-            if (dataSource instanceof Closeable) {
-                try {
-                    ((Closeable) dataSource).close();
-                } catch (IOException e) {
-                    log.error("close data source error:", e);
+        synchronized (monitor){
+
+            if (dataSourceMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
+
+                DataSource dataSource = dataSourceMap.get(tenantCode);
+                if (dataSource instanceof Closeable) {
+                    try {
+                        ((Closeable) dataSource).close();
+                    } catch (IOException e) {
+                        log.error("close data source error:", e);
+                    }
                 }
+                dataSourceMap.remove(tenantCode);
+                eventPublisher.publishRemoveEvent(this,tenantCode);
             }
-            dataSourceMap.remove(tenantCode);
-            eventPublisher.publishRemoveEvent(this,tenantCode);
         }
     }
 
@@ -210,59 +219,42 @@ public class TenantDataSourceProvider {
     /**
      * 添加数据源
      */
-    public synchronized void addDataSource(DataSourceInfo config) {
+    public void addDataSource(DataSourceInfo config) {
 
         log.info("add datasource :{} ", config);
         if (null == config) {
             log.warn("remote datasource is empty.");
             return;
         }
-        //判断是否需要重写
-        String tenantCode = config.getTenantCode();
-        if (BooleanUtils.isTrue(config.getRequireOverride())
-                && dataSourceMap.containsKey(tenantCode)
-                && dataSourceInfoMap.containsKey(tenantCode)) {
-            DataSource dataSource = createDataSource(config);
-            //重写数据源
-            overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
-            dataSourceInfoMap.put(tenantCode,config);
-            eventPublisher.publishOverrideEvent(this,tenantCode);
 
-            return;
-        }
+        synchronized (monitor){
+            //判断是否需要重写
+            String tenantCode = config.getTenantCode();
+            if (BooleanUtils.isTrue(config.getRequireOverride())
+                    && dataSourceMap.containsKey(tenantCode)
+                    && dataSourceInfoMap.containsKey(tenantCode)) {
+                DataSource dataSource = createDataSource(config);
+                //重写数据源
+                overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
+                dataSourceInfoMap.put(tenantCode,config);
+                eventPublisher.publishOverrideEvent(this,tenantCode);
 
-        prepareDataSourceInfo(Collections.singletonList(config));
-        try {
-            //1.创建数据源
-            DataSource dataSource = createDataSource(config);
-            //2.检查数据源的有效性
-            checkConnectionValidity(dataSource);
-            //3.设置数据源缓存
-            dataSourceMap.put(tenantCode, dataSource);
-        } catch (SQLException e) {
-            throw  new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * 检查数据源有效性
-     */
-    public boolean checkDatasource(String tenantCode) {
-
-        log.info("check datasource :{}", tenantCode);
-        DataSource dataSource = getDataSource(tenantCode);
-        try {
-            if (dataSource == null) {
-                return false;
+                return;
             }
-            checkConnectionValidity(dataSource);
-            return true;
-        } catch (Exception e) {
-            log.error("tenant[{}] datasource happen error:{}", tenantCode, Throwables.getRootCause(e).getMessage());
-            return false;
+
+            prepareDataSourceInfo(Collections.singletonList(config));
+            try {
+                //1.创建数据源
+                DataSource dataSource = createDataSource(config);
+                //2.检查数据源的有效性
+                checkConnectionValidity(dataSource);
+                //3.设置数据源缓存
+                dataSourceMap.put(tenantCode, dataSource);
+            } catch (SQLException e) {
+                throw  new IllegalStateException(e);
+            }
         }
     }
-
 
     /**
      * 检查数据源有效性
@@ -355,6 +347,7 @@ public class TenantDataSourceProvider {
     }
 
     private ConfigurationProperties getAnnotation(Object bean, String beanName) {
+
         ConfigurationProperties annotation = this.beanFactoryMetadata.findFactoryAnnotation(beanName, ConfigurationProperties.class);
         if (annotation == null) {
             annotation = AnnotationUtils.findAnnotation(bean.getClass(), ConfigurationProperties.class);

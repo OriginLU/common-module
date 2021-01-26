@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.event;
 
 
-import com.zeroone.tenancy.enums.DatasourceStatus;
+import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import com.zeroone.tenancy.model.DatasourceActionEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -15,26 +15,26 @@ public class DatasourceEventPublisher {
 
 
     public void publishInitEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.INIT.getStatus()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatusEnum.INIT.getStatus()));
     }
 
 
     public void publishCreateEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.CREATE.getStatus()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatusEnum.CREATE.getStatus()));
     }
 
     public void publishOverrideEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.OVERRIDE.getStatus()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatusEnum.OVERRIDE.getStatus()));
     }
 
 
     public void publishRunningEvent(Object source, String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.RUNNING.getStatus()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatusEnum.RUNNING.getStatus()));
     }
 
 
     public void publishRemoveEvent(Object source,String tenantCode){
-        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.REMOVE.getStatus()));
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatusEnum.DESTORY.getStatus()));
     }
 
 

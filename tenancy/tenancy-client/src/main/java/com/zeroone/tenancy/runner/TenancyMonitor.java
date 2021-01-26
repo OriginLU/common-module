@@ -1,8 +1,8 @@
 package com.zeroone.tenancy.runner;
 
-import com.zeroone.tenancy.enums.DatasourceStatus;
+import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import com.zeroone.tenancy.model.DatasourceActionEvent;
-import com.zeroone.tenancy.model.DatasourceMetrics;
+import com.zeroone.tenancy.dto.DatasourceMetrics;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class TenancyMonitor {
             Long eventOccurredTime = event.getEventOccurredTime();
             Integer status = event.getStatus();
 
-            if (status == DatasourceStatus.INIT.getStatus()){
+            if (status == DatasourceStatusEnum.INIT.getStatus()){
 
                 DatasourceMetrics metrics = new DatasourceMetrics();
                 metrics.setTenantCode(tenantCode);
@@ -51,7 +51,7 @@ public class TenancyMonitor {
                 continue;
             }
 
-            if (status == DatasourceStatus.CREATE.getStatus()){
+            if (status == DatasourceStatusEnum.CREATE.getStatus()){
 
                 DatasourceMetrics metrics = metricsMap.computeIfAbsent(tenantCode, k -> {
                     DatasourceMetrics datasourceMetrics = new DatasourceMetrics();
@@ -65,7 +65,7 @@ public class TenancyMonitor {
                 continue;
             }
 
-            if (status == DatasourceStatus.OVERRIDE.getStatus()){
+            if (status == DatasourceStatusEnum.OVERRIDE.getStatus()){
 
                 if (!metricsMap.containsKey(tenantCode)) {
                     log.info("not found data source metrics info ：{}",tenantCode);
@@ -78,7 +78,7 @@ public class TenancyMonitor {
                 continue;
             }
 
-            if (status == DatasourceStatus.RUNNING.getStatus()){
+            if (status == DatasourceStatusEnum.RUNNING.getStatus()){
                 if (!metricsMap.containsKey(tenantCode)) {
                     log.info("not found data source metrics info ：{}",tenantCode);
                     continue;
@@ -93,10 +93,10 @@ public class TenancyMonitor {
                 continue;
             }
 
-            if (status == DatasourceStatus.REMOVE.getStatus()){
+            if (status == DatasourceStatusEnum.DESTORY.getStatus()){
                 log.info("remove data source metrics info:{}",tenantCode);
                 DatasourceMetrics metrics = metricsMap.get(tenantCode);
-                metrics.setStatus(DatasourceStatus.REMOVE.getStatus());
+                metrics.setStatus(DatasourceStatusEnum.DESTORY.getStatus());
             }
 
         }

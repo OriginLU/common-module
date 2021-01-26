@@ -2,7 +2,6 @@ package com.zeroone.tenancy.hibernate.service;
 
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.dto.DataSourceInfo;
-import com.zeroone.tenancy.enums.DataSourceStateEnum;
 import com.zeroone.tenancy.hibernate.entity.TenantDataSourceInfo;
 import com.zeroone.tenancy.hibernate.repository.TenantDataSourceInfoRepository;
 import org.springframework.beans.BeanUtils;
@@ -36,7 +35,6 @@ public class TenantDataSourceInfoService {
         if (null == tenantDataSourceInfo.getRequireOverride()) {
             tenantDataSourceInfo.setRequireOverride(false);
         }
-        tenantDataSourceInfo.setState(DataSourceStateEnum.CREATE.getCode());
 
         tenantDataSourceInfoRepository.save(tenantDataSourceInfo);
     }

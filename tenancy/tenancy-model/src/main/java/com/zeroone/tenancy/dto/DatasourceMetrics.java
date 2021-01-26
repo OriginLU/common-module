@@ -1,6 +1,4 @@
-package com.zeroone.tenancy.model;
-
-import com.zeroone.tenancy.dto.DataSourceInfo;
+package com.zeroone.tenancy.dto;
 
 /**
  * 数据库使用情况

@@ -14,7 +14,7 @@ import java.util.List;
  * @author zero-one.lu
  * @since 2020-04-05
  */
-@ResponseBody
+@RestController
 @RequestMapping("/tenant/datasource/config")
 public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
 
@@ -28,7 +28,6 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
     public ResponseEntity<String> save(@Validated DataSourceInfo dataSourceInfo){
 
         tenantDataSourceInfoService.saveTenantDataSoureInfo(dataSourceInfo);
-
         return ResponseEntity.ok("success");
     }
 
@@ -45,4 +44,10 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
 
         return ResponseEntity.ok(tenantDataSourceInfoService.findTenantDataSourceInfoByServerNameAndState(serverName, state));
     }
+
+
+
+
+
+
 }

@@ -1,9 +1,11 @@
 package com.zeroone.tenancy.runner;
 
-import com.zeroone.tenancy.enums.DatasourceStatus;
-import com.zeroone.tenancy.model.DatasourceMetrics;
+import com.zeroone.tenancy.dto.TenancyMetricsDTO;
+import com.zeroone.tenancy.enums.DatasourceStatusEnum;
+import com.zeroone.tenancy.dto.DatasourceMetrics;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
+import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 租户心跳信息上送
+ */
 public class TenancyHealthChecker{
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -39,7 +44,9 @@ public class TenancyHealthChecker{
         if (CollectionUtils.isEmpty(metricsMap)){
             return;
         }
+        pushTenancyMetrics(metricsMap);
 
+        //空闲数据移除策略
         metricsMap.forEach((tenantCode,dataMetrics) -> {
 
             log.info("\n租户:{},\n初始化时间:{},\n创建时间:{},\n重新创建时间:{},\n最近一次使用时间：{},\n使用次数:{},\n运行状态:{}",
@@ -49,13 +56,10 @@ public class TenancyHealthChecker{
                     getTime(dataMetrics.getRecentlyOverrideTime()),
                     getTime(dataMetrics.getRecentlyUseTime()),
                     dataMetrics.getUseTimes(),
-                    DatasourceStatus.fromType(dataMetrics.getStatus()).getDesc());
-
-            //TODO send health beat to server
-
+                    DatasourceStatusEnum.fromType(dataMetrics.getStatus()).getDesc());
 
             //执行空闲超时移除逻辑
-            if (dataMetrics.getStatus() != DatasourceStatus.RUNNING.getStatus()) {
+            if (dataMetrics.getStatus() != DatasourceStatusEnum.RUNNING.getStatus() && !dataMetrics.getTenantCode().equals(TenantIdentifierHelper.DEFAULT)) {
                 return;
             }
             long idleTime = System.currentTimeMillis() - dataMetrics.getRecentlyUseTime();
@@ -74,7 +78,20 @@ public class TenancyHealthChecker{
 
     }
 
+    /**
+     * 上送数据源监控信息
+     */
+    private void pushTenancyMetrics(Map<String, DatasourceMetrics> metricsMap) {
+
+        TenancyMetricsDTO tenancyMetricsDTO = new TenancyMetricsDTO();
+        tenancyMetricsDTO.setMetricsMap(metricsMap);
+        tenancyMetricsDTO.setInstanceId(provider.getInstanceId());
+        tenancyMetricsDTO.setInstanceName(tenancyClientProperties.getInstantName());
+
+    }
+
     public String getTime(Long time){
+
         if (time == null){
             return "-1";
         }
