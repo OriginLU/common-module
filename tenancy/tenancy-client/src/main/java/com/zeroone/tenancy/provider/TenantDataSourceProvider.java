@@ -430,8 +430,8 @@ public class TenantDataSourceProvider implements InitializingBean, DisposableBea
 
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-
+    public void afterPropertiesSet() {
+        log.info("initializing tenant datasource provider ....");
         if (defaultListableBeanFactory == null){
             throw new IllegalStateException("not set up spring bean factory");
         }
@@ -440,7 +440,9 @@ public class TenantDataSourceProvider implements InitializingBean, DisposableBea
 
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
+
+        log.info("destroying tenant datasource provider....");
         dataSourceMap.forEach((tenantCode, datasource) -> {
             log.info("destory tenant :{}", tenantCode);
             remove(tenantCode);
