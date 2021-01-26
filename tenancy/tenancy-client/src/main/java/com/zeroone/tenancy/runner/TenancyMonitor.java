@@ -48,7 +48,7 @@ public class TenancyMonitor {
                 metrics.setInitTime(eventOccurredTime);
                 metrics.setStatus(status);
                 metricsMap.put(tenantCode,metrics);
-                return;
+                continue;
             }
 
             if (status == DatasourceStatus.CREATE.getStatus()){
@@ -62,7 +62,7 @@ public class TenancyMonitor {
                 });
                 metrics.setStatus(status);
                 metrics.setCreateTime(eventOccurredTime);
-                return;
+                continue;
             }
 
             if (status == DatasourceStatus.OVERRIDE.getStatus()){
@@ -75,7 +75,7 @@ public class TenancyMonitor {
                 metrics.setStatus(status);
                 metrics.setRecentlyOverrideTime(eventOccurredTime);
                 metrics.setDataSourceInfo(provider.getDatasourceInfo(tenantCode));
-                return;
+                continue;
             }
 
             if (status == DatasourceStatus.RUNNING.getStatus()){
@@ -90,7 +90,7 @@ public class TenancyMonitor {
                 }
                 metrics.setStatus(status);
                 metrics.setRecentlyUseTime(eventOccurredTime);
-                return;
+                continue;
             }
 
             if (status == DatasourceStatus.REMOVE.getStatus()){
@@ -98,7 +98,6 @@ public class TenancyMonitor {
                 DatasourceMetrics metrics = metricsMap.get(tenantCode);
                 metrics.setStatus(DatasourceStatus.REMOVE.getStatus());
             }
-
 
         }
 
