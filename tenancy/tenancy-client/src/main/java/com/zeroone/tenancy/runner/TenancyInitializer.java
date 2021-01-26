@@ -76,6 +76,6 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
         String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenancyClientProperties.getInstantName(),"mysql");
         DataSourceInfo dataSourceInfo = restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST,DataSourceInfo.class).getBody();
         provider.addDataSource(dataSourceInfo);
-        return provider.existsDatasource(tenantCode);
+        return provider.hasDatasource(tenantCode);
     }
 }

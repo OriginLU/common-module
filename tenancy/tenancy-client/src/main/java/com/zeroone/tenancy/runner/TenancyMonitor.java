@@ -48,19 +48,34 @@ public class TenancyMonitor {
                 metrics.setInitTime(eventOccurredTime);
                 metrics.setStatus(status);
                 metricsMap.put(tenantCode,metrics);
+                return;
             }
 
             if (status == DatasourceStatus.CREATE.getStatus()){
 
-                DatasourceMetrics metrics = metricsMap.computeIfAbsent(tenantCode, (k) -> {
+                DatasourceMetrics metrics = metricsMap.computeIfAbsent(tenantCode, k -> {
                     DatasourceMetrics datasourceMetrics = new DatasourceMetrics();
                     datasourceMetrics.setTenantCode(tenantCode);
                     datasourceMetrics.setDataSourceInfo(provider.getDatasourceInfo(tenantCode));
                     datasourceMetrics.setInitTime(eventOccurredTime);
-                    datasourceMetrics.setStatus(status);
                     return datasourceMetrics;
                 });
+                metrics.setStatus(status);
                 metrics.setCreateTime(eventOccurredTime);
+                return;
+            }
+
+            if (status == DatasourceStatus.OVERRIDE.getStatus()){
+
+                if (!metricsMap.containsKey(tenantCode)) {
+                    log.info("not found data source metrics info ：{}",tenantCode);
+                    continue;
+                }
+                DatasourceMetrics metrics = metricsMap.get(tenantCode);
+                metrics.setStatus(status);
+                metrics.setRecentlyOverrideTime(eventOccurredTime);
+                metrics.setDataSourceInfo(provider.getDatasourceInfo(tenantCode));
+                return;
             }
 
             if (status == DatasourceStatus.RUNNING.getStatus()){
@@ -75,11 +90,13 @@ public class TenancyMonitor {
                 }
                 metrics.setStatus(status);
                 metrics.setRecentlyUseTime(eventOccurredTime);
+                return;
             }
 
             if (status == DatasourceStatus.REMOVE.getStatus()){
                 log.info("remove data source metrics info:{}",tenantCode);
-                metricsMap.remove(tenantCode);
+                DatasourceMetrics metrics = metricsMap.get(tenantCode);
+                metrics.setStatus(DatasourceStatus.REMOVE.getStatus());
             }
 
 

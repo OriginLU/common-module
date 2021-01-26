@@ -188,7 +188,7 @@ public class TenantDataSourceProvider {
      */
     public void remove(String tenantCode) {
 
-        if (StringUtils.hasText(tenantCode)) {
+        if (!StringUtils.hasText(tenantCode)) {
             return;
         }
         if (dataSourceMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
@@ -226,7 +226,7 @@ public class TenantDataSourceProvider {
             //重写数据源
             overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
             dataSourceInfoMap.put(tenantCode,config);
-            eventPublisher.publishCreateEvent(this,tenantCode);
+            eventPublisher.publishOverrideEvent(this,tenantCode);
 
             return;
         }
@@ -267,9 +267,8 @@ public class TenantDataSourceProvider {
     /**
      * 检查数据源有效性
      */
-    public boolean existsDatasource(String tenantCode) {
-
-        return getDataSource(tenantCode) != null;
+    public boolean hasDatasource(String tenantCode) {
+        return dataSourceMap.get(tenantCode) != null;
     }
 
     /**

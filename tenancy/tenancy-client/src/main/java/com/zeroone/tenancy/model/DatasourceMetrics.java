@@ -29,6 +29,11 @@ public class DatasourceMetrics {
     private Long recentlyUseTime;
 
     /**
+     * 上次重写时间
+     */
+    private Long recentlyOverrideTime;
+
+    /**
      * 使用次数
      */
     private int useTimes = 0;
@@ -42,6 +47,16 @@ public class DatasourceMetrics {
      * 状态
      */
     private Integer status;
+
+    public Long getRecentlyOverrideTime() {
+        return recentlyOverrideTime;
+    }
+
+    public void setRecentlyOverrideTime(Long recentlyOverrideTime) {
+        this.recentlyOverrideTime = recentlyOverrideTime;
+    }
+
+
 
     public Integer getStatus() {
         return status;

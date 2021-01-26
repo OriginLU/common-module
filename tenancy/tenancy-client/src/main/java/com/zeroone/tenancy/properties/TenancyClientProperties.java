@@ -1,8 +1,5 @@
 package com.zeroone.tenancy.properties;
 
-import lombok.Data;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,9 +11,6 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Data
-@Accessors(chain = true)
-@ToString
 @Configuration
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
 public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAware {
@@ -40,10 +34,41 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
     private String instantName;
 
     /**
-     * 空闲回收时间
+     * 空闲回收时间单位：分[min]
      */
     private Long retrieveTime;
 
+    public Interceptor getInterceptor() {
+        return interceptor;
+    }
+
+    public Environment getEnvironment() {
+        return environment;
+    }
+
+    public String getTenantServerName() {
+        return tenantServerName;
+    }
+
+    public void setTenantServerName(String tenantServerName) {
+        this.tenantServerName = tenantServerName;
+    }
+
+    public String getInstantName() {
+        return instantName;
+    }
+
+    public void setInstantName(String instantName) {
+        this.instantName = instantName;
+    }
+
+    public Long getRetrieveTime() {
+        return retrieveTime;
+    }
+
+    public void setRetrieveTime(Long retrieveTime) {
+        this.retrieveTime = retrieveTime;
+    }
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
@@ -58,13 +83,24 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
         this.environment = environment;
     }
 
-    @Data
-    @Accessors(chain = true)
-    @ToString
     public static class Interceptor{
 
         private List<String> excludeUrls;
 
+        public List<String> getExcludeUrls() {
+            return excludeUrls;
+        }
+
+        public void setExcludeUrls(List<String> excludeUrls) {
+            this.excludeUrls = excludeUrls;
+        }
+
+        @Override
+        public String toString() {
+            return "Interceptor{" +
+                    "excludeUrls=" + excludeUrls +
+                    '}';
+        }
     }
 
 }

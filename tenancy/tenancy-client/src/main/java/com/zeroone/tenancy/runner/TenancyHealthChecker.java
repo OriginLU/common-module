@@ -4,7 +4,6 @@ import com.zeroone.tenancy.enums.DatasourceStatus;
 import com.zeroone.tenancy.model.DatasourceMetrics;
 import com.zeroone.tenancy.properties.TenancyClientProperties;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
-import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +42,11 @@ public class TenancyHealthChecker{
 
         metricsMap.forEach((tenantCode,dataMetrics) -> {
 
-            log.info("\n租户:{},\n初始化时间:{},\n创建时间:{},\n最近一次使用时间：{},\n使用次数:{},\n运行状态:{}",
+            log.info("\n租户:{},\n初始化时间:{},\n创建时间:{},\n重新创建时间:{},\n最近一次使用时间：{},\n使用次数:{},\n运行状态:{}",
                     tenantCode,
                     getTime(dataMetrics.getInitTime()),
                     getTime(dataMetrics.getCreateTime()),
+                    getTime(dataMetrics.getRecentlyOverrideTime()),
                     getTime(dataMetrics.getRecentlyUseTime()),
                     dataMetrics.getUseTimes(),
                     DatasourceStatus.fromType(dataMetrics.getStatus()).getDesc());
@@ -55,13 +55,15 @@ public class TenancyHealthChecker{
 
 
             //执行空闲超时移除逻辑
-            if (dataMetrics.getStatus() != DatasourceStatus.RUNNING.getStatus() && !dataMetrics.getTenantCode().equals(TenantIdentifierHelper.DEFAULT)) {
+            if (dataMetrics.getStatus() != DatasourceStatus.RUNNING.getStatus()) {
                 return;
             }
             long idleTime = System.currentTimeMillis() - dataMetrics.getRecentlyUseTime();
             Long retrieveTime = tenancyClientProperties.getRetrieveTime();
             if (retrieveTime == null){
                 retrieveTime = TenancyClientProperties.DEFAULT_RETRIEVE_TIME;
+            }else {
+                retrieveTime = TimeUnit.MINUTES.toMillis(retrieveTime);
             }
             if (idleTime >= retrieveTime){
                 log.info("idle time is over {} min,remove tenant [{}] datasource", TimeUnit.MILLISECONDS.toMinutes(retrieveTime),tenantCode);

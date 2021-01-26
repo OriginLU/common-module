@@ -7,10 +7,11 @@ import java.util.Optional;
 
 public enum DatasourceStatus {
 
-    INIT(1,"初始化"),
+    INIT(1,"就绪"),
     CREATE(2,"创建"),
-    RUNNING(3,"使用"),
-    REMOVE(4,"移除"),
+    OVERRIDE(3,"重新创建"),
+    RUNNING(4,"运行中"),
+    REMOVE(5,"移除"),
     ERROR_INPUT(-1,"错误状态"),
 
     ;

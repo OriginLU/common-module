@@ -23,6 +23,10 @@ public class DatasourceEventPublisher {
         eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.CREATE.getStatus()));
     }
 
+    public void publishOverrideEvent(Object source,String tenantCode){
+        eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.OVERRIDE.getStatus()));
+    }
+
 
     public void publishRunningEvent(Object source, String tenantCode){
         eventPublisher.publishEvent(DatasourceActionEvent.build(source,tenantCode, DatasourceStatus.RUNNING.getStatus()));

@@ -50,7 +50,7 @@ public class TenantInterceptor extends HandlerInterceptorAdapter {
             return false;
         }
         //检查数据源是否存在,不存在则初始化
-        if (!provider.existsDatasource(tenantCode) && !tenancyInitializer.initTenantDataSource(tenantCode)) {
+        if (!provider.hasDatasource(tenantCode) && !tenancyInitializer.initTenantDataSource(tenantCode)) {
             //添加数据源
             writeErrorResponse(response);
             return false;
