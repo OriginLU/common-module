@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.hibernate.spi;
 
+import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
-import com.zeroone.tenancy.provider.TenantDataSourceContext;
 import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 
 import javax.sql.DataSource;
@@ -20,6 +20,8 @@ import javax.sql.DataSource;
 public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl {
 
 
+    private static final long serialVersionUID = -5005893104168867879L;
+
     @Override
     protected DataSource selectAnyDataSource() {
         return selectDataSource(TenantIdentifierHelper.DEFAULT);
@@ -27,6 +29,6 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     @Override
     protected DataSource selectDataSource(String tenantIdentifier) {
-        return TenantDataSourceContext.getTenantDataSource(tenantIdentifier);
+        return TenantDataSourceProvider.getInstance().getDataSource(tenantIdentifier);
     }
 }

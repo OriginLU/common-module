@@ -10,6 +10,8 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -33,11 +35,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 租户数据源加载器
  */
-public class TenantDataSourceProvider {
+public class TenantDataSourceProvider implements InitializingBean, DisposableBean {
 
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
 
+    private static final TenantDataSourceProvider instance = new TenantDataSourceProvider();
 
     private final Map<String, DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
 
@@ -53,7 +56,6 @@ public class TenantDataSourceProvider {
      * monitor lock
      */
     private final Object monitor = new Object();
-
     /**
      * 默认字符集
      */
@@ -67,35 +69,45 @@ public class TenantDataSourceProvider {
     /**
      * liquibase配置
      */
-    private SpringLiquibase liquibase;
+    private  SpringLiquibase liquibase;
 
     /**
      * 数据源配置
      */
-    private DataSourceProperties dataSourceProperties;
+    private  DataSourceProperties dataSourceProperties;
 
     /**
      * spring上下文
      */
-    private final DefaultListableBeanFactory defaultListableBeanFactory;
+    private  DefaultListableBeanFactory defaultListableBeanFactory;
 
     /**
      * 配置bean工厂元数据信息
      */
-    private ConfigurationBeanFactoryMetadata beanFactoryMetadata;
+    private  ConfigurationBeanFactoryMetadata beanFactoryMetadata;
 
 
-    private DatasourceEventPublisher eventPublisher;
+    private  DatasourceEventPublisher eventPublisher;
 
 
-    private final String instanceId;
+    private  String instanceId;
 
+    private TenantDataSourceProvider() {
 
-    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
+    }
 
+    public void setDefaultListableBeanFactory(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
+    }
 
-        this.instanceId = UUID.randomUUID().toString().replace("-","");
+    public static TenantDataSourceProvider getInstance(){
+        return instance;
+    }
+
+
+    private void init(){
+
+        this.instanceId = UUID.randomUUID().toString().replace("-", "");
         //1.获取liquibase bean
         this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
         //2.获取bean配置
@@ -112,16 +124,15 @@ public class TenantDataSourceProvider {
         //6.添加默认数据源
         dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
 
-        this.eventPublisher.publishCreateEvent(this,TenantIdentifierHelper.DEFAULT);
-
-        TenantDataSourceContext.setTenantDataSourceContext(this);
+        this.eventPublisher.publishCreateEvent(this, TenantIdentifierHelper.DEFAULT);
     }
+
 
     public String getInstanceId() {
         return instanceId;
     }
 
-    public DataSourceInfo getDatasourceInfo(String tenantCode){
+    public DataSourceInfo getDatasourceInfo(String tenantCode) {
         return dataSourceInfoMap.get(tenantCode);
     }
 
@@ -136,7 +147,7 @@ public class TenantDataSourceProvider {
         }
         if (dataSourceMap.containsKey(tenantCode)) {
             log.info("get tenant data source:{}", tenantCode);
-            eventPublisher.publishRunningEvent(this,tenantCode);
+            eventPublisher.publishRunningEvent(this, tenantCode);
             return dataSourceMap.get(tenantCode);
         }
 
@@ -144,7 +155,7 @@ public class TenantDataSourceProvider {
 
             synchronized (monitor) {
                 if (dataSourceMap.containsKey(tenantCode)) {
-                    eventPublisher.publishRunningEvent(this,tenantCode);
+                    eventPublisher.publishRunningEvent(this, tenantCode);
                     return dataSourceMap.get(tenantCode);
                 }
                 DataSourceInfo dataSourceInfo = dataSourceInfoMap.get(tenantCode);
@@ -156,7 +167,7 @@ public class TenantDataSourceProvider {
                     //3.设置数据源缓存
                     dataSourceMap.put(tenantCode, dataSource);
                     //4.设置监控指标
-                    eventPublisher.publishRunningEvent(this,tenantCode);
+                    eventPublisher.publishRunningEvent(this, tenantCode);
 
                     return dataSource;
                 } catch (SQLException e) {
@@ -197,7 +208,7 @@ public class TenantDataSourceProvider {
             return;
         }
 
-        synchronized (monitor){
+        synchronized (monitor) {
 
             if (dataSourceMap.containsKey(tenantCode) && !TenantIdentifierHelper.DEFAULT.equalsIgnoreCase(tenantCode)) {
 
@@ -210,7 +221,7 @@ public class TenantDataSourceProvider {
                     }
                 }
                 dataSourceMap.remove(tenantCode);
-                eventPublisher.publishRemoveEvent(this,tenantCode);
+                eventPublisher.publishRemoveEvent(this, tenantCode);
             }
         }
     }
@@ -227,7 +238,7 @@ public class TenantDataSourceProvider {
             return;
         }
 
-        synchronized (monitor){
+        synchronized (monitor) {
             //判断是否需要重写
             String tenantCode = config.getTenantCode();
             if (BooleanUtils.isTrue(config.getRequireOverride())
@@ -235,9 +246,9 @@ public class TenantDataSourceProvider {
                     && dataSourceInfoMap.containsKey(tenantCode)) {
                 DataSource dataSource = createDataSource(config);
                 //重写数据源
-                overrideDataSource(tenantCode,dataSource,config.getRequireOverride());
-                dataSourceInfoMap.put(tenantCode,config);
-                eventPublisher.publishOverrideEvent(this,tenantCode);
+                overrideDataSource(tenantCode, dataSource, config.getRequireOverride());
+                dataSourceInfoMap.put(tenantCode, config);
+                eventPublisher.publishOverrideEvent(this, tenantCode);
 
                 return;
             }
@@ -251,7 +262,7 @@ public class TenantDataSourceProvider {
                 //3.设置数据源缓存
                 dataSourceMap.put(tenantCode, dataSource);
             } catch (SQLException e) {
-                throw  new IllegalStateException(e);
+                throw new IllegalStateException(e);
             }
         }
     }
@@ -288,7 +299,7 @@ public class TenantDataSourceProvider {
                 //判断数据是否存在
                 boolean isAbsent = queryRunner.query(connection,
                         MysqlConstants.QUERY_SCHEMA_SQL,
-                        rs ->  rs.next() && rs.getInt(1) == 0,
+                        rs -> rs.next() && rs.getInt(1) == 0,
                         dataSourceInfo.getDatabase());
 
                 if (isAbsent) {
@@ -300,7 +311,7 @@ public class TenantDataSourceProvider {
                 //liquibase初始化数据表
                 initializeDataBase(connection);
                 dataSourceInfoMap.put(dataSourceInfo.getTenantCode(), dataSourceInfo);
-                eventPublisher.publishInitEvent(this,dataSourceInfo.getTenantCode());
+                eventPublisher.publishInitEvent(this, dataSourceInfo.getTenantCode());
             }
 
         } catch (Exception e) {
@@ -308,7 +319,6 @@ public class TenantDataSourceProvider {
             throw new IllegalStateException(e);
 
         }
-
 
     }
 
@@ -318,7 +328,7 @@ public class TenantDataSourceProvider {
         Connection connection = DataSourceUtils.doGetConnection(dataSource);
 
         try {
-             new QueryRunner().execute(connection, MysqlConstants.TEST_QUERY);
+            new QueryRunner().execute(connection, MysqlConstants.TEST_QUERY);
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
@@ -387,7 +397,7 @@ public class TenantDataSourceProvider {
             }
 
             @Override
-            public boolean isWrapperFor(Class<?> iface)  {
+            public boolean isWrapperFor(Class<?> iface) {
                 throw new UnsupportedOperationException();
             }
 
@@ -419,4 +429,21 @@ public class TenantDataSourceProvider {
     }
 
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+        if (defaultListableBeanFactory == null){
+            throw new IllegalStateException("not set up spring bean factory");
+        }
+        init();
+    }
+
+
+    @Override
+    public void destroy() throws Exception {
+        dataSourceMap.forEach((tenantCode, datasource) -> {
+            log.info("destory tenant :{}", tenantCode);
+            remove(tenantCode);
+        });
+    }
 }

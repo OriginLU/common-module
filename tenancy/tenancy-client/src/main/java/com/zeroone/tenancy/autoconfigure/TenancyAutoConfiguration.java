@@ -89,8 +89,11 @@ public class TenancyAutoConfiguration {
     }
 
     @Bean
-    public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory, DataSource dataSource){
-        return new TenantDataSourceProvider(defaultListableBeanFactory);
+    public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
+
+        TenantDataSourceProvider instance = TenantDataSourceProvider.getInstance();
+        instance.setDefaultListableBeanFactory(defaultListableBeanFactory);
+        return instance;
     }
 
 
