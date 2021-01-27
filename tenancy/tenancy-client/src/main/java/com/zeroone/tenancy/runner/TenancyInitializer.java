@@ -44,7 +44,7 @@ public class TenancyInitializer implements SmartInitializingSingleton, Initializ
     }
 
     private String getRequestUri(String uri, Object... replace) {
-        return String.format("http://" + tenancyClientProperties.getTenantServerName() + uri, replace);
+        return String.format("http://" + tenancyClientProperties.getServerName() + uri, replace);
     }
 
 

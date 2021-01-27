@@ -29,7 +29,7 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
     /**
      * 数据源服务名称
      */
-    private String tenantServerName;
+    private String serverName;
 
     /**
      * 实例名称
@@ -56,6 +56,20 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
      */
     private String instanceId;
 
+    /**
+     * 租户服务地址
+     */
+    private List<String> serverUrls;
+
+
+    public List<String> getServerUrls() {
+        return serverUrls;
+    }
+
+    public void setServerUrls(List<String> serverUrls) {
+        this.serverUrls = serverUrls;
+    }
+
     public Integer getServerPort() {
         return serverPort;
     }
@@ -76,12 +90,12 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
         return environment;
     }
 
-    public String getTenantServerName() {
-        return tenantServerName;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setTenantServerName(String tenantServerName) {
-        this.tenantServerName = tenantServerName;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     public String getInstantName() {
