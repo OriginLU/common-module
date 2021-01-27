@@ -21,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
@@ -59,11 +59,9 @@ import org.springframework.web.servlet.handler.AbstractHandlerMethodMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.persistence.EntityManager;
-import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration
@@ -90,10 +88,7 @@ public class TenancyAutoConfiguration {
 
     @Bean
     public TenantDataSourceProvider tenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory){
-
-        TenantDataSourceProvider instance = TenantDataSourceProvider.getInstance();
-        instance.setDefaultListableBeanFactory(defaultListableBeanFactory);
-        return instance;
+        return new TenantDataSourceProvider(defaultListableBeanFactory);
     }
 
 
@@ -232,21 +227,15 @@ public class TenancyAutoConfiguration {
     @ConditionalOnClass({ LocalContainerEntityManagerFactoryBean.class, EntityManager.class })
     static class HibernateTenancyAutoConfiguration {
 
-        /**
-         * override bean to configure default multi-tenancy
-         */
-        @Bean
-        public JpaProperties jpaProperties(JpaProperties jpaProperties){
-            //添加多租户默认配置
-            Map<String, String> properties = jpaProperties.getProperties();
-            //配置多租户策略
-            properties.putIfAbsent(AvailableSettings.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
-            //配置多租户租户ID解析器
-            properties.putIfAbsent(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, CustomMultiTenantIdentifierResolver.class.getName());
-            //配置多租户ID链接提供器
-            properties.putIfAbsent(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, CustomMultiTenantConnectionProvider.class.getName());
 
-            return jpaProperties;
+        @Bean
+        public MultiTenantConnectionProvider multiTenantConnectionProvider(TenantDataSourceProvider provider){
+            return new CustomMultiTenantConnectionProvider(provider);
+        }
+
+        @Bean
+        public CurrentTenantIdentifierResolver currentTenantIdentifierResolver(){
+            return new CustomMultiTenantIdentifierResolver();
         }
     }
 

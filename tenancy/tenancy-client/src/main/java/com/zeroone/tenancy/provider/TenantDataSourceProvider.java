@@ -11,7 +11,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -35,12 +34,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 租户数据源加载器
  */
-public class TenantDataSourceProvider implements InitializingBean, DisposableBean {
+public class TenantDataSourceProvider implements DisposableBean {
 
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
 
-    private static final TenantDataSourceProvider instance = new TenantDataSourceProvider();
 
     private final Map<String, DataSourceInfo> dataSourceInfoMap = new ConcurrentHashMap<>();
 
@@ -69,43 +67,32 @@ public class TenantDataSourceProvider implements InitializingBean, DisposableBea
     /**
      * liquibase配置
      */
-    private  SpringLiquibase liquibase;
+    private final SpringLiquibase liquibase;
 
     /**
      * 数据源配置
      */
-    private  DataSourceProperties dataSourceProperties;
+    private final DataSourceProperties dataSourceProperties;
 
     /**
      * spring上下文
      */
-    private  DefaultListableBeanFactory defaultListableBeanFactory;
+    private final DefaultListableBeanFactory defaultListableBeanFactory;
 
     /**
      * 配置bean工厂元数据信息
      */
-    private  ConfigurationBeanFactoryMetadata beanFactoryMetadata;
+    private final ConfigurationBeanFactoryMetadata beanFactoryMetadata;
 
 
-    private  DatasourceEventPublisher eventPublisher;
+    private final DatasourceEventPublisher eventPublisher;
 
 
-    private  String instanceId;
+    private final String instanceId;
 
-    private TenantDataSourceProvider() {
+    public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
 
-    }
-
-    public void setDefaultListableBeanFactory(DefaultListableBeanFactory defaultListableBeanFactory) {
         this.defaultListableBeanFactory = defaultListableBeanFactory;
-    }
-
-    public static TenantDataSourceProvider getInstance(){
-        return instance;
-    }
-
-
-    private void init(){
 
         this.instanceId = UUID.randomUUID().toString().replace("-", "");
         //1.获取liquibase bean
@@ -430,21 +417,11 @@ public class TenantDataSourceProvider implements InitializingBean, DisposableBea
 
 
     @Override
-    public void afterPropertiesSet() {
-        log.info("initializing tenant datasource provider ....");
-        if (defaultListableBeanFactory == null){
-            throw new IllegalStateException("not set up spring bean factory");
-        }
-        init();
-    }
-
-
-    @Override
     public void destroy() {
 
         log.info("destroying tenant datasource provider....");
         dataSourceMap.forEach((tenantCode, datasource) -> {
-            log.info("destory tenant :{}", tenantCode);
+            log.info("destroy tenant :{}", tenantCode);
             remove(tenantCode);
         });
     }

@@ -22,6 +22,13 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     private static final long serialVersionUID = -5005893104168867879L;
 
+
+    private final TenantDataSourceProvider provider;
+
+    public CustomMultiTenantConnectionProvider(TenantDataSourceProvider tenantDataSourceProvider) {
+        this.provider = tenantDataSourceProvider;
+    }
+
     @Override
     protected DataSource selectAnyDataSource() {
         return selectDataSource(TenantIdentifierHelper.DEFAULT);
@@ -29,6 +36,6 @@ public class CustomMultiTenantConnectionProvider extends AbstractDataSourceBased
 
     @Override
     protected DataSource selectDataSource(String tenantIdentifier) {
-        return TenantDataSourceProvider.getInstance().getDataSource(tenantIdentifier);
+        return provider.getDataSource(tenantIdentifier);
     }
 }
