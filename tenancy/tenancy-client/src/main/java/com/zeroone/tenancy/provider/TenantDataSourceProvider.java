@@ -11,6 +11,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationBeanFactoryMetadata;
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 租户数据源加载器
  */
-public class TenantDataSourceProvider implements DisposableBean {
+public class TenantDataSourceProvider implements SmartInitializingSingleton, DisposableBean {
 
 
     private final static Logger log = LoggerFactory.getLogger(TenantDataSourceProvider.class);
@@ -110,8 +111,6 @@ public class TenantDataSourceProvider implements DisposableBean {
                 .findFirst().ifPresent(beanName -> this.beanName = beanName);
         //6.添加默认数据源
         dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
-
-        this.eventPublisher.publishCreateEvent(this, TenantIdentifierHelper.DEFAULT);
     }
 
 
@@ -424,5 +423,10 @@ public class TenantDataSourceProvider implements DisposableBean {
             log.info("destroy tenant :{}", tenantCode);
             remove(tenantCode);
         });
+    }
+
+    @Override
+    public void afterSingletonsInstantiated() {
+        this.eventPublisher.publishCreateEvent(this, TenantIdentifierHelper.DEFAULT);
     }
 }

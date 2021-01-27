@@ -58,8 +58,12 @@ public class TenancyHealthChecker{
                     dataMetrics.getUseTimes(),
                     DatasourceStatusEnum.fromType(dataMetrics.getStatus()).getDesc());
 
+            //默认数据源不可做删改
+            if (dataMetrics.getTenantCode().equals(TenantIdentifierHelper.DEFAULT)) {
+                return;
+            }
             //执行空闲超时移除逻辑
-            if (dataMetrics.getStatus() != DatasourceStatusEnum.RUNNING.getStatus() && !dataMetrics.getTenantCode().equals(TenantIdentifierHelper.DEFAULT)) {
+            if (dataMetrics.getStatus() != DatasourceStatusEnum.RUNNING.getStatus()) {
                 return;
             }
             long idleTime = System.currentTimeMillis() - dataMetrics.getRecentlyUseTime();
