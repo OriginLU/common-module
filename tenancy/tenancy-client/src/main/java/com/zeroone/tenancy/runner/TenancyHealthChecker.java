@@ -9,10 +9,14 @@ import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,10 +34,18 @@ public class TenancyHealthChecker{
 
     private final TenancyClientProperties tenancyClientProperties;
 
-    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor,TenancyClientProperties tenancyClientProperties) {
+    private final RestTemplate restTemplate;
+
+    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientProperties tenancyClientProperties, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizer) {
         this.provider = provider;
         this.tenancyMonitor = tenancyMonitor;
         this.tenancyClientProperties = tenancyClientProperties;
+        this.restTemplate = new RestTemplate();
+        restTemplateCustomizer.ifAvailable(restTemplateCustomizers -> {
+            for (RestTemplateCustomizer customizer : restTemplateCustomizers) {
+                customizer.customize(restTemplate);
+            }
+        });
     }
 
     @Scheduled(initialDelay = 10000L,fixedDelay = 30000L)
@@ -89,8 +101,13 @@ public class TenancyHealthChecker{
 
         TenancyMetricsDTO tenancyMetricsDTO = new TenancyMetricsDTO();
         tenancyMetricsDTO.setMetricsMap(metricsMap);
-        tenancyMetricsDTO.setInstanceId(provider.getInstanceId());
+        tenancyMetricsDTO.setInstanceId(tenancyClientProperties.getInstanceId());
         tenancyMetricsDTO.setInstanceName(tenancyClientProperties.getInstantName());
+        tenancyMetricsDTO.setIp(tenancyClientProperties.getIp());
+        tenancyMetricsDTO.setInstanceName(tenancyClientProperties.getInstanceId());
+
+//        restTemplate.postForObject(getRequestUri())
+
 
     }
 

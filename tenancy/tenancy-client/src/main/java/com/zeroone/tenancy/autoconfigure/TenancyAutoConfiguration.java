@@ -116,8 +116,8 @@ public class TenancyAutoConfiguration {
     }
 
     @Bean
-    public TenancyHealthChecker tenancyHealthChecker(TenantDataSourceProvider provider,TenancyMonitor tenancyMonitor,TenancyClientProperties tenancyClientProperties){
-        return new TenancyHealthChecker(provider,tenancyMonitor,tenancyClientProperties);
+    public TenancyHealthChecker tenancyHealthChecker(TenantDataSourceProvider provider,TenancyMonitor tenancyMonitor,TenancyClientProperties tenancyClientProperties, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
+        return new TenancyHealthChecker(provider,tenancyMonitor,tenancyClientProperties,restTemplateCustomizers);
     }
 
 

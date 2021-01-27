@@ -1,5 +1,7 @@
 package com.zeroone.tenancy.properties;
 
+import com.zeroone.tenancy.utils.DockerUtils;
+import com.zeroone.tenancy.utils.NetUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -37,6 +40,33 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
      * 空闲回收时间单位：分[min]
      */
     private Long retrieveTime;
+
+    /**
+     * 服务端口
+     */
+    private Integer serverPort;
+
+    /**
+     * ip
+     */
+    private String ip;
+
+    /**
+     * 实例ID
+     */
+    private String instanceId;
+
+    public Integer getServerPort() {
+        return serverPort;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
 
     public Interceptor getInterceptor() {
         return interceptor;
@@ -75,6 +105,17 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
         if (!StringUtils.hasText(instantName)){
             this.instantName = getEnvironment().getProperty(INSTANCE_NAME_KEY);
         }
+
+        if (DockerUtils.isDocker()) {
+            this.ip = DockerUtils.getDockerHost();
+        } else {
+            this.ip = NetUtils.getLocalAddress();
+        }
+
+        this.serverPort = Integer
+                .valueOf(getEnvironment().getProperty("server.port", getEnvironment().getProperty("port", "8080")));
+        //配置实例ID
+        this.instanceId = UUID.randomUUID().toString().replace("-", "");
         return bean;
     }
 

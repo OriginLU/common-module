@@ -89,13 +89,11 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
     private final DatasourceEventPublisher eventPublisher;
 
 
-    private final String instanceId;
-
     public TenantDataSourceProvider(DefaultListableBeanFactory defaultListableBeanFactory) {
 
         this.defaultListableBeanFactory = defaultListableBeanFactory;
 
-        this.instanceId = UUID.randomUUID().toString().replace("-", "");
+
         //1.获取liquibase bean
         this.liquibase = (SpringLiquibase) defaultListableBeanFactory.getBean(LIQUIBASE_BEAN_NAME);
         //2.获取bean配置
@@ -111,11 +109,6 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                 .findFirst().ifPresent(beanName -> this.beanName = beanName);
         //6.添加默认数据源
         dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
-    }
-
-
-    public String getInstanceId() {
-        return instanceId;
     }
 
     public DataSourceInfo getDatasourceInfo(String tenantCode) {

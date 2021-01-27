@@ -16,6 +16,11 @@ public interface TenancyApiConstants {
          * 租户数据源状态
          */
         String TENANT_DATA_SOURCE_STATUS = "/api/data-source/config/server/%s/status";
+
+        /**
+         * 上报数据监控信息
+         */
+        String PUSH_DATA_SOURCE_METRICS = "/tenant/datasource/cache/datasourceMetrics";
     }
 
     interface TenancyMethods {
@@ -35,6 +40,9 @@ public interface TenancyApiConstants {
          * id生成
          */
         String ID_GENERATE = "/api/id-generate";
+
+
+
 
     }
 }
