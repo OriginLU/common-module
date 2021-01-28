@@ -11,9 +11,9 @@ import java.util.concurrent.*;
 /**
  * 多租户工具类
  */
-public class MultiTenantUtil {
+public class TenecyThreadPoolExecutor {
 
-    private static final Logger log = LoggerFactory.getLogger(MultiTenantUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(TenecyThreadPoolExecutor.class);
 
 
     /**
@@ -74,9 +74,8 @@ public class MultiTenantUtil {
      *
      * @param executeTenantCode 指定租户
      * @param runnable          执行方法
-     * @param <T>               返回类型
      */
-    public static <T> void asyncExecute(final String executeTenantCode, final Runnable runnable) {
+    public static void asyncExecute(final String executeTenantCode, final Runnable runnable) {
         log.debug("execute without return:{},{}", executeTenantCode, runnable);
         checkTenantCode(executeTenantCode);
         execute(executeTenantCode, () -> {
