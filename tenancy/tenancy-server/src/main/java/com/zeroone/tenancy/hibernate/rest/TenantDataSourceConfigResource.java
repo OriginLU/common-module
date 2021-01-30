@@ -1,7 +1,6 @@
 package com.zeroone.tenancy.hibernate.rest;
 
 import com.zeroone.tenancy.dto.DataSourceInfo;
-import com.zeroone.tenancy.enums.DataSourceStateEnum;
 import com.zeroone.tenancy.hibernate.service.TenantDataSourceInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +31,11 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
     }
 
 
-    @GetMapping("{serverName}")
-    public ResponseEntity<List<DataSourceInfo>> getActiveDataSourceInfo(@PathVariable("serverName") String serverName){
-
-        return ResponseEntity.ok(tenantDataSourceInfoService.findTenantDataSourceInfoByServerNameAndState(serverName, DataSourceStateEnum.ACTIVE.getCode()));
-    }
+//    @GetMapping("{serverName}")
+//    public ResponseEntity<List<DataSourceInfo>> getActiveDataSourceInfo(@PathVariable("serverName") String serverName){
+//
+//        return ResponseEntity.ok(tenantDataSourceInfoService.findTenantDataSourceInfoByServerNameAndState(serverName, DataSourceStateEnum.ACTIVE.getCode()));
+//    }
 
 
     @GetMapping("{serverName}/{state}")

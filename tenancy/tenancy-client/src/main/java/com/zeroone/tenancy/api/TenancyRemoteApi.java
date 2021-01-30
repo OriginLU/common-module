@@ -33,7 +33,7 @@ public class TenancyRemoteApi {
 
     private Boolean isEnableEnurekaLoadBalance = false;
 
-    private LoadBalaceStrategy loadBalaceStrategy;
+    private LoadBalanceStrategy loadBalanceStrategy;
 
     private Supplier<String> url;
 
@@ -44,11 +44,11 @@ public class TenancyRemoteApi {
         this.restTemplate = new RestTemplate();
         //检测是否启用ribbon
         restTemplateCustomizers.ifAvailable(customizers -> {
-            this.isEnableEnurekaLoadBalance = true;
             String serverName = tenancyClientProperties.getServerName();
             if (StringUtils.isBlank(serverName)){
-                throw new IllegalStateException("tenancy server name not found,check config please");
+                return;
             }
+            this.isEnableEnurekaLoadBalance = true;
             for (RestTemplateCustomizer customizer : customizers) {
                 customizer.customize(restTemplate);
             }
@@ -58,7 +58,7 @@ public class TenancyRemoteApi {
         if (!isEnableEnurekaLoadBalance){
             List<String> serverUrls = tenancyClientProperties.getServerUrls();
             if (CollectionUtils.isEmpty(serverUrls)){
-                throw new IllegalStateException("tenancy server urls not found,check config please");
+                throw new IllegalStateException("tenancy server config not found,check config please");
             }
             List<String> urls = new ArrayList<>();
             serverUrls.forEach(url -> {
@@ -67,17 +67,13 @@ public class TenancyRemoteApi {
 
             SelectStrategyEnum strategy = tenancyClientProperties.getStrategy();
             if (strategy == null){
-                this.loadBalaceStrategy = new RoundStrategy(urls);
+                this.loadBalanceStrategy = new RoundStrategy(urls);
             }else if (strategy.equals(SelectStrategyEnum.ROUND)){
-                this.loadBalaceStrategy = new RoundStrategy(urls);
+                this.loadBalanceStrategy = new RoundStrategy(urls);
             }else {
-                this.loadBalaceStrategy = new RandomStrategy(urls);
+                this.loadBalanceStrategy = new RandomStrategy(urls);
             }
-
-
-
-
-            this.url = () -> loadBalaceStrategy.select();
+            this.url = () -> loadBalanceStrategy.select();
         }
 
     }
@@ -104,13 +100,13 @@ public class TenancyRemoteApi {
     }
 
 
-    interface LoadBalaceStrategy{
+    interface LoadBalanceStrategy {
 
         String select();
     }
 
 
-    static class RoundStrategy implements LoadBalaceStrategy {
+    static class RoundStrategy implements LoadBalanceStrategy {
 
 
         private final String[] serverUrl;
@@ -125,19 +121,16 @@ public class TenancyRemoteApi {
 
         @Override
         public String select() {
-            return serverUrl[serverUrl.length % count.getAndIncrement()];
+            return serverUrl[serverUrl.length % count.incrementAndGet()];
         }
     }
 
 
-    static class RandomStrategy implements LoadBalaceStrategy{
+    static class RandomStrategy implements LoadBalanceStrategy {
 
         private final String[] serverUrl;
 
         private final Random random = new Random();
-
-
-        private final AtomicInteger count = new AtomicInteger(0);
 
         public RandomStrategy(List<String> serverUrl) {
             this.serverUrl = serverUrl.toArray(new String[0]);

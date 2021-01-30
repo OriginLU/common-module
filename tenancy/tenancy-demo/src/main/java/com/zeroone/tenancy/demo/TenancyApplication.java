@@ -3,13 +3,13 @@ package com.zeroone.tenancy.demo;
 import com.zeroone.tenancy.annotation.EnableTenancyClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+//import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+//import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableTenancyClient
-@EnableDiscoveryClient
-@EnableEurekaClient
+//@EnableDiscoveryClient
+//@EnableEurekaClient
 public class TenancyApplication {
 
 
