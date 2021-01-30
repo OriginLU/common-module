@@ -1,5 +1,6 @@
 package com.zeroone.tenancy.properties;
 
+import com.zeroone.tenancy.enums.SelectStrategyEnum;
 import com.zeroone.tenancy.utils.DockerUtils;
 import com.zeroone.tenancy.utils.NetUtils;
 import org.springframework.beans.BeansException;
@@ -61,6 +62,16 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
      */
     private List<String> serverUrls;
 
+
+    private SelectStrategyEnum strategy;
+
+    public SelectStrategyEnum getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(SelectStrategyEnum strategy) {
+        this.strategy = strategy;
+    }
 
     public List<String> getServerUrls() {
         return serverUrls;

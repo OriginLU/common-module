@@ -4,6 +4,7 @@ package com.zeroone.tenancy.autoconfigure;
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.annotation.TenancyApi;
 import com.zeroone.tenancy.aop.TenancyDataSourceAspect;
+import com.zeroone.tenancy.api.TenancyRemoteApi;
 import com.zeroone.tenancy.event.DatasourceEventListener;
 import com.zeroone.tenancy.event.DatasourceEventPublisher;
 import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider;
@@ -91,22 +92,16 @@ public class TenancyAutoConfiguration {
         return new TenantDataSourceProvider(defaultListableBeanFactory);
     }
 
+    @Bean
+    public TenancyRemoteApi tenancyRemoteApi(TenancyClientProperties tenancyClientProperties,ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
+        return new TenancyRemoteApi(tenancyClientProperties,restTemplateCustomizers);
+    }
 
-    /**
-     * 多租户初始化器
-     *  关于为什么使用RestTemplateCustomizer问题解读：
-     *  <p>
-     *   1.RestTemplate完成最后初始化需要在@see {@link AbstractApplicationContext#refresh()}中的finishBeanFactoryInitialization阶段操作，
-     *   该阶段所处的bean的位置是在倒几位，这个时候初始化多租户的bean，会导致RestTemplate中LoadBalance相关的拦截器未加载，进而调用会
-     *   出现直接失败，失败原因是未进行对应的服务名替换。</p>
-     * <p>
-     *   2.RestTemplateCustomizer使用详细可以查看@see{@link LoadBalancerAutoConfiguration#loadBalancedRestTemplateInitializerDeprecated(org.springframework.beans.factory.ObjectProvider)}，
-     *   该方法实现了RestTemplate最后阶段的拦截器注入 </p>
-     */
+
     @Bean
     @ConditionalOnBean({TenantDataSourceProvider.class})
-    public TenancyInitializer tenancyInitializer(TenantDataSourceProvider tenantDataSourceProvider, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers, TenancyClientProperties tenancyProperties){
-        return new TenancyInitializer(tenantDataSourceProvider,restTemplateCustomizers,tenancyProperties);
+    public TenancyInitializer tenancyInitializer(TenantDataSourceProvider tenantDataSourceProvider, TenancyRemoteApi tenancyRemoteApi){
+        return new TenancyInitializer(tenantDataSourceProvider,tenancyRemoteApi);
     }
 
 
