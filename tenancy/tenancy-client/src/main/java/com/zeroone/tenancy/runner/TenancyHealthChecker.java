@@ -3,7 +3,7 @@ package com.zeroone.tenancy.runner;
 import com.zeroone.tenancy.dto.TenancyMetricsDTO;
 import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import com.zeroone.tenancy.dto.DatasourceMetrics;
-import com.zeroone.tenancy.properties.TenancyClientProperties;
+import com.zeroone.tenancy.properties.TenancyClientConfig;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -32,14 +32,14 @@ public class TenancyHealthChecker{
 
     private final TenancyMonitor tenancyMonitor;
 
-    private final TenancyClientProperties tenancyClientProperties;
+    private final TenancyClientConfig tenancyClientConfig;
 
     private final RestTemplate restTemplate;
 
-    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientProperties tenancyClientProperties, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizer) {
+    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientConfig tenancyClientConfig, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizer) {
         this.provider = provider;
         this.tenancyMonitor = tenancyMonitor;
-        this.tenancyClientProperties = tenancyClientProperties;
+        this.tenancyClientConfig = tenancyClientConfig;
         this.restTemplate = new RestTemplate();
         restTemplateCustomizer.ifAvailable(restTemplateCustomizers -> {
             for (RestTemplateCustomizer customizer : restTemplateCustomizers) {
@@ -79,9 +79,9 @@ public class TenancyHealthChecker{
                 return;
             }
             long idleTime = System.currentTimeMillis() - dataMetrics.getRecentlyUseTime();
-            Long retrieveTime = tenancyClientProperties.getRetrieveTime();
+            Long retrieveTime = tenancyClientConfig.getRetrieveTime();
             if (retrieveTime == null){
-                retrieveTime = TenancyClientProperties.DEFAULT_RETRIEVE_TIME;
+                retrieveTime = TenancyClientConfig.DEFAULT_RETRIEVE_TIME;
             }else {
                 retrieveTime = TimeUnit.MINUTES.toMillis(retrieveTime);
             }
@@ -101,10 +101,10 @@ public class TenancyHealthChecker{
 
         TenancyMetricsDTO tenancyMetricsDTO = new TenancyMetricsDTO();
         tenancyMetricsDTO.setMetricsMap(metricsMap);
-        tenancyMetricsDTO.setInstanceId(tenancyClientProperties.getInstanceId());
-        tenancyMetricsDTO.setInstanceName(tenancyClientProperties.getInstantName());
-        tenancyMetricsDTO.setIp(tenancyClientProperties.getIp());
-        tenancyMetricsDTO.setInstanceName(tenancyClientProperties.getInstanceId());
+        tenancyMetricsDTO.setInstanceId(tenancyClientConfig.getInstanceId());
+        tenancyMetricsDTO.setInstanceName(tenancyClientConfig.getInstantName());
+        tenancyMetricsDTO.setIp(tenancyClientConfig.getIp());
+        tenancyMetricsDTO.setInstanceName(tenancyClientConfig.getInstanceId());
 
 //        restTemplate.postForObject(getRequestUri())
 

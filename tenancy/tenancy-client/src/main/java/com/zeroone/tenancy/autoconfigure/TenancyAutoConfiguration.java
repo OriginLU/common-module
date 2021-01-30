@@ -12,7 +12,7 @@ import com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver;
 import com.zeroone.tenancy.interceptor.TenantInterceptor;
 import com.zeroone.tenancy.miss.handler.TenantCodeMissHandler;
 import com.zeroone.tenancy.mybatis.datasource.RoutingDataSource;
-import com.zeroone.tenancy.properties.TenancyClientProperties;
+import com.zeroone.tenancy.properties.TenancyClientConfig;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.runner.TenancyHealthChecker;
 import com.zeroone.tenancy.runner.TenancyInitializer;
@@ -38,13 +38,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
 import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
@@ -68,7 +66,7 @@ import java.util.Set;
 @Configuration
 @EnableAsync
 @EnableScheduling
-@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientProperties.class})
+@EnableConfigurationProperties({LiquibaseProperties.class, TenancyClientConfig.class})
 public class TenancyAutoConfiguration {
 
 
@@ -93,8 +91,8 @@ public class TenancyAutoConfiguration {
     }
 
     @Bean
-    public TenancyRemoteApi tenancyRemoteApi(TenancyClientProperties tenancyClientProperties,ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
-        return new TenancyRemoteApi(tenancyClientProperties,restTemplateCustomizers);
+    public TenancyRemoteApi tenancyRemoteApi(TenancyClientConfig tenancyClientConfig, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
+        return new TenancyRemoteApi(tenancyClientConfig,restTemplateCustomizers);
     }
 
 
@@ -111,8 +109,8 @@ public class TenancyAutoConfiguration {
     }
 
     @Bean
-    public TenancyHealthChecker tenancyHealthChecker(TenantDataSourceProvider provider,TenancyMonitor tenancyMonitor,TenancyClientProperties tenancyClientProperties, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
-        return new TenancyHealthChecker(provider,tenancyMonitor,tenancyClientProperties,restTemplateCustomizers);
+    public TenancyHealthChecker tenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientConfig tenancyClientConfig, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers){
+        return new TenancyHealthChecker(provider,tenancyMonitor, tenancyClientConfig,restTemplateCustomizers);
     }
 
 
@@ -142,16 +140,16 @@ public class TenancyAutoConfiguration {
 
         private final TenantDataSourceProvider tenantDataSourceProvider;
 
-        private final TenancyClientProperties tenancyClientProperties;
+        private final TenancyClientConfig tenancyClientConfig;
 
         private final TenancyInitializer tenancyInitializer;
 
         private Set<TenantCodeMissHandler> tenantCodeMissHandlers;
 
 
-        public TenancyInterceptorConfiguration(TenantDataSourceProvider tenantDataSourceProvider,TenancyClientProperties tenancyClientProperties,TenancyInitializer tenancyInitializer, ObjectProvider<Set<TenantCodeMissHandler>> missHandlerProvider) {
+        public TenancyInterceptorConfiguration(TenantDataSourceProvider tenantDataSourceProvider, TenancyClientConfig tenancyClientConfig, TenancyInitializer tenancyInitializer, ObjectProvider<Set<TenantCodeMissHandler>> missHandlerProvider) {
             this.tenantDataSourceProvider = tenantDataSourceProvider;
-            this.tenancyClientProperties = tenancyClientProperties;
+            this.tenancyClientConfig = tenancyClientConfig;
             this.tenancyInitializer = tenancyInitializer;
             missHandlerProvider.ifAvailable(missHandler -> this.tenantCodeMissHandlers = missHandler);
         }
@@ -162,7 +160,7 @@ public class TenancyAutoConfiguration {
             log.debug("add tenant interceptor");
             // 请求拦截
             List<String> allExcludes = Lists.newArrayList(excludes);
-            List<String> excludeUrls = tenancyClientProperties.getInterceptor().getExcludeUrls();
+            List<String> excludeUrls = tenancyClientConfig.getInterceptor().getExcludeUrls();
             if (!CollectionUtils.isEmpty(excludeUrls)) {
                 log.debug("server has config excludes of {}", excludeUrls);
                 allExcludes.addAll(excludeUrls);

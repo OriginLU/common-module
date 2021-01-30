@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ConfigurationProperties(prefix = "tenancy.client", ignoreInvalidFields = true)
-public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAware {
+public class TenancyClientConfig implements BeanPostProcessor, EnvironmentAware {
 
 
     public final static long DEFAULT_RETRIEVE_TIME = TimeUnit.HOURS.toMillis(1L);
@@ -62,8 +62,20 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
      */
     private List<String> serverUrls;
 
-
     private SelectStrategyEnum strategy;
+
+
+    private Boolean isEnableEurekaClient;
+
+    private Boolean isEnableDiscoverClient;
+
+    public Boolean getEnableDiscoverClient() {
+        return isEnableDiscoverClient;
+    }
+
+    public Boolean getEnableEurekaClient() {
+        return isEnableEurekaClient;
+    }
 
     public SelectStrategyEnum getStrategy() {
         return strategy;
@@ -141,6 +153,11 @@ public class TenancyClientProperties implements BeanPostProcessor, EnvironmentAw
                 .valueOf(getEnvironment().getProperty("server.port", getEnvironment().getProperty("port", "8080")));
         //配置实例ID
         this.instanceId = UUID.randomUUID().toString().replace("-", "");
+
+        this.isEnableEurekaClient = getEnvironment().getProperty("eureka.client.enabled",Boolean.class,Boolean.FALSE);
+
+        this.isEnableDiscoverClient = getEnvironment().getProperty("spring.cloud.discovery.enabled", Boolean.class, Boolean.FALSE);
+
         return bean;
     }
 
