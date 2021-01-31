@@ -5,6 +5,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 import java.util.Properties;
 
 @Data
@@ -49,13 +50,19 @@ public class DataSourceInfo {
     private String type;
 
 
-    private Boolean isEnable;
+    private Boolean enableOverride;
 
 
-    private Boolean requireOverride = true;
 
-    /**
-     * 连接配置信息
-     */
-    private Properties properties;
+    public Boolean getEnableOverride() {
+        if (enableOverride == null){
+            return true;
+        }
+        return enableOverride;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tenantCode, url, database, username, password, serverName, type, enableOverride);
+    }
 }

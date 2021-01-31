@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.rest;
+package com.zeroone.tenancy.rest;
 
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;

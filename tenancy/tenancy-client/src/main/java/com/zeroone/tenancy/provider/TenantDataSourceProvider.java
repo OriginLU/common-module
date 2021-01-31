@@ -167,10 +167,10 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
         return this.dataSourceMap;
     }
 
-    private void overrideDataSource(String tenantCode, DataSource dataSource, boolean requireOverride) {
+    private void overrideDataSource(String tenantCode, DataSource dataSource) {
 
         synchronized (monitor) {
-            if (dataSourceMap.containsKey(tenantCode) && BooleanUtils.isTrue(requireOverride)) {
+            if (dataSourceMap.containsKey(tenantCode)) {
                 remove(tenantCode);
             }
             dataSourceMap.put(tenantCode, dataSource);
@@ -220,13 +220,28 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
         synchronized (monitor) {
             //判断是否需要重写
             String tenantCode = config.getTenantCode();
-            if (BooleanUtils.isTrue(config.getRequireOverride())
-                    && dataSourceMap.containsKey(tenantCode)
-                    && dataSourceInfoMap.containsKey(tenantCode)) {
+            if (dataSourceMap.containsKey(tenantCode) && dataSourceInfoMap.containsKey(tenantCode)) {
+
+                if (!BooleanUtils.isTrue(config.getEnableOverride())){
+                    log.info("[{}]the data source is unsupport to changed",tenantCode);
+                    return;
+                }
+
+                if (dataSourceMap.get(tenantCode).hashCode() == config.hashCode()){
+                    log.info("[{}]noting has changed",tenantCode);
+                    return;
+                }
+
                 DataSource dataSource = createDataSource(config);
                 //重写数据源
-                overrideDataSource(tenantCode, dataSource, config.getRequireOverride());
+                if (dataSourceMap.containsKey(tenantCode)) {
+                    remove(tenantCode);
+                }
+                //数据源变更
+                dataSourceMap.put(tenantCode, dataSource);
+                //数据源配置变更
                 dataSourceInfoMap.put(tenantCode, config);
+                //发布重写变更事件
                 eventPublisher.publishOverrideEvent(this, tenantCode);
 
                 return;
@@ -272,9 +287,6 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
 
                 Connection connection = DriverManager.getConnection(dataSourceProperties.getUrl(), dataSourceProperties.getUsername(), dataSourceProperties.getPassword());
 
-                if (dataSourceInfo.getIsEnable() != null && !dataSourceInfo.getIsEnable()) {
-                    continue;
-                }
                 //判断数据是否存在
                 boolean isAbsent = queryRunner.query(connection,
                         MysqlConstants.QUERY_SCHEMA_SQL,
@@ -349,8 +361,12 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
 
         try {
             log.info("start init database by liquibase");
+            //获取已存在数据源，保护现场
+            DataSource dataSource = liquibase.getDataSource();
             liquibase.setDataSource(wrap(connection));
             liquibase.afterPropertiesSet();
+            //还原现场
+            liquibase.setDataSource(dataSource);
             log.info("success init database by liquibase");
         } catch (Exception e) {
             log.error("init database failed, {}", connection, e);

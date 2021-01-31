@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.rest;
+package com.zeroone.tenancy.rest;
 
 
 import com.zeroone.tenancy.dto.TenancyMetricsDTO;

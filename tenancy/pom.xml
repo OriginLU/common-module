@@ -17,7 +17,6 @@
         <module>tenancy-demo</module>
         <module>tenancy-server</module>
         <module>tenancy-model</module>
-        <module>tenency-server-demo</module>
     </modules>
 
 

@@ -1,7 +1,7 @@
 package com.zeroone.tenancy.autoconfigure;
 
-import com.zeroone.tenancy.hibernate.rest.TenantDataSourceConfigResource;
-import com.zeroone.tenancy.hibernate.service.TenantDataSourceInfoService;
+import com.zeroone.tenancy.rest.TenantDataSourceConfigResource;
+import com.zeroone.tenancy.service.TenantDataSourceInfoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;

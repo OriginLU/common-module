@@ -1,5 +1,7 @@
-package com.zeroone.tenancy.hibernate.entity;
+package com.zeroone.tenancy.entity;
 
+import com.zeroone.tenancy.enums.DataBaseTypeEnum;
+import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -7,6 +9,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author zero-one.lu
@@ -16,8 +19,11 @@ import java.util.Date;
 @Accessors(chain = true)
 @ToString
 @Entity
-@Table(name = "t_tenant_data_source_info")
+@Table(name = "tenant_data_source_info")
 public class TenantDataSourceInfo implements Serializable {
+
+
+    private static final long serialVersionUID = 823067067135243374L;
 
 
     @Id
@@ -40,7 +46,7 @@ public class TenantDataSourceInfo implements Serializable {
     /**
      * 用户名
      */
-    @Column(name = "username")
+    @Column(name = "user_name")
     private String username;
     /**
      * 密码
@@ -56,17 +62,23 @@ public class TenantDataSourceInfo implements Serializable {
      * 数据库类型 mongo/mysql
      */
     @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private DataBaseTypeEnum type;
 
 
-    @Column(name = "require_override")
-    private Boolean requireOverride;
+    @Column(name = "enable_override")
+    private Boolean enableOverride;
 
     /**
      * 数据源状态
      */
     @Column(name = "state")
-    private Integer state;
+    @Enumerated(EnumType.STRING)
+    private DatasourceStatusEnum state;
+
+
+    @Column(name = "hash")
+    private int hash;
 
     /**
      * 创建时间
@@ -79,4 +91,14 @@ public class TenantDataSourceInfo implements Serializable {
      */
     @Column(name = "modify_time")
     private Date modifyTime;
+
+
+    @Column(name = "delete_status")
+    private Integer deleteStatus;
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, tenantCode, url, database, username, password, serverName, type, enableOverride, state, hash, createTime, modifyTime, deleteStatus);
+    }
 }

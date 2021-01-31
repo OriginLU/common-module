@@ -20,7 +20,7 @@ public interface TenancyApiConstants {
         /**
          * 上报数据监控信息
          */
-        String PUSH_DATA_SOURCE_METRICS = "/tenant/datasource/cache/datasourceMetrics";
+        String PUSH_DATA_SOURCE_METRICS = "/tenant/data-source/cache/datasourceMetrics";
     }
 
     interface TenancyMethods {

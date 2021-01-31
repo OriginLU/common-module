@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.server;
+package com.zeroone.tenancy;
 
 import com.zeroone.tenancy.annotation.EnableTenancyServer;
 import org.springframework.boot.SpringApplication;
