@@ -34,5 +34,10 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
         return ResponseEntity.ok("success");
     }
 
+    @GetMapping("/api/data-source/config/tenant/{tenantCode}/server/{serverName}/type/{databaseType}")
+    public DataSourceInfo getSpecifiedActiveDataSourceInfo(String tenantCode,String serverName,String databaseType){
+        return tenantDataSourceInfoService.getSpecifiedActiveDataSourceInfo(tenantCode,serverName,databaseType);
+    }
+
 
 }

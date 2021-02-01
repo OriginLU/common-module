@@ -57,4 +57,11 @@ public class TenantDataSourceInfoService {
 
         return list;
     }
+
+    public DataSourceInfo getSpecifiedActiveDataSourceInfo(String tenantCode, String serverName, String databaseType) {
+
+        tenantDataSourceInfoRepository.findByTenantCodeAndServerNameAndType(tenantCode,serverName,databaseType);
+
+        return null;
+    }
 }

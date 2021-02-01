@@ -15,4 +15,6 @@ public interface TenantDataSourceInfoRepository extends JpaRepository<TenantData
 
 
     List<TenantDataSourceInfo> findByStateAndTenantCode(DataSourceConfigStatusEnum state, String tenantCode);
+
+    TenantDataSourceInfo findByTenantCodeAndServerNameAndType(String tenantCode, String serverName, String databaseType);
 }
