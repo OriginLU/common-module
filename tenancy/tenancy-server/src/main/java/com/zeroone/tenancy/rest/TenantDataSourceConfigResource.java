@@ -30,7 +30,7 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
     @PostMapping("save")
     public ResponseEntity<String> save(@Validated DataSourceInfo dataSourceInfo){
 
-        tenantDataSourceInfoService.saveTenantDataSoureInfo(dataSourceInfo);
+        tenantDataSourceInfoService.saveTenantDataSourceInfo(dataSourceInfo);
         return ResponseEntity.ok("success");
     }
 

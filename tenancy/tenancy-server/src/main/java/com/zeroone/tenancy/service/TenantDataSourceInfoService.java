@@ -25,7 +25,7 @@ public class TenantDataSourceInfoService {
 
 
 
-    public void saveTenantDataSoureInfo(DataSourceInfo dataSourceInfo){
+    public void saveTenantDataSourceInfo(DataSourceInfo dataSourceInfo){
 
         TenantDataSourceInfo tenantDataSourceInfo = new TenantDataSourceInfo();
 
