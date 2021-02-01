@@ -3,6 +3,7 @@ package com.zeroone.tenancy.service;
 import com.google.common.collect.Lists;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.entity.TenantDataSourceInfo;
+import com.zeroone.tenancy.enums.DataBaseTypeEnum;
 import com.zeroone.tenancy.enums.DataSourceConfigStatusEnum;
 import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import com.zeroone.tenancy.repository.TenantDataSourceInfoRepository;
@@ -38,8 +39,6 @@ public class TenantDataSourceInfoService {
     }
 
 
-
-
     public List<DataSourceInfo> getActiveDataSourceInfo(String tenantCode) {
 
         List<TenantDataSourceInfo> tenantDataSourceInfos = tenantDataSourceInfoRepository.findByStateAndTenantCode(DataSourceConfigStatusEnum.ENABLE, tenantCode);
@@ -58,10 +57,15 @@ public class TenantDataSourceInfoService {
         return list;
     }
 
-    public DataSourceInfo getSpecifiedActiveDataSourceInfo(String tenantCode, String serverName, String databaseType) {
+    public DataSourceInfo getSpecifiedActiveDataSourceInfo(String tenantCode, String serverName, DataBaseTypeEnum databaseType) {
 
-        tenantDataSourceInfoRepository.findByTenantCodeAndServerNameAndType(tenantCode,serverName,databaseType);
+        TenantDataSourceInfo tenantDataSourceInfo = tenantDataSourceInfoRepository.findByTenantCodeAndServerNameAndType(tenantCode, serverName, databaseType);
 
-        return null;
+        if (tenantDataSourceInfo == null){
+            return null;
+        }
+        DataSourceInfo dataSourceInfo = new DataSourceInfo();
+        BeanUtils.copyProperties(tenantDataSourceInfo,dataSourceInfo);
+        return dataSourceInfo;
     }
 }

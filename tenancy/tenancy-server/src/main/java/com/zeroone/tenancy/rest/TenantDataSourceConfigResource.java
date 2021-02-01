@@ -1,6 +1,8 @@
 package com.zeroone.tenancy.rest;
 
 import com.zeroone.tenancy.dto.DataSourceInfo;
+import com.zeroone.tenancy.dto.RestResult;
+import com.zeroone.tenancy.enums.DataBaseTypeEnum;
 import com.zeroone.tenancy.service.TenantDataSourceInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,22 +11,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * @author zero-one.lu
- * @since 2020-04-05
- */
+
 @RestController
 @RequestMapping("/api/data-source/config")
-public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
+public class TenantDataSourceConfigResource  {
 
 
     @Autowired
     private TenantDataSourceInfoService tenantDataSourceInfoService;
 
 
-    @PostMapping("tenant/server/{tenantCode}")
-    public List<DataSourceInfo> getActiveDataSourceInfo(@PathVariable("tenantCode") String tenantCode){
-        return tenantDataSourceInfoService.getActiveDataSourceInfo(tenantCode);
+    @PostMapping("/tenant/server/{tenantCode}")
+    public RestResult<List<DataSourceInfo>> getActiveDataSourceInfo(@PathVariable("tenantCode") String tenantCode){
+        return RestResult.returnSuccess(tenantDataSourceInfoService.getActiveDataSourceInfo(tenantCode));
     }
 
     @PostMapping("save")
@@ -34,9 +33,9 @@ public class TenantDataSourceConfigResource extends ExceptionHandlerResource {
         return ResponseEntity.ok("success");
     }
 
-    @GetMapping("/api/data-source/config/tenant/{tenantCode}/server/{serverName}/type/{databaseType}")
-    public DataSourceInfo getSpecifiedActiveDataSourceInfo(String tenantCode,String serverName,String databaseType){
-        return tenantDataSourceInfoService.getSpecifiedActiveDataSourceInfo(tenantCode,serverName,databaseType);
+    @GetMapping("/tenant/{tenantCode}/server/{serverName}/type/{databaseType}")
+    public RestResult<DataSourceInfo> getSpecifiedActiveDataSourceInfo(@PathVariable("tenantCode") String tenantCode, @PathVariable("serverName")String serverName, @PathVariable("databaseType")DataBaseTypeEnum databaseType){
+        return RestResult.returnSuccess(tenantDataSourceInfoService.getSpecifiedActiveDataSourceInfo(tenantCode,serverName,databaseType));
     }
 
 
