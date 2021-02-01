@@ -51,6 +51,7 @@ eureka:
 
 tenancy:
   client:
+    sync: false
     server-urls:
       - 10.0.25.101:8090
     retrieve-time: 5

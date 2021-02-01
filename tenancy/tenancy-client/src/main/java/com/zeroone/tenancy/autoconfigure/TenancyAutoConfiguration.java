@@ -98,8 +98,8 @@ public class TenancyAutoConfiguration {
 
     @Bean
     @ConditionalOnBean({TenantDataSourceProvider.class})
-    public TenancyInitializer tenancyInitializer(TenantDataSourceProvider tenantDataSourceProvider, TenancyRemoteApi tenancyRemoteApi){
-        return new TenancyInitializer(tenantDataSourceProvider,tenancyRemoteApi);
+    public TenancyInitializer tenancyInitializer(TenantDataSourceProvider tenantDataSourceProvider, TenancyRemoteApi tenancyRemoteApi,TenancyClientConfig tenancyClientConfig){
+        return new TenancyInitializer(tenantDataSourceProvider,tenancyRemoteApi,tenancyClientConfig);
     }
 
 

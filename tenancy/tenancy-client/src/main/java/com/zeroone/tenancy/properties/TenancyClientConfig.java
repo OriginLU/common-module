@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.properties;
 
-import com.zeroone.tenancy.enums.SelectStrategyEnum;
+import com.zeroone.tenancy.enums.LoadBalanceStrategyEnum;
 import com.zeroone.tenancy.utils.DockerUtils;
 import com.zeroone.tenancy.utils.NetUtils;
 import org.springframework.beans.BeansException;
@@ -62,12 +62,34 @@ public class TenancyClientConfig implements BeanPostProcessor, EnvironmentAware 
      */
     private List<String> serverUrls;
 
-    private SelectStrategyEnum strategy;
+    /**
+     * 负载均衡策略
+     */
+    private LoadBalanceStrategyEnum strategy;
+
+    /**
+     * 初始化同步/异步
+     */
+    private Boolean sync;
 
 
+    /**
+     * 是否启用eureka客户端
+     */
     private Boolean isEnableEurekaClient;
 
+    /**
+     * 是否启用服务发现客户端
+     */
     private Boolean isEnableDiscoverClient;
+
+    public Boolean getSync() {
+        return sync;
+    }
+
+    public void setSync(Boolean sync) {
+        this.sync = sync;
+    }
 
     public Boolean getEnableDiscoverClient() {
         return isEnableDiscoverClient;
@@ -77,11 +99,11 @@ public class TenancyClientConfig implements BeanPostProcessor, EnvironmentAware 
         return isEnableEurekaClient;
     }
 
-    public SelectStrategyEnum getStrategy() {
+    public LoadBalanceStrategyEnum getStrategy() {
         return strategy;
     }
 
-    public void setStrategy(SelectStrategyEnum strategy) {
+    public void setStrategy(LoadBalanceStrategyEnum strategy) {
         this.strategy = strategy;
     }
 

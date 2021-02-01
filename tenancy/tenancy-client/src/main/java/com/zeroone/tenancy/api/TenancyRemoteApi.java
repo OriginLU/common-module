@@ -2,7 +2,7 @@ package com.zeroone.tenancy.api;
 
 import com.zeroone.tenancy.constants.TenancyApiConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
-import com.zeroone.tenancy.enums.SelectStrategyEnum;
+import com.zeroone.tenancy.enums.LoadBalanceStrategyEnum;
 import com.zeroone.tenancy.properties.TenancyClientConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
@@ -65,10 +65,10 @@ public class TenancyRemoteApi {
                 urls.add(url.replace("http：//","").trim());
             });
 
-            SelectStrategyEnum strategy = tenancyClientConfig.getStrategy();
+            LoadBalanceStrategyEnum strategy = tenancyClientConfig.getStrategy();
             if (strategy == null){
                 this.loadBalanceStrategy = new RoundStrategy(urls);
-            }else if (strategy.equals(SelectStrategyEnum.ROUND)){
+            }else if (strategy.equals(LoadBalanceStrategyEnum.ROUND)){
                 this.loadBalanceStrategy = new RoundStrategy(urls);
             }else {
                 this.loadBalanceStrategy = new RandomStrategy(urls);

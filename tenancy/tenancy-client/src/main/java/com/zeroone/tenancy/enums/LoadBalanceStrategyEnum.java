@@ -1,6 +1,6 @@
 package com.zeroone.tenancy.enums;
 
-public enum SelectStrategyEnum {
+public enum LoadBalanceStrategyEnum {
 
     ROUND,
     RANDOM;
