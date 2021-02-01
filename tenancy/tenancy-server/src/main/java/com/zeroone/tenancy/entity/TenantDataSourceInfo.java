@@ -1,6 +1,7 @@
 package com.zeroone.tenancy.entity;
 
 import com.zeroone.tenancy.enums.DataBaseTypeEnum;
+import com.zeroone.tenancy.enums.DataSourceConfigStatusEnum;
 import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import lombok.Data;
 import lombok.ToString;
@@ -74,7 +75,7 @@ public class TenantDataSourceInfo implements Serializable {
      */
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
-    private DatasourceStatusEnum state;
+    private DataSourceConfigStatusEnum state;
 
 
     @Column(name = "hash")

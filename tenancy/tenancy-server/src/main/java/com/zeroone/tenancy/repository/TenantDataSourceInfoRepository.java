@@ -2,6 +2,7 @@ package com.zeroone.tenancy.repository;
 
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.entity.TenantDataSourceInfo;
+import com.zeroone.tenancy.enums.DataBaseTypeEnum;
 import com.zeroone.tenancy.enums.DataSourceConfigStatusEnum;
 import com.zeroone.tenancy.enums.DatasourceStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,5 @@ public interface TenantDataSourceInfoRepository extends JpaRepository<TenantData
 
     List<TenantDataSourceInfo> findByStateAndTenantCode(DataSourceConfigStatusEnum state, String tenantCode);
 
-    TenantDataSourceInfo findByTenantCodeAndServerNameAndType(String tenantCode, String serverName, String databaseType);
+    TenantDataSourceInfo findByTenantCodeAndServerNameAndType(String tenantCode, String serverName, DataBaseTypeEnum databaseType);
 }
