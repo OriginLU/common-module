@@ -1,22 +1,20 @@
 package com.zeroone.tenancy.runner;
 
+import com.zeroone.tenancy.api.TenancyRemoteApi;
+import com.zeroone.tenancy.dto.DatasourceMetrics;
+import com.zeroone.tenancy.dto.RestResult;
 import com.zeroone.tenancy.dto.TenancyMetricsDTO;
 import com.zeroone.tenancy.enums.DatasourceStatusEnum;
-import com.zeroone.tenancy.dto.DatasourceMetrics;
 import com.zeroone.tenancy.properties.TenancyClientConfig;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.cloud.client.loadbalancer.RestTemplateCustomizer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -34,18 +32,13 @@ public class TenancyHealthChecker{
 
     private final TenancyClientConfig tenancyClientConfig;
 
-    private final RestTemplate restTemplate;
+    private final TenancyRemoteApi tenancyRemoteApi;
 
-    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientConfig tenancyClientConfig, ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizer) {
+    public TenancyHealthChecker(TenantDataSourceProvider provider, TenancyMonitor tenancyMonitor, TenancyClientConfig tenancyClientConfig, TenancyRemoteApi tenancyRemoteApi) {
         this.provider = provider;
         this.tenancyMonitor = tenancyMonitor;
         this.tenancyClientConfig = tenancyClientConfig;
-        this.restTemplate = new RestTemplate();
-        restTemplateCustomizer.ifAvailable(restTemplateCustomizers -> {
-            for (RestTemplateCustomizer customizer : restTemplateCustomizers) {
-                customizer.customize(restTemplate);
-            }
-        });
+        this.tenancyRemoteApi = tenancyRemoteApi;
     }
 
     @Scheduled(initialDelay = 10000L,fixedDelay = 30000L)
@@ -106,9 +99,11 @@ public class TenancyHealthChecker{
         tenancyMetricsDTO.setIp(tenancyClientConfig.getIp());
         tenancyMetricsDTO.setInstanceName(tenancyClientConfig.getInstanceId());
 
-//        restTemplate.postForObject(getRequestUri())
+        RestResult<Void> pushResult = tenancyRemoteApi.pushDataSourceMetrics(tenancyMetricsDTO);
 
-
+        if (!pushResult.isSuccess()) {
+            log.warn("push data source metrics info error [{}]",pushResult.getMessage());
+        }
     }
 
     public String getTime(Long time){

@@ -2,6 +2,8 @@ package com.zeroone.tenancy.api;
 
 import com.zeroone.tenancy.constants.TenancyApiConstants;
 import com.zeroone.tenancy.dto.DataSourceInfo;
+import com.zeroone.tenancy.dto.RestResult;
+import com.zeroone.tenancy.dto.TenancyMetricsDTO;
 import com.zeroone.tenancy.enums.LoadBalanceStrategyEnum;
 import com.zeroone.tenancy.properties.TenancyClientConfig;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +13,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -82,14 +87,41 @@ public class TenancyRemoteApi {
 
     public List<DataSourceInfo> getAvailableConfigInfo() {
 
-        return restTemplate.exchange(getRequestUri(TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientConfig.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<List<DataSourceInfo>>() {
+        RestResult<List<DataSourceInfo>> restResult = restTemplate.exchange(getRequestUri(TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientConfig.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<List<DataSourceInfo>>>() {
         }).getBody();
+
+        assert restResult != null;
+        if (!restResult.isSuccess()) {
+            throw new IllegalStateException("get tenant data source info error [" + restResult.getMessage() + "]");
+        }
+
+        return restResult.getData();
     }
 
     public DataSourceInfo queryDataSource(String tenantCode){
 
         String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenantCode, tenancyClientConfig.getInstantName(),"mysql");
-        return restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST,DataSourceInfo.class).getBody();
+        RestResult<DataSourceInfo> restResult = restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<DataSourceInfo>>() {
+        }).getBody();
+        assert restResult != null;
+        if (!restResult.isSuccess()) {
+            throw new IllegalStateException("get tenant data source info error [" + restResult.getMessage() + "]");
+        }
+
+        return restResult.getData();
+    }
+
+    /**
+     * 推送租户信息
+     */
+    public RestResult<Void> pushDataSourceMetrics(TenancyMetricsDTO tenancyMetricsDTO){
+
+        String requestUri = getRequestUri(TenancyApiConstants.Query.PUSH_DATA_SOURCE_METRICS);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8.toString());
+        HttpEntity<TenancyMetricsDTO> tenancyMetricsDTOHttpEntity = new HttpEntity<>(tenancyMetricsDTO,headers);
+        return restTemplate.exchange(requestUri, HttpMethod.POST, tenancyMetricsDTOHttpEntity, new ParameterizedTypeReference<RestResult<Void>>() {
+        }).getBody();
     }
 
     private String getRequestUri(String uri, Object... replace) {
