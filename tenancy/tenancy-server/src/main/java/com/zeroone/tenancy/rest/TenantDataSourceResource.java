@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tenant/data-source")
+@RequestMapping("/api/tenant/data-source")
 public class TenantDataSourceResource {
 
 

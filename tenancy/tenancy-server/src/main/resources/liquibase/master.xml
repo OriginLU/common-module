@@ -6,6 +6,6 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
 
-    <include file="config/liquibase/changelog/20200519130000_open_account_record.xml" relativeToChangelogFile="false"/>
+    <include file="liquibase/changelog/tenant_data_source_info.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
