@@ -10,7 +10,6 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -177,15 +176,6 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
         return this.dataSourceMap;
     }
 
-    private void overrideDataSource(String tenantCode, DataSource dataSource) {
-
-        synchronized (monitor) {
-            if (dataSourceMap.containsKey(tenantCode)) {
-                remove(tenantCode);
-            }
-            dataSourceMap.put(tenantCode, dataSource);
-        }
-    }
 
     /**
      * 移除对应的数据源
