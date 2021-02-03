@@ -22,6 +22,6 @@ public interface TenancyClientProxy {
      * 移除对应租户数据源
      */
     @GetMapping("remove-datasource/{tenantCode}")
-    void removeDatasource(URI url, @PathVariable("tenantCode") String tenantCode);
+    RestResult<Void> removeDatasource(URI url, @PathVariable("tenantCode") String tenantCode);
 
 }
