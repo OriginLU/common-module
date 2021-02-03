@@ -249,19 +249,6 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                 dataSourceInfoMap.put(tenantCode, config);
                 //发布重写变更事件
                 eventPublisher.publishOverrideEvent(this, tenantCode);
-
-                return;
-            }
-
-            try {
-                //1.创建数据源
-                DataSource dataSource = createDataSource(config);
-                //2.检查数据源的有效性
-                checkConnectionValidity(dataSource);
-                //3.设置数据源缓存
-                dataSourceMap.put(tenantCode, dataSource);
-            } catch (SQLException e) {
-                throw new IllegalStateException(e);
             }
         }
     }
@@ -270,7 +257,7 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
      * 检查数据源有效性
      */
     public boolean hasDatasource(String tenantCode) {
-        return dataSourceMap.get(tenantCode) != null;
+        return dataSourceInfoMap.containsKey(tenantCode);
     }
 
     /**

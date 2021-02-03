@@ -1,0 +1,59 @@
+{
+  "groups": [
+    {
+      "name": "tenancy.client",
+      "type": "com.zeroone.tenancy.properties.TenancyClientConfig",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.interceptor",
+      "type": "com.zeroone.tenancy.properties.TenancyClientConfig$Interceptor",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig",
+      "sourceMethod": "getInterceptor()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "tenancy.client.environment",
+      "type": "org.springframework.core.env.Environment",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.instant-name",
+      "type": "java.lang.String",
+      "description": "实例名称",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.retrieve-time",
+      "type": "java.lang.Long",
+      "description": "空闲回收时间单位：分[min]",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.server-name",
+      "type": "java.lang.String",
+      "description": "数据源服务名称",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.server-urls",
+      "type": "java.util.List<java.lang.String>",
+      "description": "租户服务地址",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.strategy",
+      "type": "com.zeroone.tenancy.enums.LoadBalanceStrategyEnum",
+      "description": "负载均衡策略",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    },
+    {
+      "name": "tenancy.client.sync",
+      "type": "java.lang.Boolean",
+      "description": "初始化同步\/异步",
+      "sourceType": "com.zeroone.tenancy.properties.TenancyClientConfig"
+    }
+  ],
+  "hints": []
+}
