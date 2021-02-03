@@ -17,13 +17,13 @@
             <column name="type" remarks="数据库类型" type="VARCHAR(20)"/>
             <column name="enable_override" remarks="是否重写" type="tinyint"/>
             <column name="state" remarks="数据源状态" type="VARCHAR(20)"/>
-            <column name="hash" type="int"/>
             <column name="create_time" remarks="创建时间" type="datetime"/>
             <column name="modify_time" remarks="修改时间" type="datetime"/>
             <column name="delete_status" type="tinyint"/>
         </createTable>
-        <createIndex tableName="tenant_data_source_info" indexName="ix_hashcode" unique="true" >
-            <column  name="hash" type="int"/>
+        <createIndex tableName="tenant_data_source_info" indexName="ix_tenantCode_serverName" unique="true" >
+            <column name="tenant_code" type="varchar(20)"/>
+            <column name="server_name" remarks="服务名" type="VARCHAR(50)"/>
         </createIndex>
     </changeSet>
 

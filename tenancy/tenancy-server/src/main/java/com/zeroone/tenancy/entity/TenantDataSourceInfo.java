@@ -77,10 +77,6 @@ public class TenantDataSourceInfo implements Serializable {
     @Enumerated(EnumType.STRING)
     private DataSourceConfigStatusEnum state;
 
-
-    @Column(name = "hash")
-    private int hash;
-
     /**
      * 创建时间
      */
@@ -98,8 +94,9 @@ public class TenantDataSourceInfo implements Serializable {
     private Integer deleteStatus;
 
 
+
     @Override
     public int hashCode() {
-        return Objects.hash(id, tenantCode, url, database, username, password, serverName, type, enableOverride, state, hash, createTime, modifyTime, deleteStatus);
+        return Objects.hash(id, tenantCode, url, database, username, password, serverName, type, enableOverride, state, createTime, modifyTime, deleteStatus);
     }
 }
