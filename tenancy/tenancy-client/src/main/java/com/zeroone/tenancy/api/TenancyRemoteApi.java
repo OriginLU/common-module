@@ -85,30 +85,20 @@ public class TenancyRemoteApi {
 
     }
 
-    public List<DataSourceInfo> getAvailableConfigInfo() {
+    public RestResult<List<DataSourceInfo>> getAvailableConfigInfo() {
 
-        RestResult<List<DataSourceInfo>> restResult = restTemplate.exchange(getRequestUri(TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientConfig.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<List<DataSourceInfo>>>() {
+        return restTemplate.exchange(getRequestUri(TenancyApiConstants.Query.QUERY_ALL_DATA_SOURCE, tenancyClientConfig.getInstantName()), HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<List<DataSourceInfo>>>() {
         }).getBody();
 
-        assert restResult != null;
-        if (!restResult.isSuccess()) {
-            throw new IllegalStateException("get tenant data source info error [" + restResult.getMessage() + "]");
-        }
 
-        return restResult.getData();
     }
 
-    public DataSourceInfo queryDataSource(String tenantCode){
+    public RestResult<DataSourceInfo> queryDataSource(String tenantCode){
 
         String requestUri = getRequestUri(TenancyApiConstants.Query.QUERY_TENANT_DATA_SOURCE, tenantCode, tenancyClientConfig.getInstantName(),"mysql");
-        RestResult<DataSourceInfo> restResult = restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<DataSourceInfo>>() {
+        return  restTemplate.exchange(requestUri, HttpMethod.GET, DEFAULT_REQUEST, new ParameterizedTypeReference<RestResult<DataSourceInfo>>() {
         }).getBody();
-        assert restResult != null;
-        if (!restResult.isSuccess()) {
-            throw new IllegalStateException("get tenant data source info error [" + restResult.getMessage() + "]");
-        }
 
-        return restResult.getData();
     }
 
     /**

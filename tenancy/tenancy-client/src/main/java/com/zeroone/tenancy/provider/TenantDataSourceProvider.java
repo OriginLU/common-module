@@ -31,6 +31,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * 租户数据源加载器
@@ -45,6 +46,9 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
 
 
     private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
+
+
+    private final Set<String> tenantCodes = new ConcurrentSkipListSet<>();
 
     /**
      * 默认的liquibase名称
@@ -109,6 +113,10 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                 .findFirst().ifPresent(beanName -> this.beanName = beanName);
         //6.添加默认数据源
         dataSourceMap.put(TenantIdentifierHelper.DEFAULT, (DataSource) defaultListableBeanFactory.getBean(beanName));
+    }
+
+    public boolean hasTenantCode(String tenantCode){
+        return tenantCodes.contains(tenantCode);
     }
 
     public DataSourceInfo getDatasourceInfo(String tenantCode) {
@@ -200,6 +208,7 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                     }
                 }
                 dataSourceMap.remove(tenantCode);
+                tenantCodes.remove(tenantCode);
                 eventPublisher.publishRemoveEvent(this, tenantCode);
             }
         }
@@ -220,7 +229,12 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
         synchronized (monitor) {
             //判断是否需要重写
             String tenantCode = config.getTenantCode();
-            if (dataSourceMap.containsKey(tenantCode) && dataSourceInfoMap.containsKey(tenantCode)) {
+
+            if (!dataSourceInfoMap.containsKey(tenantCode)){
+                prepareDataSourceInfo(Collections.singletonList(config));
+            }
+
+            if (dataSourceMap.containsKey(tenantCode)) {
 
                 if (!BooleanUtils.isTrue(config.getEnableOverride())){
                     log.info("[{}]the data source is unsupport to changed",tenantCode);
@@ -247,7 +261,6 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                 return;
             }
 
-            prepareDataSourceInfo(Collections.singletonList(config));
             try {
                 //1.创建数据源
                 DataSource dataSource = createDataSource(config);
@@ -301,6 +314,7 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
                 }
                 //liquibase初始化数据表
                 initializeDataBase(connection);
+                tenantCodes.add(dataSourceInfo.getTenantCode());
                 dataSourceInfoMap.put(dataSourceInfo.getTenantCode(), dataSourceInfo);
                 eventPublisher.publishInitEvent(this, dataSourceInfo.getTenantCode());
             }

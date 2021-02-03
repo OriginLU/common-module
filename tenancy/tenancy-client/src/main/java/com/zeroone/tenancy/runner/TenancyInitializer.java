@@ -2,8 +2,11 @@ package com.zeroone.tenancy.runner;
 
 import com.zeroone.tenancy.api.TenancyRemoteApi;
 import com.zeroone.tenancy.dto.DataSourceInfo;
+import com.zeroone.tenancy.dto.RestResult;
 import com.zeroone.tenancy.properties.TenancyClientConfig;
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 
 import java.util.List;
@@ -13,6 +16,8 @@ import java.util.concurrent.Executors;
 
 public class TenancyInitializer implements SmartInitializingSingleton {
 
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
 
     private final TenantDataSourceProvider provider;
@@ -49,9 +54,15 @@ public class TenancyInitializer implements SmartInitializingSingleton {
 
     private void init() {
         //1.获取有效配置信息进行多租户的初始化
-        List<DataSourceInfo> configs = tenancyRemoteApi.getAvailableConfigInfo();
+        RestResult<List<DataSourceInfo>> configs = tenancyRemoteApi.getAvailableConfigInfo();
+
+        if (!configs.isSuccess()) {
+            throw new IllegalStateException("get tenant data source info error [" + configs.getMessage() + "]");
+        }
+        List<DataSourceInfo> data = configs.getData();
+
         //2.启动默认执行数据库初始化操作
-        provider.prepareDataSourceInfo(configs);
+        provider.prepareDataSourceInfo(data);
     }
 
 
@@ -60,8 +71,18 @@ public class TenancyInitializer implements SmartInitializingSingleton {
      */
     public boolean initTenantDataSource(String tenantCode) {
 
-        DataSourceInfo dataSourceInfo = tenancyRemoteApi.queryDataSource(tenantCode);
-        provider.addDataSource(dataSourceInfo);
+        RestResult<DataSourceInfo> dataSourceInfo = tenancyRemoteApi.queryDataSource(tenantCode);
+
+        if (!dataSourceInfo.isSuccess()) {
+           log.warn("get tenancy data source info error [{}]",dataSourceInfo.getMessage());
+           return false;
+        }
+        DataSourceInfo data = dataSourceInfo.getData();
+        if (data == null){
+            return false;
+        }
+        provider.addDataSource(dataSourceInfo.getData());
+
         return provider.hasDatasource(tenantCode);
     }
 }

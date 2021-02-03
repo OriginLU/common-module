@@ -1,6 +1,9 @@
 package com.zeroone.tenancy.service;
 
 import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zeroone.tenancy.dto.DataSourceInfo;
 import com.zeroone.tenancy.dto.RestResult;
@@ -10,6 +13,7 @@ import com.zeroone.tenancy.enums.DataBaseTypeEnum;
 import com.zeroone.tenancy.enums.DataSourceConfigStatusEnum;
 import com.zeroone.tenancy.proxy.TenancyClientProxy;
 import com.zeroone.tenancy.repository.TenantDataSourceInfoRepository;
+import com.zeroone.tenancy.utils.Reflector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
@@ -18,10 +22,11 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PreDestroy;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author zero-one.lu
@@ -35,13 +40,12 @@ public class TenantDataSourceInfoService implements DisposableBean {
     private final String url = "http://{}:{}/";
 
 
-
     private final ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(3,
             10,
             5,
             TimeUnit.SECONDS,
             new LinkedBlockingDeque<>(),
-            new ThreadFactoryBuilder().setNameFormat("tenancy-server-%s").build(),
+            new ThreadFactoryBuilder().setNameFormat("tenancy-server-%d").build(),
             new ThreadPoolExecutor.AbortPolicy());
 
     @Autowired
@@ -54,12 +58,11 @@ public class TenantDataSourceInfoService implements DisposableBean {
     private TenancyClientProxy tenancyClientProxy;
 
 
-
-    public void saveTenantDataSourceInfo(DataSourceInfo dataSourceInfo){
+    public void saveTenantDataSourceInfo(DataSourceInfo dataSourceInfo) {
 
         TenantDataSourceInfo tenantDataSourceInfo = new TenantDataSourceInfo();
 
-        BeanUtils.copyProperties(dataSourceInfo,tenantDataSourceInfo);
+        BeanUtils.copyProperties(dataSourceInfo, tenantDataSourceInfo);
 
         tenantDataSourceInfo.setCreateTime(new Date());
         tenantDataSourceInfo.setModifyTime(new Date());
@@ -80,13 +83,26 @@ public class TenantDataSourceInfoService implements DisposableBean {
                 String uri = MessageFormatter.format(url, ip, port).toString();
 
 
+                Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
+                        .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                        .withWaitStrategy(WaitStrategies.fixedWait(3, TimeUnit.SECONDS))
+                        .retryIfException()
+                        .build();
+
                 try {
-                    RestResult<Void> restResult = tenancyClientProxy.addDatasource(new URI(uri), dataSourceInfo);
-                    if (!restResult.isSuccess()) {
-                        log.error("notify tenancy client instance [{}] error:[{}]",key,restResult.getMessage());
-                    }
+                    retryer.call(() -> {
+                        try {
+                            RestResult<Void> restResult = tenancyClientProxy.addDatasource(new URI(uri), dataSourceInfo);
+                            if (!restResult.isSuccess()) {
+                                log.error("notify tenancy client instance [{}] error:[{}]", key, restResult.getMessage());
+                            }
+                        } catch (Exception e) {
+                            Reflector.sneakyThrow(e);
+                        }
+                        return null;
+                    });
                 } catch (Exception e) {
-                    log.error("notify tenancy client instance [" + key + "] error",e);
+                    log.error("notify tenancy client instance [" + key + "] error", e);
                 }
             });
         });
@@ -98,14 +114,14 @@ public class TenantDataSourceInfoService implements DisposableBean {
 
         List<TenantDataSourceInfo> tenantDataSourceInfos = tenantDataSourceInfoRepository.findByStateAndTenantCode(DataSourceConfigStatusEnum.ENABLE, tenantCode);
 
-        if (CollectionUtils.isEmpty(tenantDataSourceInfos)){
+        if (CollectionUtils.isEmpty(tenantDataSourceInfos)) {
             return Collections.emptyList();
         }
         List<DataSourceInfo> list = new ArrayList<>();
         tenantDataSourceInfos.forEach(tenantDataSourceInfo -> {
 
             DataSourceInfo dataSourceInfo = new DataSourceInfo();
-            BeanUtils.copyProperties(tenantDataSourceInfo,dataSourceInfo);
+            BeanUtils.copyProperties(tenantDataSourceInfo, dataSourceInfo);
             list.add(dataSourceInfo);
         });
 
@@ -116,11 +132,11 @@ public class TenantDataSourceInfoService implements DisposableBean {
 
         TenantDataSourceInfo tenantDataSourceInfo = tenantDataSourceInfoRepository.findByTenantCodeAndServerNameAndType(tenantCode, serverName, databaseType);
 
-        if (tenantDataSourceInfo == null){
+        if (tenantDataSourceInfo == null) {
             return null;
         }
         DataSourceInfo dataSourceInfo = new DataSourceInfo();
-        BeanUtils.copyProperties(tenantDataSourceInfo,dataSourceInfo);
+        BeanUtils.copyProperties(tenantDataSourceInfo, dataSourceInfo);
         return dataSourceInfo;
     }
 
