@@ -1,6 +1,7 @@
 package com.zeroone.tenancy.proxy;
 
 import com.zeroone.tenancy.dto.DataSourceInfo;
+import com.zeroone.tenancy.dto.RestResult;
 import com.zeroone.tenancy.feign.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,7 @@ public interface TenancyClientProxy {
 
 
     @PostMapping("add-datasource")
-    void addDatasource(URI url, DataSourceInfo dataSourceInfo);
+    RestResult<Void> addDatasource(URI url, DataSourceInfo dataSourceInfo);
 
 
     /**
