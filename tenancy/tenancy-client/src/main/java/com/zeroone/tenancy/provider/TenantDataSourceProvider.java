@@ -10,6 +10,8 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -298,7 +300,7 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
             QueryRunner queryRunner = new QueryRunner();
             for (DataSourceInfo dataSourceInfo : dataSourceInfos) {
 
-                Connection connection = DriverManager.getConnection(dataSourceProperties.getUrl(), dataSourceProperties.getUsername(), dataSourceProperties.getPassword());
+                Connection connection = DriverManager.getConnection(dataSourceInfo.getUrl(), dataSourceInfo.getUsername(), dataSourceInfo.getPassword());
 
                 //判断数据是否存在
                 boolean isAbsent = queryRunner.query(connection,
@@ -308,9 +310,11 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
 
                 if (isAbsent) {
                     //1.创建数据库
-                    queryRunner.execute(connection, MysqlConstants.CREATE_DATABASE_SQL, dataSourceInfo.getDatabase(), MysqlConstants.DEFAULT_CHARSET);
+                    String createDatabaseSql = MessageFormatter.format(MysqlConstants.CREATE_DATABASE_SQL, dataSourceInfo.getDatabase()).getMessage();
+                    queryRunner.execute(connection, createDatabaseSql, MysqlConstants.DEFAULT_CHARSET);
                     //2.设置数据库
-                    queryRunner.execute(connection, MysqlConstants.USE_DATABASE_SQL, dataSourceInfo.getDatabase());
+                    String useDatabaseSql = MessageFormatter.format(MysqlConstants.USE_DATABASE_SQL, dataSourceInfo.getDatabase()).getMessage();
+                    queryRunner.execute(connection, useDatabaseSql);
                 }
                 //liquibase初始化数据表
                 initializeDataBase(connection);

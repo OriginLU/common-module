@@ -21,9 +21,9 @@ public class TenantDataSourceConfigResource  {
     private TenantDataSourceInfoService tenantDataSourceInfoService;
 
 
-    @PostMapping("/tenant/server/{tenantCode}")
-    public RestResult<List<DataSourceInfo>> getActiveDataSourceInfo(@PathVariable("tenantCode") String tenantCode){
-        return RestResult.returnSuccess(tenantDataSourceInfoService.getActiveDataSourceInfo(tenantCode));
+    @GetMapping("/tenant/server/{serverName}")
+    public RestResult<List<DataSourceInfo>> getActiveDataSourceInfo(@PathVariable("serverName") String serverName){
+        return RestResult.returnSuccess(tenantDataSourceInfoService.getActiveDataSourceInfo(serverName));
     }
 
     @PostMapping("save")

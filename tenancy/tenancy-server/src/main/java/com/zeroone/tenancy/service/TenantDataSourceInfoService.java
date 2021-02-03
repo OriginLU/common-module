@@ -80,7 +80,7 @@ public class TenantDataSourceInfoService implements DisposableBean {
                 TenancyMetricsDTO tenancyMetrics = tenantDataSourceMetricsService.getTenancyMetrics(key);
                 String ip = tenancyMetrics.getIp();
                 String port = tenancyMetrics.getPort();
-                String uri = MessageFormatter.format(url, ip, port).toString();
+                String uri = MessageFormatter.format(url, ip, port).getMessage();
 
 
                 Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
@@ -110,9 +110,9 @@ public class TenantDataSourceInfoService implements DisposableBean {
     }
 
 
-    public List<DataSourceInfo> getActiveDataSourceInfo(String tenantCode) {
+    public List<DataSourceInfo> getActiveDataSourceInfo(String serverName) {
 
-        List<TenantDataSourceInfo> tenantDataSourceInfos = tenantDataSourceInfoRepository.findByStateAndTenantCode(DataSourceConfigStatusEnum.ENABLE, tenantCode);
+        List<TenantDataSourceInfo> tenantDataSourceInfos = tenantDataSourceInfoRepository.findByStateAndServerName(DataSourceConfigStatusEnum.ENABLE, serverName);
 
         if (CollectionUtils.isEmpty(tenantDataSourceInfos)) {
             return Collections.emptyList();

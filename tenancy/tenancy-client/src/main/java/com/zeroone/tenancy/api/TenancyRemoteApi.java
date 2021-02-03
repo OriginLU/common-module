@@ -145,7 +145,7 @@ public class TenancyRemoteApi {
 
         @Override
         public String select() {
-            return serverUrl[serverUrl.length % count.incrementAndGet()];
+            return serverUrl[(serverUrl.length - 1) % count.incrementAndGet()];
         }
     }
 

@@ -47,16 +47,20 @@ public class TenancyHealthChecker{
     public void healthCheck(){
 
 
-        Map<String, DatasourceMetrics> metricsMap = tenancyMonitor.getMetricsMap();
-        if (CollectionUtils.isEmpty(metricsMap)){
-            return;
+        try {
+            Map<String, DatasourceMetrics> metricsMap = tenancyMonitor.getMetricsMap();
+            if (CollectionUtils.isEmpty(metricsMap)){
+                return;
+            }
+            //监控数据推送
+            pushTenancyMetrics(metricsMap);
+            //空闲数据移除策略
+            idleCheck(metricsMap);
+            //租户数据源检查刷新
+            refreshDataSource();
+        } catch (Exception e) {
+            log.error("health checker happened error",e);
         }
-        //监控数据推送
-        pushTenancyMetrics(metricsMap);
-        //空闲数据移除策略
-        idleCheck(metricsMap);
-        //租户数据源检查刷新
-        refreshDataSource();
 
     }
 

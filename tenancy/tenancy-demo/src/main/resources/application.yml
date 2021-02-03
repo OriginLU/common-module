@@ -8,7 +8,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: pay
+    name: tenancy-client
 
   profiles:
     active: dev
@@ -36,22 +36,21 @@ spring:
 #    #配置mysql
 #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
-eureka:
-  instance:
-    appname: pay
-    instanceId: pay:${spring.application.instance-id:${random.value}}
-    lease-renewal-interval-in-seconds: 5
-    lease-expiration-duration-in-seconds: 10
-  client:
-    enabled: true
-    fetch-registry: true
-    register-with-eureka: true
-    instance-info-replication-interval-seconds: 10
-    registry-fetch-interval-seconds: 10
+#eureka:
+#  instance:
+#    appname: tenancy-client
+#    instanceId: tenancy-client:${spring.application.instance-id:${random.value}}
+#    lease-renewal-interval-in-seconds: 5
+#    lease-expiration-duration-in-seconds: 10
+#  client:
+#    enabled: true
+#    fetch-registry: true
+#    register-with-eureka: true
+#    instance-info-replication-interval-seconds: 10
+#    registry-fetch-interval-seconds: 10
 
 tenancy:
   client:
-    sync: false
     server-urls:
-      - 10.0.25.101:8090
+      - 127.0.0.1:8888
     retrieve-time: 5
