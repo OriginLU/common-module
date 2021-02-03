@@ -27,10 +27,10 @@ public class TenantDataSourceConfigResource  {
     }
 
     @PostMapping("save")
-    public ResponseEntity<String> save(@Validated DataSourceInfo dataSourceInfo){
+    public RestResult<Void> save(@Validated DataSourceInfo dataSourceInfo){
 
         tenantDataSourceInfoService.saveTenantDataSourceInfo(dataSourceInfo);
-        return ResponseEntity.ok("success");
+        return RestResult.returnSuccess();
     }
 
     @GetMapping("/tenant/{tenantCode}/server/{serverName}/type/{databaseType}")
