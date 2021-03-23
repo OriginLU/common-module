@@ -1,0 +1,30 @@
+server:
+  port: 8889
+
+spring:
+  application:
+    name: @project.artifactId@
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+  main:
+    allow-bean-definition-overriding: true
+
+
+eureka:
+  instance:
+    appname: @project.artifactId@
+    instanceId: @project.artifactId@:${spring.application.instance-id:${random.value}}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+  client:
+    enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    instance-info-replication-interval-seconds: 10
+    registry-fetch-interval-seconds: 10
+    service-url:
+      defaultZone: http://admin:admin123456@127.0.0.1:8761/eureka/
