@@ -6,6 +6,6 @@ import org.springframework.context.annotation.Configuration;
  * @author zero-one.lu
  * @since 2020-12-05
  */
-@Configuration
+//@Configuration
 public class TokenConfig {
 }
