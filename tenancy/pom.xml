@@ -14,7 +14,7 @@
 
     <modules>
         <module>tenancy-client</module>
-        <module>tenancy-demo</module>
+        <module>samples-client</module>
         <module>tenancy-server</module>
         <module>tenancy-model</module>
     </modules>

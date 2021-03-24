@@ -30,25 +30,31 @@
 #            exposure:
 #                include: refresh,health,info,env
 server:
-    port: 53020
+  port: 53020
 spring:
-    application:
-        name: uaa
-#    datasource:
-#        driver-class-name: com.mysql.jdbc.Driver
-#        password: mysql
-#        url: jdbc:mysql://localhost:3306/user_db?useUnicode=true
-#        username: root
-#    freemarker:
-#        charset: UTF-8
-#        content-type: text/html
-#        enabled: true
-#        request-context-attribute: rc
-#        suffix: .html
-    http:
-        encoding:
-            charset: UTF-8
-            enabled: true
-            force: true
-    main:
-        allow-bean-definition-overriding: true
+  application:
+    name: uaa
+  security:
+    user:
+      name: root
+      password: root
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-test-query: select 1
+      connection-init-sql: select 1
+      connection-timeout: 20000
+      max-lifetime: 1200000
+      auto-commit: true
+      idle-timeout: 300000
+    username: root
+    password: 123456
+    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/tenancy-client?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+  main:
+    allow-bean-definition-overriding: true
+
+oauth2:
+  mode: auth-code
