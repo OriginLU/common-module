@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import javax.sql.DataSource;
 
 @Configuration
-@ConditionalOnProperty(prefix = "oauth2", name = "mode", havingValue = "client-jdbc")
+@ConditionalOnProperty(prefix = "oauth2", name = "authorization-mode", havingValue = "jdbc")
 public class JdbcTokenConfiguration {
 
 

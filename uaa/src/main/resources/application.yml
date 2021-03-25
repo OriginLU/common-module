@@ -54,4 +54,5 @@ spring:
     url: jdbc:mysql://internal.mysql.taoqicar.com:3306/test-auth?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
 
 oauth2:
-  mode: client-jdbc
+  authenticate-mode: jdbc
+  authorization-mode: jwt

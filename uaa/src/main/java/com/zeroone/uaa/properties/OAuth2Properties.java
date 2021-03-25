@@ -10,5 +10,13 @@ import org.springframework.context.annotation.Configuration;
 public class OAuth2Properties {
 
 
-   private String mode;
+   /**
+    * 授权集成模式[jwt,jdbc,in-memory]
+    */
+   private String authorizationMode;
+
+   /**
+    * 认证集成模式[jdbc,in-memory]
+    */
+   private String authenticateMode;
 }

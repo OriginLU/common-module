@@ -25,7 +25,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
  */
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
-@ConditionalOnProperty(prefix = "oauth2", name = "mode", havingValue = "auth-code")
+@ConditionalOnProperty(prefix = "oauth2", name = "authenticate-mode", havingValue = "in-memory")
 public class WebSecurityInMemoryConfig extends WebSecurityConfigurerAdapter {
 
 

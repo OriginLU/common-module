@@ -35,7 +35,7 @@ import java.util.Collections;
  */
 @Configuration
 @EnableAuthorizationServer
-@ConditionalOnProperty(prefix = "oauth2",name = "mode",havingValue = "client-jdbc")
+@ConditionalOnProperty(prefix = "oauth2",name = "authorization-mode",havingValue = "jdbc")
 public class JdbcAuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 

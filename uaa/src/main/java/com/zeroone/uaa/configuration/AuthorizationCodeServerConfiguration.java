@@ -36,7 +36,7 @@ import java.util.Collections;
  */
 @Configuration
 @EnableAuthorizationServer
-@ConditionalOnProperty(prefix = "oauth2", name = "mode", havingValue = "auth-code")
+@ConditionalOnProperty(prefix = "oauth2", name = "authorization-mode", havingValue = "in-memory")
 public class AuthorizationCodeServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 

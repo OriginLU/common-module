@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-@ConditionalOnProperty(prefix = "oauth2", name = "mode", havingValue = "client-jdbc")
+@ConditionalOnProperty(prefix = "oauth2", name = "authenticate-mode", havingValue = "jdbc")
 public class UserDetailService implements UserDetailsService {
 
 

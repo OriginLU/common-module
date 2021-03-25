@@ -19,7 +19,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
  */
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
-@ConditionalOnProperty(prefix = "oauth2", name = "mode", havingValue = "client-jdbc")
+@ConditionalOnProperty(prefix = "oauth2", name = "authenticate-mode", havingValue = "jdbc")
 public class WebSecurityJdbcConfig extends WebSecurityConfigurerAdapter {
 
 
