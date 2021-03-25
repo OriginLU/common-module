@@ -59,8 +59,44 @@ public class AuthorizationCodeServerConfiguration extends AuthorizationServerCon
     private AuthorizationCodeServices authorizationCodeServices;
 
 
+
+    /**
+     * 令牌管理服务
+     */
+    @Bean
+    public AuthorizationServerTokenServices authorizationServerTokenServices() {
+
+        DefaultTokenServices service = new DefaultTokenServices();
+        service.setClientDetailsService(clientDetailsService);//客户端详情服务
+        //支持刷新令牌
+        service.setSupportRefreshToken(true);
+        //令牌存储策略使用内存储存
+        service.setTokenStore(tokenStore);
+        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
+        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
+        return service;
+    }
+
+
+    /**
+     * 授权码存储方案
+     */
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices() {
+        return new InMemoryAuthorizationCodeServices();
+    }
+
+    /**
+     * 内存存储token
+     */
+    @Bean
+    public TokenStore tokenStore() {
+        return new InMemoryTokenStore();
+    }
+
+
     @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    public void configure(AuthorizationServerSecurityConfigurer security){
 
         security.tokenKeyAccess("permitAll()")
                 .checkTokenAccess("permitAll()")
@@ -98,38 +134,5 @@ public class AuthorizationCodeServerConfiguration extends AuthorizationServerCon
     }
 
 
-    /**
-     * 令牌管理服务
-     */
-    @Bean
-    public AuthorizationServerTokenServices authorizationServerTokenServices() {
-
-        DefaultTokenServices service = new DefaultTokenServices();
-        service.setClientDetailsService(clientDetailsService);//客户端详情服务
-        //支持刷新令牌
-        service.setSupportRefreshToken(true);
-        //令牌存储策略使用内存储存
-        service.setTokenStore(tokenStore);
-        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
-        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
-        return service;
-    }
-
-
-    /**
-     * 授权码存储方案
-     */
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        return new InMemoryAuthorizationCodeServices();
-    }
-
-    /**
-     * 内存存储token
-     */
-    @Bean
-    public TokenStore tokenStore() {
-        return new InMemoryTokenStore();
-    }
 
 }

@@ -24,20 +24,19 @@
 #            springframework:
 #                web: info
 #        root: debug
-#management:
-#    endpoints:
-#        web:
-#            exposure:
-#                include: refresh,health,info,env
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health,info,env
 server:
   port: 53020
 spring:
   application:
     name: uaa
-  security:
-    user:
-      name: root
-      password: root
+  main:
+    allow-bean-definition-overriding: true
+
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.jdbc.Driver
@@ -52,9 +51,7 @@ spring:
       idle-timeout: 300000
     username: root
     password: 123456
-    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/tenancy-client?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
-  main:
-    allow-bean-definition-overriding: true
+    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/test-auth?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
 
 oauth2:
-  mode: auth-code
+  mode: client-jdbc

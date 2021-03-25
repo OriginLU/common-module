@@ -1,6 +1,7 @@
 package com.zeroone.uaa.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -40,14 +42,6 @@ public class JdbcAuthorizationServerConfiguration extends AuthorizationServerCon
     @Autowired
     private ClientDetailsService clientDetailsService;
 
-
-    @Autowired
-    private JwtAccessTokenConverter jwtAccessTokenConverter;
-
-
-    @Autowired
-    private TokenStore tokenStore;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -60,6 +54,8 @@ public class JdbcAuthorizationServerConfiguration extends AuthorizationServerCon
     private AuthorizationCodeServices authorizationCodeServices;
 
 
+
+
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 
@@ -70,24 +66,13 @@ public class JdbcAuthorizationServerConfiguration extends AuthorizationServerCon
     }
 
 
-
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-//        clients.withClientDetails(clientDetailsService);
-
-                clients.inMemory()// 使用in-memory存储
-                .withClient("c1")// client_id
-                .secret(new BCryptPasswordEncoder().encode("secret"))//客户端密钥
-                .resourceIds("res1")//资源列表
-                .authorizedGrantTypes("authorization_code", "password","client_credentials","implicit","refresh_token")// 该client允许的授权类型authorization_code,password,refresh_token,implicit,client_credentials
-                .scopes("all")// 允许的授权范围
-                .autoApprove(false)//false跳转到授权页面
-                //加上验证回调地址
-                .redirectUris("http://www.baidu.com");
+        clients.withClientDetails(clientDetailsService);
     }
 
     @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints)  {
        endpoints.allowedTokenEndpointRequestMethods(HttpMethod.POST)
                .authenticationManager(authenticationManager)
                .tokenServices(authorizationServerTokenServices)
@@ -95,60 +80,12 @@ public class JdbcAuthorizationServerConfiguration extends AuthorizationServerCon
     }
 
 
-    @Bean
-    public ClientDetailsService clientDetailsService(DataSource dataSource) {
-        JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
-        clientDetailsService.setPasswordEncoder(new BCryptPasswordEncoder());
-        return clientDetailsService;
-    }
-
-    //令牌管理服务
-    @Bean
-    public AuthorizationServerTokenServices tokenService() {
-        DefaultTokenServices service = new DefaultTokenServices();
-        service.setClientDetailsService(clientDetailsService);//客户端详情服务
-        //支持刷新令牌
-        service.setSupportRefreshToken(true);
-        //令牌存储策略 使用jwt还是
-        service.setTokenStore(tokenStore);
-        //令牌增强
-        TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(jwtAccessTokenConverter));
-        service.setTokenEnhancer(tokenEnhancerChain);
-
-        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
-        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
-        return service;
-    }
 
 
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
-        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
-    }
 
 
-    /**
-     * oauth2.0token 持久化服务使用，数据库保存
-     */
-//    @Bean
-//    public TokenStore tokenStore(DataSource dataSource){
-//        return new JdbcTokenStore(dataSource);
-//    }
 
 
-    /**
-     * 使用jwt做token持久化服务，token无需存储
-     */
-    @Bean
-    public TokenStore tokenStore(JwtAccessTokenConverter accessTokenConverter) {
-        return new JwtTokenStore(accessTokenConverter);
-    }
 
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        jwtAccessTokenConverter.setSigningKey("1234567890");
-        return jwtAccessTokenConverter;
-    }
+
 }

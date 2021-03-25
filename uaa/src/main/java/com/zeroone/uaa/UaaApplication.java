@@ -2,7 +2,9 @@ package com.zeroone.uaa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * @author zero-one.lu
@@ -12,10 +14,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 //@EnableDiscoveryClient
 //@EnableHystrix
 //@EnableFeignClients
+@EntityScan("com.zeroone.uaa.entity")
+@EnableJpaRepositories
 @EnableConfigurationProperties
-public class UaaApplicatioin {
+public class UaaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UaaApplicatioin.class,args);
+        SpringApplication.run(UaaApplication.class,args);
     }
 }
