@@ -19,6 +19,10 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import javax.sql.DataSource;
 import java.util.Collections;
 
+/**
+ * <p>token endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.TokenEndpoint}</p>
+ * <p>Authorization endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}</p>
+ */
 @Configuration
 @ConditionalOnProperty(prefix = "oauth2", name = "authorization-mode", havingValue = "jwt")
 public class JwtTokenConfiguration {

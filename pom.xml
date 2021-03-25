@@ -21,6 +21,7 @@
         <module>uaa</module>
         <module>agent</module>
         <module>gateway</module>
+        <module>uaa-authorization</module>
     </modules>
 
     <properties>

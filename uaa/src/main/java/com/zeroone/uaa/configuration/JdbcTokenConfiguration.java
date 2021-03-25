@@ -16,6 +16,10 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
 import javax.sql.DataSource;
 
+/**
+ * <p>token endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.TokenEndpoint}</p>
+ * <p>Authorization endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}</p>
+ */
 @Configuration
 @ConditionalOnProperty(prefix = "oauth2", name = "authorization-mode", havingValue = "jdbc")
 public class JdbcTokenConfiguration {

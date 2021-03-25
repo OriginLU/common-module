@@ -30,6 +30,8 @@ import java.util.Collections;
 
 /**
  * 客户端模式[token存储方案：jdbc]
+ * <p>token endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.TokenEndpoint}</p>
+ * <p>Authorization endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}</p>
  * @author zero-one.lu
  * @since 2020-12-05
  */

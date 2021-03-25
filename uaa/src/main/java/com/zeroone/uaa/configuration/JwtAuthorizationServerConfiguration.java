@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 
 /**
  * 客户端模式[jwt 无需客户端存储]
+ * <p>token endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.TokenEndpoint}</p>
+ * <p>Authorization endpoint @see {@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}</p>
  * @author zero-one.lu
  * @since 2020-12-05
  */
