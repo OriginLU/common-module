@@ -70,7 +70,7 @@ public class TenantDataSourceProvider implements SmartInitializingSingleton, Dis
     /**
      * datasource默认bean名称
      */
-    private String beanName;
+    private final String beanName;
 
     /**
      * liquibase配置
