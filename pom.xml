@@ -23,6 +23,7 @@
         <module>gateway</module>
         <module>uaa-authorization</module>
         <module>designer</module>
+        <module>log</module>
     </modules>
 
     <properties>
