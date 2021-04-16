@@ -1,5 +1,6 @@
 package com.zeroone.log.aspect;
 
+import com.zeroone.log.utils.Requests;
 import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,8 +14,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class AutoLoggerAspect {
                         logEntity.setUserAgent(Optional.ofNullable(request.getHeader("user-agent")).orElse(""));
                         logEntity.setIp(request.getRemoteAddr());
                         logEntity.setHeaders(getHeadersInfo(request));
-                        logEntity.setRealIp(getIpAddress(request));
+                        logEntity.setRealIp(Requests.getIpAddress(request));
                     });
 
             //类名
@@ -109,38 +108,6 @@ public class AutoLoggerAspect {
         return result == null ? "<>" : StringUtils.abbreviate(result.toString(), 1500);
     }
 
-    /**
-     * 获取用户真实ip
-     */
-    private static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-            if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-                //根据网卡取本机配置的IP
-                InetAddress inet = null;
-                try {
-                    inet = InetAddress.getLocalHost();
-                } catch (UnknownHostException e) {
-                    log.error("");
-                }
-                ip = inet == null ? null : inet.getHostAddress();
-            }
-        }
-        return ip;
-    }
 
     /**
      * 获取异常信息
