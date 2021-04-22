@@ -7,8 +7,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
-@EnableTenancyClient
-@EnableDiscoveryClient
+//@EnableTenancyClient
+//@EnableDiscoveryClient
 //@EnableEurekaClient
 public class TenancyApplication {
 
