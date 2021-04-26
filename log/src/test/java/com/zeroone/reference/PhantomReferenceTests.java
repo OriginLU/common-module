@@ -19,8 +19,8 @@ public class PhantomReferenceTests {
 
         Reference<?> poll = referenceQueue.poll();
         bytes = null;
-        System.out.println("before invoke gc，reference queue has value? " + (poll != null? "yes": "no"));
-        System.out.println("before invoke gc，reference value? " + phantomReference.get());
+        System.out.println("before invoke gc,reference queue has value? " + (poll != null? "yes": "no"));
+        System.out.println("before invoke gc,reference value? " + phantomReference.get());
         System.gc();
 
         Thread.sleep(1000L);
