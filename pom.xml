@@ -26,6 +26,10 @@
         <module>log</module>
         <module>raft</module>
         <module>test</module>
+        <module>tcc</module>
+        <module>seata</module>
+        <module>himly-from</module>
+        <module>himly-account-from</module>
     </modules>
 
     <properties>
