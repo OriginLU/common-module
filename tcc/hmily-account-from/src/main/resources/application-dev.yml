@@ -1,0 +1,36 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://admin:admin@127.0.0.1:8761/eureka/
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:config/liquibase/master.xml
+    contexts: local
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/from-account?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+
+org:
+  dromara:
+    hmily:
+      serializer: kryo
+      #定时任务延迟时间（单位是秒，默认120，这个参数只是大于你的rpc的超时时间）
+      recoverDelayTime: 128
+      # 最大重试次数，默认3次，当你服务down机，定时任务会执行retryMax次数取执行你的cancel还是confirm
+      # bufferSize：disruptor的bufferSize
+      retryMax: 30
+      scheduledDelay: 128
+      scheduledThreadMax: 10
+      repositorySupport: db
+      #发起方为true，参与方为false
+      started: true
+      hmilyDbConfig:
+        driverClassName: com.mysql.jdbc.Driver
+        username: root
+        password: 123456
+        url: jdbc:mysql://internal.mysql.taoqicar.com:3306/tcc?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8

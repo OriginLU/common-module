@@ -12,8 +12,8 @@
     <artifactId>tcc</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>himly-account-from</module>
-        <module>himly-account-to</module>
+        <module>hmily-account-from</module>
+        <module>hmily-account-to</module>
     </modules>
 
     <properties>
@@ -21,6 +21,14 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
+
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -46,6 +54,21 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hmily-spring-boot-starter-springcloud</artifactId>
+            <version>2.0.6-RELEASE</version>
+        </dependency>
+
+
+
     </dependencies>
 
 
