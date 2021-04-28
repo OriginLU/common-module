@@ -9,7 +9,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   application:
-    name: to-account
+    name: seata-account-to
 
   profiles:
     active: dev
@@ -44,8 +44,8 @@ spring:
 
 eureka:
   instance:
-    appname: to-account
-    instanceId: to-account:${spring.application.instance-id:${random.value}}
+    appname: seata-account-to
+    instanceId: seata-account-to:${spring.application.instance-id:${random.value}}
     lease-renewal-interval-in-seconds: 5
     lease-expiration-duration-in-seconds: 10
   client:
