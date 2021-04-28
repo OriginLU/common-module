@@ -1,0 +1,38 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://admin:admin@127.0.0.1:8761/eureka/
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:config/liquibase/master.xml
+    contexts: local
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/to-account?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+
+seata:
+  enabled: true
+  application-id: seata-account-to
+  tx-service-group: my_test_tx_group    #此处配置自定义的seata事务分组名称
+  enable-auto-data-source-proxy: true    #开启数据库代理
+  config:
+    type: nacos
+    nacos:
+      namespace:
+      server-addr: 10.0.25.7:8848
+      group: SEATA_GROUP
+      username: nacos
+      password: nacos
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 10.0.25.7:8848
+      namespace:
+      username: nacos
+      password: nacos
