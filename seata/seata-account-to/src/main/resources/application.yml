@@ -41,17 +41,9 @@ spring:
       properties:
         recovery:
           forget-orphaned-log-entries-delay:
-
-eureka:
-  instance:
-    appname: seata-account-to
-    instanceId: seata-account-to:${spring.application.instance-id:${random.value}}
-    lease-renewal-interval-in-seconds: 5
-    lease-expiration-duration-in-seconds: 10
-  client:
-    enabled: true
-    fetch-registry: true
-    register-with-eureka: true
-    instance-info-replication-interval-seconds: 10
-    registry-fetch-interval-seconds: 10
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 10.0.25.7:8848
+        group: SEATA_GROUP
 

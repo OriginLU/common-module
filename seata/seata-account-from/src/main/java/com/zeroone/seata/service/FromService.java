@@ -23,7 +23,7 @@ public class FromService {
 
 
 
-    @GlobalTransactional
+    @GlobalTransactional(name = "my_test_tx_group")
     @Transactional(rollbackFor = Exception.class)
     public void tryUpdate(Long id,Long transMoney,Long toId){
 

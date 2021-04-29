@@ -17,7 +17,7 @@ public class ToService {
     private AccountRepository accountRepository;
 
 
-    @GlobalTransactional
+    @GlobalTransactional(name = "my_test_tx_group")
     @Transactional(rollbackFor = Exception.class)
     public void tryUpdate(Long id,Long transMoney){
         if (accountRepository.updateBalance(id,transMoney) <= 0) {
