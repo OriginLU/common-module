@@ -28,6 +28,7 @@
         <module>test</module>
         <module>tcc</module>
         <module>seata</module>
+        <module>rocketmq-transaction</module>
     </modules>
 
     <properties>

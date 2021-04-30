@@ -1,0 +1,10 @@
+rocketmq:
+  producer:
+   group: producer_bank1
+  name-server: 127.0.0.1:9876
+
+spring:
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://internal.mysql.taoqicar.com:3306/to-account?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8

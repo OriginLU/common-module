@@ -20,9 +20,11 @@ seata:
   application-id: seata-account-to
   tx-service-group: my_test_tx_group    #此处配置自定义的seata事务分组名称
   enable-auto-data-source-proxy: true    #开启数据库代理
+# 配置为file.conf需要配置seata的连接地址
 #  service:
 #    grouplist:
 #      default: 10.0.25.7:8091
+#配置从nacos中取需要和seata-server保持一致
   config:
     type: nacos
     nacos:
