@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
-@RocketMQTransactionListener(rocketMQTemplateBeanName = "producer_group_txmsg_bank1")
+@RocketMQTransactionListener(txProducerGroup = "producer_group_txmsg_bank1")
 public class ProducerTxListener implements RocketMQLocalTransactionListener {
 
     @Autowired

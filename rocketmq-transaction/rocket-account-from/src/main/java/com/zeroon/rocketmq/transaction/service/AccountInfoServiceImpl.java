@@ -45,7 +45,7 @@ public class AccountInfoServiceImpl implements AccountInfoService {
          * Message<?> message, 消息内容
          * Object arg 参数
          */
-        rocketMQTemplate.sendMessageInTransaction("producer_group_txmsg_bank1",message,null);
+        rocketMQTemplate.sendMessageInTransaction("producer_group_txmsg_bank1","topic_txmsg",message,null);
  
     }
  
