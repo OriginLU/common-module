@@ -29,6 +29,7 @@
         <module>tcc</module>
         <module>seata</module>
         <module>rocketmq-transaction</module>
+        <module>cloud-hystrix</module>
     </modules>
 
     <properties>
