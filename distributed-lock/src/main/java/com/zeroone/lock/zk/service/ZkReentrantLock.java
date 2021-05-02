@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 /**
+ * 采用临时顺序节点避免羊群效应
  * @author zero-one.lu
  * @since 2021-05-02
  */
@@ -111,17 +112,16 @@ public class ZkReentrantLock implements Lock {
 
         try {
 
+            //尝试加锁
             if (tryLock()) {
                 return;
             }
-
+            //尝试取锁
             for (;;) {
                 //等待加锁
                 await(DEFAULT_WAIT_TIME_SECOND,TimeUnit.SECONDS);
-                //获取排队列表
-                List<String> waiters = getWaiters();
                 //检查加锁情况
-                if (isLocked(waiters)) {
+                if (isLocked(getWaiters())) {
                     return;
                 }
             }
