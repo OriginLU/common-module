@@ -1,7 +1,7 @@
 rocketmq:
   producer:
    group: producer_bank1
-  name-server: 127.0.0.1:9876
+  name-server: 10.0.25.169:9876
 
 spring:
   datasource:
