@@ -73,6 +73,7 @@
         <maven-resource-plugins.version>3.1.0</maven-resource-plugins.version>
         <javassist.version>3.26.0-GA</javassist.version>
         <byte.buddy.version>1.10.18</byte.buddy.version>
+        <redisson.version>3.15.4</redisson.version>
     </properties>
 
     <!-- 管理依赖版本号,子项目不会默认依赖 -->
@@ -301,6 +302,13 @@
                 <artifactId>reflections</artifactId>
                 <version>0.9.11</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>
