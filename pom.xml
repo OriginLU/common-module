@@ -44,7 +44,7 @@
         <jwt.token.version>0.10.5</jwt.token.version>
         <google.guava.version>30.0-jre</google.guava.version>
         <mysql.driver.version>5.1.47</mysql.driver.version>
-        <http.client.version>4.5</http.client.version>
+        <http.client.version>4.5.13</http.client.version>
         <spring.boot.dependencies.version>2.3.9.RELEASE</spring.boot.dependencies.version>
         <alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
         <mybatis.starter.version>2.0.1</mybatis.starter.version>
