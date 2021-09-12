@@ -50,7 +50,7 @@
         <mybatis.starter.version>2.0.1</mybatis.starter.version>
         <common.lang3.version>3.4</common.lang3.version>
         <common.collections.version>3.2.2</common.collections.version>
-        <common.io.version>2.2</common.io.version>
+        <common.io.version>2.7</common.io.version>
         <slf4j.api.version>1.7.7</slf4j.api.version>
         <lombok.version>1.18.20</lombok.version>
         <junit.version>4.12</junit.version>
