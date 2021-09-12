@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.spi;
+package com.zeroone.tenancy.hibernate.database.spi;
 
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
@@ -11,7 +11,7 @@ import java.util.Optional;
  *     spring:
  *       jpa:
  *         properties:
- *       hibernate.tenant_identifier_resolver: com.zeroone.tenancy.hibernate.spi.CustomMultiTenantIdentifierResolver
+ *       hibernate.tenant_identifier_resolver: com.zeroone.tenancy.hibernate.database.spi.CustomMultiTenantIdentifierResolver
  * </pre>
  * hibernate tenant Identifier
  * 租户id获取方法

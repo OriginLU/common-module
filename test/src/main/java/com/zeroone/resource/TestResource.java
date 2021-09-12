@@ -1,9 +1,13 @@
 package com.zeroone.resource;
 
-import com.zeroone.bean.LazyService;
+import com.zeroone.entity.Xa01;
+import com.zeroone.service.XaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author zero-one.lu
@@ -15,10 +19,18 @@ public class TestResource {
 
 
     @Autowired
-    private LazyService lazyService;
+    private XaService xaService;
 
     @GetMapping("test")
-    public void test(){
-        lazyService.say0();
+    public List<Xa01> test(){
+        return xaService.findAll();
     }
+
+
+    @GetMapping("test1")
+    public Page<Xa01> test1(){
+        return xaService.findSpecification();
+    }
+
+
 }

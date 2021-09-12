@@ -1,4 +1,4 @@
-package com.zeroone.tenancy.hibernate.spi;
+package com.zeroone.tenancy.hibernate.database.spi;
 
 import com.zeroone.tenancy.provider.TenantDataSourceProvider;
 import com.zeroone.tenancy.utils.TenantIdentifierHelper;
@@ -12,7 +12,7 @@ import javax.sql.DataSource;
  *     spring:
  *       jpa:
  *        properties:
- *         hibernate.tenant_identifier_resolver: com.zeroone.tenancy.hibernate.spi.CustomMultiTenantConnectionProvider
+ *         hibernate.tenant_identifier_resolver: com.zeroone.tenancy.hibernate.database.spi.CustomMultiTenantConnectionProvider
  * </pre>
  * hibernate tenant spi implementations
  * 数据源选取
