@@ -53,7 +53,7 @@
         <common.io.version>2.2</common.io.version>
         <slf4j.api.version>1.7.7</slf4j.api.version>
         <lombok.version>1.18.20</lombok.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
         <mybatis.plus.version>3.2.0</mybatis.plus.version>
         <mybatis.generator.version>3.2.0</mybatis.generator.version>
