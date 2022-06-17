@@ -46,7 +46,7 @@
         <mysql.driver.version>5.1.47</mysql.driver.version>
         <http.client.version>4.5</http.client.version>
         <spring.boot.dependencies.version>2.3.9.RELEASE</spring.boot.dependencies.version>
-        <alibaba.fastjson.version>1.2.58</alibaba.fastjson.version>
+        <alibaba.fastjson.version>1.2.83</alibaba.fastjson.version>
         <mybatis.starter.version>2.0.1</mybatis.starter.version>
         <common.lang3.version>3.4</common.lang3.version>
         <common.collections.version>3.2.2</common.collections.version>
